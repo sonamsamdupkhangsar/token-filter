@@ -17,3 +17,5 @@ management:
 server:
   #  port: 8080
   port: 9001
+
+permitPaths: /api/health/readiness
