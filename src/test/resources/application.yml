@@ -19,3 +19,14 @@ server:
   port: 9001
 
 permitPaths: /api/health/readiness
+jwt-rest-service-public-key-id: http://localhost:{port}/jwt-rest-service/publickeys/{keyId}
+
+jwt:
+  secret: mysecret
+  issuer: https://www.sonam.cloud
+
+spring:
+  r2dbc:
+    url: r2dbc:h2:mem:///contentitem?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    name: sa
+    password:
