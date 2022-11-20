@@ -17,21 +17,21 @@ import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.*;
 
+/**
+ * This class will create a JWT string token.
+ * User needs to call the interface method {@code #createJwtKey method} with the params.
+ * The user params are set in the JWT header such as 'groups', 'clientId', and 'keyId'.
+ */
 @Service
 public class PublicKeyJwtCreator implements JwtCreator {
 
     private static final Logger LOG = LoggerFactory.getLogger(PublicKeyJwtCreator.class);
-
-    @Value("${jwt.secret}")
-    private String secret;
 
     @Value("${jwt.issuer}")
     private String issuer;
 
     @Autowired
     private JwtKeyRepository jwtKeyRepository;
-
-    static final String TOKEN_PREFIX = "Bearer";
 
     public PublicKeyJwtCreator() {
     }
@@ -54,8 +54,6 @@ public class PublicKeyJwtCreator implements JwtCreator {
 
     @Override
     public Mono<String> create(String clientId, String groupNames, String subject, String audience, int calendarField, int calendarValue) {
-        LOG.info("issuer: {}, secret: {}", issuer, secret);
-
         checkForKey();
 
         return jwtKeyRepository.findTop1ByRevokedIsFalse().flatMap(jwtKey -> {

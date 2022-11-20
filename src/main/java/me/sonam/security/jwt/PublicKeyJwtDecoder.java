@@ -25,6 +25,12 @@ import java.security.KeyFactory;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
 
+/**
+ * This class will decode a JWT token in string form.  It will build the
+ * OAuth2 JWT token form and retrun to the caller.
+ * This implementation of {@link ReactiveJwtDecoder} is used by {@link me.sonam.security.AuthenticationManager}
+ * for decoding a string JWT token and returning a OAuth2 JWT token type.
+ */
 @Component
 public class PublicKeyJwtDecoder implements ReactiveJwtDecoder  {
     private static final Logger LOG = LoggerFactory.getLogger(PublicKeyJwtDecoder.class);
