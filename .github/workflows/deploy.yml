@@ -24,6 +24,8 @@ jobs:
 
       - name: Build with Maven
         run: mvn -B test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate JaCoCo Badge
         uses: cicirello/jacoco-badge-generator@v2
