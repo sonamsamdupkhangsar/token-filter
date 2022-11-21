@@ -37,7 +37,6 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
 
         return jwtDecoder.decode(authToken).map(jwt -> {
             LOG.info("returning UsernamePasswordAuthenticationToken: jwt.subject: {}", jwt.getSubject());
-            //List<String> rolesMap = claims.get("role", List.class);
             List<GrantedAuthority> list = new ArrayList<>();
             list.add(new SimpleGrantedAuthority("API_ACCESS"));
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
