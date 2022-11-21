@@ -23,11 +23,6 @@ jobs:
           distribution: 'adopt'
 
 
-      - name: Generate JaCoCo Badge
-        uses: cicirello/jacoco-badge-generator@v2
-        with:
-          generate-branches-badge: true
-
       - name: Publish package
         run: mvn --batch-mode deploy
         env:
