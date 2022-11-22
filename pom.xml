@@ -141,17 +141,6 @@
             <url>https://maven.pkg.github.com/sonamsamdupkhangsar/jwt-spring-security</url>
         </repository>
     </distributionManagement>
-    <repositories>
-        <repository>
-            <id>githubrepo_jwt-issuer</id>
-            <name>GitHub OWNER Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/sonamsamdupkhangsar/jwt-issuer</url>
 
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
 
 </project>
