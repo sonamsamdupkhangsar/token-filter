@@ -40,14 +40,14 @@ public class PublicKeyJwtDecoder implements ReactiveJwtDecoder  {
 
     public PublicKeyJwtDecoder(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.build();
-        LOG.info("initialized webClient: {}", webClient);
+        LOG.trace("initialized webClient: {}", webClient);
     }
 
     @Override
     public Mono<Jwt> decode(String jwtToken) throws org.springframework.security.oauth2.jwt.JwtException {
         return getKeyId(jwtToken)
                 .flatMap(uuid -> {
-                    LOG.info("keyId: {}", uuid);
+                    LOG.trace("keyId: {}", uuid);
                     if(keyMap.get(uuid) == null) {
                         return getPublicKeyFromRestService(uuid);
                     }
@@ -62,7 +62,7 @@ public class PublicKeyJwtDecoder implements ReactiveJwtDecoder  {
     }
 
     public Mono<Jwt> validate(String jwt, Key publicKey) {
-        LOG.info("jwt: {}", jwt);
+        LOG.debug("validate jwt: {}", jwt);
 
         if (jwt == null || jwt.isEmpty()) {
             LOG.error("cannot authenticate a null jwt token");
@@ -78,7 +78,7 @@ public class PublicKeyJwtDecoder implements ReactiveJwtDecoder  {
             Date expirationDate = claims.getExpiration();
 
             if (expirationDate == null) {
-                LOG.info("no expiration date, jwt is valid");
+                LOG.debug("no expiration date, jwt is valid");
                 return getJwt(jwsHeader, claims);
             }
             else {
@@ -139,19 +139,19 @@ public class PublicKeyJwtDecoder implements ReactiveJwtDecoder  {
     }
 
     public Mono<UUID> getKeyId(String jwtToken) {
-        LOG.info("getKeyId for jwtToken by marshaling string to SonamsJwtHeader class");
+        LOG.debug("getKeyId for jwtToken by marshaling string to SonamsJwtHeader class");
         Base64.Decoder decoder = Base64.getUrlDecoder();
 
         String[] chunks = jwtToken.split("\\.");
 
         String header = new String(decoder.decode(chunks[0]));
-        LOG.info("header: {}", header);
+        LOG.debug("header: {}", header);
 
         ObjectMapper mapper = new ObjectMapper();
 
         try {
             SonamsJwtHeader sonamsJwtHeader = mapper.readValue(header, SonamsJwtHeader.class);
-            LOG.info("returning keyId: {}", sonamsJwtHeader.getKeyId());
+            LOG.debug("returning keyId: {}", sonamsJwtHeader.getKeyId());
             return Mono.just(sonamsJwtHeader.getKeyId());
         } catch (JsonProcessingException e) {
             LOG.error("failed to convert header to sonams jwt header", e);
@@ -161,14 +161,14 @@ public class PublicKeyJwtDecoder implements ReactiveJwtDecoder  {
     }
 
     private Mono<Key> getPublicKeyFromRestService(UUID keyId) {
-        LOG.info("get publicKey for keyId");
+        LOG.debug("get publicKey for keyId");
 
         final String keyIdString = jwtRestServicePublicKeyId.replace("{keyId}", keyId.toString());
 
         WebClient.ResponseSpec spec = webClient.get().uri(keyIdString).retrieve();
 
         return spec.bodyToMono(String.class).map(string -> {
-            LOG.info("public key string retrieved {}", string);
+            LOG.debug("public key string retrieved {}", string);
             return loadPublicKey(string);
         }).onErrorResume(throwable -> {
             LOG.error("failed to get public key string", throwable);

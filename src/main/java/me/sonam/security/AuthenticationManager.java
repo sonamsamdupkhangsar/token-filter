@@ -27,7 +27,7 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
     private ReactiveJwtDecoder jwtDecoder;
 
     public AuthenticationManager() {
-        LOG.info("instantiating authenticationManager");
+        LOG.debug("instantiating authenticationManager");
     }
 
     @Override
@@ -36,7 +36,7 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
         String authToken = authentication.getCredentials().toString();
 
         return jwtDecoder.decode(authToken).map(jwt -> {
-            LOG.info("returning UsernamePasswordAuthenticationToken: jwt.subject: {}", jwt.getSubject());
+            LOG.debug("returning UsernamePasswordAuthenticationToken: jwt.subject: {}", jwt.getSubject());
             List<GrantedAuthority> list = new ArrayList<>();
             list.add(new SimpleGrantedAuthority("API_ACCESS"));
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =

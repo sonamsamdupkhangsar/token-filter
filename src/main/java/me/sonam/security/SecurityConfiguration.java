@@ -29,7 +29,7 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityWebFilterChain securitygWebFilterChain(ServerHttpSecurity http) {
-        LOG.info("permitPaths.length: {}, permitPaths: {}", permitPaths.length, permitPaths);
+        LOG.debug("permitPaths.length: {}, permitPaths: {}", permitPaths.length, permitPaths);
         return http
                 .exceptionHandling()
                 .authenticationEntryPoint((swe, e) ->

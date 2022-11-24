@@ -29,7 +29,7 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 
     @Override
     public Mono<SecurityContext> load(ServerWebExchange swe) {
-        LOG.info("security context load check");
+        LOG.debug("security context load check");
 
         return Mono.justOrEmpty(swe.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
                 .filter(authHeader -> authHeader.startsWith("Bearer "))
