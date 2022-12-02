@@ -10,6 +10,7 @@ import java.util.UUID;
  */
 @Getter
 public class SonamsJwtHeader {
+    private String clientUserRole;
     private String groups;
     private String clientId;
     private UUID keyId;
@@ -22,7 +23,8 @@ public class SonamsJwtHeader {
     @Override
     public String toString() {
         return "SonamsJwtHeader{" +
-                "groups='" + groups + '\'' +
+                "clientUserRole='" + clientUserRole + '\'' +
+                ", groups='" + groups + '\'' +
                 ", clientId='" + clientId + '\'' +
                 ", keyId=" + keyId +
                 ", alg='" + alg + '\'' +

@@ -119,6 +119,7 @@ public class PublicKeyJwtDecoder implements ReactiveJwtDecoder  {
                 Map.of("alg", jwsHeader.getAlgorithm(),
                         "groups", jwsHeader.get("groups"),
                         "clientId", jwsHeader.get("clientId"),
+                        "clientUserRole", jwsHeader.get("clientUserRole"),
                         "keyId", UUID.fromString(jwsHeader.get("keyId").toString())),
                 Map.of("sub", claims.getSubject(),
                         "aud", claims.getAudience(),

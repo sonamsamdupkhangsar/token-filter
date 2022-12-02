@@ -107,8 +107,9 @@ public class JwtValidation {
         mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(jwtKey.getPublicKey()));
 
         final String clientId = "sonam-123-322";
+        final String clientUserRole = "admin";
         final String groups = "Admin, Cameramen, Driver, foodballer";
-        Mono<String> jwtTokenString = jwtCreator.create(clientId, groups, "sonam-username", "https://sonam.cloud", Calendar.HOUR, 5);
+        Mono<String> jwtTokenString = jwtCreator.create(clientUserRole, clientId, groups, "sonam-username", "https://sonam.cloud", Calendar.HOUR, 5);
 
         Mono<Jwt> jwtMono = jwtTokenString.flatMap(token -> rPublicKeyJwtDecoder.decode(token));
 
@@ -128,6 +129,7 @@ public class JwtValidation {
             LOG.info("jwt.subject: {}", jwt.getSubject());
             LOG.info("jwt.issuer: {}", jwt.getIssuer().toString());
             LOG.info("jwt.clientId: {}", jwt.getHeaders().get("clientId"));
+            LOG.info("jwt.clientUserRole: {}", jwt.getHeaders().get("clientUserRole"));
             LOG.info("jwt.groups: {}", jwt.getHeaders().get("groups"));
             LOG.info("jwt.keyId: {}", jwt.getHeaders().get("keyId"));
             LOG.info("jwt.headers: {}", jwt.getHeaders().toString());
@@ -142,6 +144,7 @@ public class JwtValidation {
             LOG.info("claims: {}", jwt.getClaims());
 
             assertThat(jwt.getHeaders().get("clientId")).isEqualTo(clientId);
+            assertThat(jwt.getHeaders().get("clientUserRole")).isEqualTo(clientUserRole);
             assertThat(jwt.getHeaders().get("groups")).isEqualTo(groups);
             assertThat(jwt.getHeaders().get("keyId")).isEqualTo(jwtKey.getId());
 
