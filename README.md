@@ -11,10 +11,27 @@ This library is used for securing access to a web based application by requiring
   
  ## Token Validator
  Token validators should use the library provided here for securing web app.
- 
 
  ## Building package
  `mvn -s settings.xml clean package`
  Use the settings.xml file included and specify the personal token in a environment variable for PERSONAL_ACCESS_TOKEN as `export PERSONAL_ACCESS_TOKEN=1234-dummy-value`
  
  The `deploy.yml` in building maven package does this.
+ 
+## How to use this in your Spring Maven based project
+To use this `jwt-validator` in your maven based project include the following in your pom.xml as:
+```
+<dependency>
+  <groupId>me.sonam</groupId>
+  <artifactId>jwt-validator</artifactId>
+  <version>1.0-SNAPSHOT</version>
+</dependency>
+```
+
+Then in your class you have to enable component scan as following to pick up this library security configuration:
+`@ComponentScan(basePackages = {"me.sonam.security"})`
+
+You can override permitted paths that don't require jwt validation in your application.yaml as following:
+```
+permitPaths: /api/health/
+```
