@@ -44,3 +44,6 @@ You can override permitted paths that don't require jwt validation in your appli
 ```
 permitPaths: /api/health/*
 ```
+<br />
+
+Fore more on how to use this `jwt-validator` from github to your github repository follow [How to use maven library from github in your maven project?](https://github.com/sonamsamdupkhangsar/articles/blob/main/pulling-down-github-maven-library/README.md)
