@@ -29,9 +29,18 @@ To use this `jwt-validator` in your maven based project include the following in
 ```
 
 Then in your class you have to enable component scan as following to pick up this library security configuration:
-`@ComponentScan(basePackages = {"me.sonam.security"})`
+``` 
+@ComponentScan(basePackages = {"me.sonam.security"})
+```
+or do
+```
+@SpringBootApplication(scanBasePackages = {"me.sonam", "include.your.app.base.code.package.also.if.needed."})
+```
+
+You also have to ensure your application is scanned too.  So you may have to add additional package to scan as well as shown above.
+
 
 You can override permitted paths that don't require jwt validation in your application.yaml as following:
 ```
-permitPaths: /api/health/
+permitPaths: /api/health/*
 ```
