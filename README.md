@@ -28,11 +28,14 @@ To use this `jwt-validator` in your maven based project include the following in
 </dependency>
 ```
 
-Then in your class you have to enable component scan as following to pick up this library security configuration:
+Then in your class you have to enable component scan as following to pick up this security library package:
+
 ``` 
 @ComponentScan(basePackages = {"me.sonam.security"})
 ```
+
 or do
+
 ```
 @SpringBootApplication(scanBasePackages = {"me.sonam", "include.your.app.base.code.package.also.if.needed."})
 ```
@@ -47,3 +50,4 @@ permitPaths: /api/health/*
 <br />
 
 Fore more on how to use this `jwt-validator` from github to another github repository follow [How to use maven library from github in your maven project?](https://sonamsamdupkhangsar.github.io/pulling-down-github-maven-library/)
+
