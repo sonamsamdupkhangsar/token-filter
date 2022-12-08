@@ -46,4 +46,4 @@ permitPaths: /api/health/*
 ```
 <br />
 
-Fore more on how to use this `jwt-validator` from github to another github repository follow [How to use maven library from github in your maven project?](https://github.com/sonamsamdupkhangsar/articles/blob/main/pulling-down-github-maven-library/README.md)
+Fore more on how to use this `jwt-validator` from github to another github repository follow [How to use maven library from github in your maven project?](https://sonamsamdupkhangsar.github.io/pulling-down-github-maven-library/)
