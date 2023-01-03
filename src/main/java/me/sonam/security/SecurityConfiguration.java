@@ -1,6 +1,7 @@
 package me.sonam.security;
 
 
+import me.sonam.security.property.PermitPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,8 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import reactor.core.publisher.Mono;
 
+import java.util.Arrays;
+
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 public class SecurityConfiguration {
@@ -24,13 +27,13 @@ public class SecurityConfiguration {
     @Autowired
     private SecurityContextRepository securityContextRepository;
 
-    @Value("${permitPaths}")
-    private String[] permitPaths;
+    @Autowired
+    private PermitPath permitPath;
 
     @Bean
     public SecurityWebFilterChain securitygWebFilterChain(ServerHttpSecurity http) {
-        LOG.debug("permitPaths.length: {}, permitPaths: {}", permitPaths.length, permitPaths);
-        return http
+        LOG.debug("permitPath: {}", permitPath);
+         ServerHttpSecurity.AuthorizeExchangeSpec spec = http
                 .exceptionHandling()
                 .authenticationEntryPoint((swe, e) ->
                         Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED))
@@ -43,9 +46,23 @@ public class SecurityConfiguration {
                 .authenticationManager(authenticationManager)
                 .securityContextRepository(securityContextRepository)
                 .authorizeExchange()
-                .pathMatchers(HttpMethod.OPTIONS).permitAll()
-                .pathMatchers(permitPaths).permitAll()
-                .anyExchange().authenticated()
+                .pathMatchers(HttpMethod.OPTIONS).permitAll();
+         permitPath.getPermitpath().forEach(path -> {
+             if (path.getHttpMethods() == null) {
+                 spec.pathMatchers(path.getPath()).permitAll();
+             }
+             else {
+                 Arrays.stream(path.getHttpMethods().split(","))
+                         .forEach(s ->{
+                             LOG.debug("httMethod.valueOf: {}", HttpMethod.valueOf(s.trim()));
+                             spec.pathMatchers(HttpMethod.valueOf( s.trim()), path.getPath()).permitAll();});
+             }
+         });
+         /*spec
+                .pathMatchers(HttpMethod.POST, permitPaths).permitAll()
+                .pathMatchers(permitPaths).permitAll()*/
+                return spec.anyExchange().authenticated()
                 .and().build();
+
     }
 }
