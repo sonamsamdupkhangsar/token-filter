@@ -39,8 +39,11 @@ me.sonam.jwt-validator:
     - path: /user/create
       httpMethods: POST
     - path: /api/health/readiness
-      httpMethods: HEAD
-    - path: /api/hello
+      httpMethods: GET
+    - path: /api/health/readiness
+      httpMethods: POST
+    - path: /api/health/liveness
+      httpmethods: HEAD, POST
 
 
 #permitPaths: /api/health/readiness

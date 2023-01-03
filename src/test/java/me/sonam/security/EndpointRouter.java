@@ -9,8 +9,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
-import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
+import static org.springframework.web.reactive.function.server.RequestPredicates.*;
 
 /**
  * For testing the endpoint permitted and not permitted paths
@@ -24,7 +23,16 @@ public class EndpointRouter {
         LOG.info("building email router function");
         return RouterFunctions.route(GET("/api/health/liveness").and(accept(MediaType.APPLICATION_JSON)),
                 livenessReadinessHandler::liveness)
+                .andRoute(HEAD("/api/health/liveness").and(accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::livenessHead)
+                .andRoute(POST("/api/health/liveness").and(accept(MediaType.APPLICATION_JSON)),
+                livenessReadinessHandler::livenessPost)
                 .andRoute(GET("/api/health/readiness").and(accept(MediaType.APPLICATION_JSON)),
-                        livenessReadinessHandler::readiness);
+                        livenessReadinessHandler::readiness)
+                .andRoute(POST("/api/health/readiness").and(accept(MediaType.APPLICATION_JSON)),
+                livenessReadinessHandler::readinessPost)
+                .andRoute(DELETE("/api/health/readiness").and(accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::readinessDelete);
+
     }
 }
