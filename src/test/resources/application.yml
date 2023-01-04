@@ -14,12 +14,39 @@ management:
     health:
       show-details: always
 
-server:
+server2:
   #  port: 8080
   port: 9001
 
 # /login, /actuator/health
-permitPaths: /api/health/readiness
+permitPaths: /login
+
+# example of a simple 1 level
+allow:
+  - path: /users
+    httpMethod: POST
+  - path: /user/create
+    httpMethod: GET
+  - path: /api/health/readiness
+    httpMethod: HttpMethod.POST
+  - path: /api/health/readiness
+
+# working today.  Use this for now
+me.sonam.jwt-validator:
+  permitpath:
+    - path: /users
+      httpMethods: POST, GET
+    - path: /user/create
+      httpMethods: POST
+    - path: /api/health/readiness
+      httpMethods: GET
+    - path: /api/health/readiness
+      httpMethods: POST
+    - path: /api/health/liveness
+      httpmethods: HEAD, POST
+
+
+#permitPaths: /api/health/readiness
 jwt-rest-service-public-key-id: http://localhost:{port}/jwt-rest-service/publickeys/{keyId}
 
 jwt:

@@ -47,6 +47,21 @@ You can override permitted paths that don't require jwt validation in your appli
 ```
 permitPaths: /api/health/*
 ```
+2.0.1-snapshot version now uses:
+```
+me.sonam.jwt-validator:
+  permitpath:
+    - path: /users
+      httpMethods: POST, GET
+    - path: /user/create
+      httpMethods: POST
+    - path: /api/health/readiness
+      httpMethods: GET
+    - path: /api/health/readiness
+      httpMethods: POST
+    - path: /api/health/liveness
+      httpmethods: HEAD, POST
+```
 <br />
 
 Fore more on how to use this `jwt-validator` from github to another github repository follow [How to use maven library from github in your maven project?](https://sonamsamdupkhangsar.github.io/pulling-down-github-maven-library/)

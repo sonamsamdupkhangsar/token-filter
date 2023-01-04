@@ -41,10 +41,40 @@ public class EndpointPermitIntegTest {
 
   @Test
   public void readinessEndpointPermittedPublic() {
-    LOG.info("this endpoint is permitted without jwt");
+    LOG.info("readiness get is permitted without jwt");
     client.get().uri("/api/health/readiness")
             .exchange().expectStatus().isOk();
   }
+
+  @Test
+  public void readinessPostAllowed() {
+    LOG.info("readiness post is permitted without jwt");
+
+    client.post().uri("/api/health/readiness")
+            .exchange().expectStatus().isOk();
+  }
+
+  @Test
+  public void readinessDeleteRequiresJwt() {
+    LOG.info("readiness delete requires jwt, should get bad request");
+
+    client.delete().uri("/api/health/readiness")
+            .exchange().expectStatus().isUnauthorized();
+  }
+
+  @Test
+  public void readinessDeleteSendJwt() {
+    LOG.info("readiness delete requires jwt, should get bad request");
+
+    final String authenticationId = "dave";
+    Jwt jwt = jwt(authenticationId);
+    when(this.jwtDecoder.decode(anyString())).thenReturn(Mono.just(jwt));
+
+    client.delete().uri("/api/health/readiness")
+            .headers(addJwt(jwt))
+            .exchange().expectStatus().isOk();
+  }
+
 
   @Test
   public void livenessEndpoindRequiresJwtWithJwt() {
@@ -65,6 +95,23 @@ public class EndpointPermitIntegTest {
     client.get().uri("/api/health/liveness")
             .exchange().expectStatus().is4xxClientError();
   }
+
+  @Test
+  public void livenessEndpoindHeadAllowed() {
+    LOG.info("liveness Head allowed");
+
+    client.head().uri("/api/health/liveness")
+            .exchange().expectStatus().isOk();
+  }
+
+  @Test
+  public void livenessEndpoindPostAllowed() {
+    LOG.info("liveness post allowed");
+
+    client.post().uri("/api/health/liveness")
+            .exchange().expectStatus().isOk();
+  }
+
 
   private Jwt jwt(String subjectName) {
     return new Jwt("token", null, null,
