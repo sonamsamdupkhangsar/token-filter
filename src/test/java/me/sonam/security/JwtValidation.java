@@ -1,5 +1,6 @@
 package me.sonam.security;
 
+import me.sonam.security.jwt.JwtBody;
 import me.sonam.security.jwt.PublicKeyJwtCreator;
 import me.sonam.security.jwt.PublicKeyJwtDecoder;
 import me.sonam.security.jwt.repo.JwtKeyRepository;
@@ -33,6 +34,7 @@ import java.net.URL;
 import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.Calendar;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -106,10 +108,15 @@ public class JwtValidation {
 
         mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(jwtKey.getPublicKey()));
 
-        final String clientId = "sonam-123-322";
-        final String clientUserRole = "admin";
+        final String role = JwtBody.RoleEnum.admin.toString();
         final String groups = "Admin, Cameramen, Driver, foodballer";
-        Mono<String> jwtTokenString = jwtCreator.create(clientUserRole, clientId, groups, "sonam-username", "https://sonam.cloud", Calendar.HOUR, 5);
+        final String subject = "123-sonam";
+        final String scopes = "";
+        final String clientId = "12411221-3232-dummy";
+        final String audience = "";
+
+        me.sonam.security.jwt.JwtBody jwtBody = new me.sonam.security.jwt.JwtBody(subject, scopes, clientId, audience, role, groups, 10);
+        Mono<String> jwtTokenString = jwtCreator.create(jwtBody);
 
         Mono<Jwt> jwtMono = jwtTokenString.flatMap(token -> rPublicKeyJwtDecoder.decode(token));
 
@@ -128,25 +135,26 @@ public class JwtValidation {
             LOG.info("jwt.audience: {}", jwt.getAudience());
             LOG.info("jwt.subject: {}", jwt.getSubject());
             LOG.info("jwt.issuer: {}", jwt.getIssuer().toString());
-            LOG.info("jwt.clientId: {}", jwt.getHeaders().get("clientId"));
-            LOG.info("jwt.clientUserRole: {}", jwt.getHeaders().get("clientUserRole"));
-            LOG.info("jwt.groups: {}", jwt.getHeaders().get("groups"));
-            LOG.info("jwt.keyId: {}", jwt.getHeaders().get("keyId"));
-            LOG.info("jwt.headers: {}", jwt.getHeaders().toString());
-            LOG.info("headsers: {}", jwt.getHeaders());
+            LOG.info("jwt.clientId: {}", jwt.getClaims().get("clientId"));
+            LOG.info("jwt.clientUserRole: {}", jwt.getClaims().get("role"));
+            LOG.info("jwt.groups: {}", jwt.getClaims().get("groups"));
+            LOG.info("jwt.keyId: {}", jwt.getClaims().get("keyId"));
 
             assertThat(jwt.getIssuedAt()).isNotNull();
             assertThat(jwt.getExpiresAt()).isNotNull();
             assertThat(jwt.getHeaders().get("alg")).isNotNull();
-            assertThat(jwt.getAudience()).contains("https://sonam.cloud");
-            assertThat(jwt.getSubject()).isEqualTo("sonam-username");
+            assertThat(jwt.getAudience()).contains(audience);
+            assertThat(jwt.getSubject()).isEqualTo(subject);
+            assertThat(jwt.getClaims().get("clientId")).isEqualTo(clientId);
+            assertThat(jwt.getClaims().get("scope")).isEqualTo(scopes);
+            assertThat(jwt.getClaims().get("keyId")).isNotNull();
+            assertThat(jwt.getClaims().get("role")).isEqualTo(role);
+            assertThat(jwt.getClaims().get("groups")).isEqualTo(groups);
+            assertThat(jwt.getAudience()).isEqualTo(Arrays.asList(""));
+            assertThat(jwt.getIssuer()).isNotNull();
 
             LOG.info("claims: {}", jwt.getClaims());
 
-            assertThat(jwt.getHeaders().get("clientId")).isEqualTo(clientId);
-            assertThat(jwt.getHeaders().get("clientUserRole")).isEqualTo(clientUserRole);
-            assertThat(jwt.getHeaders().get("groups")).isEqualTo(groups);
-            assertThat(jwt.getHeaders().get("keyId")).isEqualTo(jwtKey.getId());
 
             try {
                 assertThat(jwt.getIssuer()).isEqualTo(new URL("https://www.sonam.cloud"));

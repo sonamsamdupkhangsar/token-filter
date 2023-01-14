@@ -3,6 +3,7 @@ package me.sonam.security.jwt;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
+import me.sonam.security.JwtBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -116,14 +117,15 @@ public class PublicKeyJwtDecoder implements ReactiveJwtDecoder  {
 
         return Mono.just(new Jwt("token", claims.getIssuedAt().toInstant(),
                 claims.getExpiration().toInstant(),
-                Map.of("alg", jwsHeader.getAlgorithm(),
-                        "groups", jwsHeader.get("groups"),
-                        "clientId", jwsHeader.get("clientId"),
-                        "clientUserRole", jwsHeader.get("clientUserRole"),
-                        "keyId", UUID.fromString(jwsHeader.get("keyId").toString())),
+                Map.of("alg", jwsHeader.getAlgorithm()),
                 Map.of("sub", claims.getSubject(),
+                        "clientId", claims.get("clientId"),
                         "aud", claims.getAudience(),
-                        "iss", issuerUrl)));
+                        "scope", claims.get("scope"),
+                        "iss", issuerUrl,
+                        "role", claims.get("role"),
+                        "groups", claims.get("groups"),
+                        "keyId", UUID.fromString(claims.get("keyId").toString()))));
     }
 
     public Key loadPublicKey(String stored)  {
@@ -140,20 +142,20 @@ public class PublicKeyJwtDecoder implements ReactiveJwtDecoder  {
     }
 
     public Mono<UUID> getKeyId(String jwtToken) {
-        LOG.debug("getKeyId for jwtToken by marshaling string to SonamsJwtHeader class");
+        LOG.debug("getKeyId for jwtToken by marshaling string to JwtBody class");
         Base64.Decoder decoder = Base64.getUrlDecoder();
 
         String[] chunks = jwtToken.split("\\.");
 
-        String header = new String(decoder.decode(chunks[0]));
-        LOG.debug("header: {}", header);
+        String payload = new String(decoder.decode(chunks[1]));
+        LOG.debug("payload: {}", payload);
 
         ObjectMapper mapper = new ObjectMapper();
 
         try {
-            SonamsJwtHeader sonamsJwtHeader = mapper.readValue(header, SonamsJwtHeader.class);
-            LOG.debug("returning keyId: {}", sonamsJwtHeader.getKeyId());
-            return Mono.just(sonamsJwtHeader.getKeyId());
+            JwtBody jwtBody = mapper.readValue(payload, JwtBody.class);
+            LOG.debug("returning keyId: {}", jwtBody.getKeyId());
+            return Mono.just(jwtBody.getKeyId());
         } catch (JsonProcessingException e) {
             LOG.error("failed to convert header to sonams jwt header", e);
             return Mono.empty();
