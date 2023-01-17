@@ -99,7 +99,9 @@ public class PublicKeyJwtDecoder implements ReactiveJwtDecoder  {
         } catch (SignatureException signatureException) {
             return Mono.error(new JwtException(signatureException.getMessage()));
         } catch (ExpiredJwtException exception) {
-            return Mono.error(new JwtException(exception.getMessage()));
+            LOG.debug("jwt has expired", exception);
+
+            return Mono.error(new JwtException("Jwt expired at "+ exception.getClaims().getExpiration()));
         }
         catch (MalformedJwtException malformedJwtException) {
             return Mono.error(new JwtException(malformedJwtException.getMessage()));

@@ -58,9 +58,6 @@ public class SecurityConfiguration {
                              spec.pathMatchers(HttpMethod.valueOf( s.trim()), path.getPath()).permitAll();});
              }
          });
-         /*spec
-                .pathMatchers(HttpMethod.POST, permitPaths).permitAll()
-                .pathMatchers(permitPaths).permitAll()*/
                 return spec.anyExchange().authenticated()
                 .and().build();
 

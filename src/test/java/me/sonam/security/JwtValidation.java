@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -52,6 +53,9 @@ public class JwtValidation {
 
     @Autowired
     private PublicKeyJwtDecoder rPublicKeyJwtDecoder;
+
+    @Autowired
+    private ReactiveJwtDecoder decoder;
 
     @Autowired
     private JwtKeyRepository jwtKeyRepository;
@@ -162,5 +166,46 @@ public class JwtValidation {
                 LOG.error("error occured for matching issuer", e);
             }
             assertThat(jwt.getClaims()).isNotNull();}).verifyComplete();
+    }
+
+
+    public void expiredJwt() throws Exception {
+        final String role = JwtBody.RoleEnum.admin.toString();
+        final String groups = "Admin, Cameramen, Driver, foodballer";
+        final String subject = "123-sonam";
+        final String scopes = "";
+        final String clientId = "12411221-3232-dummy";
+        final String audience = "";
+
+        me.sonam.security.jwt.JwtBody jwtBody = new me.sonam.security.jwt.JwtBody(subject, scopes, clientId, audience, role, groups, 1);
+        Mono<String> jwtTokenString = jwtCreator.create(jwtBody);
+
+        jwtTokenString.map(jwtToken -> {
+                    try {
+                        LOG.info("sleep for 2 seconds..");
+                        Thread.sleep(2000);
+
+                        LOG.info("awake after 2 seconds now");
+                        return jwtToken;
+                    }
+                    catch (Exception e) {
+                        LOG.error("failed to sleep for 2 seconds", e);
+                        return null;
+                    }
+                }
+                ).flatMap(jwtToken ->{
+                    LOG.info("decode now");
+                    return decoder.decode(jwtToken);
+                })
+                .subscribe(jwtObject -> {
+                            try {
+                                Thread.sleep(10000);
+                            } catch (Exception e) {
+                                LOG.error("failed to sleep for 10 seconds", e);
+                            }
+                            LOG.info("jwtObject: {}", jwtObject);
+                        }
+                );
+
     }
 }
