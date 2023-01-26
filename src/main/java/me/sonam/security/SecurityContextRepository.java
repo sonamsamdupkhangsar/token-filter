@@ -33,7 +33,6 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 
         return Mono.justOrEmpty(swe.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
                 .filter(authHeader -> authHeader.startsWith("Bearer "))
-                //.switchIfEmpty(Mono.just("No Authorization token found"))
                 .flatMap(authHeader -> {
                     String authToken = authHeader.substring(7);
                     Authentication auth = new UsernamePasswordAuthenticationToken(authToken, authToken);
