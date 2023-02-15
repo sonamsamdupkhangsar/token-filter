@@ -13,10 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.ClientRequest;
-import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.reactive.function.client.*;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
@@ -96,6 +94,56 @@ public class ReactiveRequestContextHolder {
                 return next.exchange(clientRequest);
             }
         });
+    }
+
+
+    public ExchangeFilterFunction headerFilter2() {
+
+        return (request, next) -> ReactiveRequestContextHolder.getRequest().flatMap(r ->
+                {
+
+                    List<JwtPath.JwtRequest> jwtRequestList = jwtPath.getJwtRequest();
+                    for (JwtPath.JwtRequest jwtRequest : jwtRequestList) {
+                        if (jwtRequest.getIn().equals(r.getPath().pathWithinApplication().value()) && jwtRequest.getOut().equals(request.url().getPath())) {
+                            LOG.info("inbound request path and outbound request path both matched");
+                            return getClientResponse(jwtRequest, request, r, next);
+                        }
+                    }
+                    LOG.info("no path match found");
+                    LOG.info("just do nothing to add to header");
+                    ClientRequest clientRequest = ClientRequest.from(request).build();
+                    return next.exchange(clientRequest);
+                });
+
+    }
+
+    private Mono<ClientResponse> getClientResponse(JwtPath.JwtRequest jwtRequest, ClientRequest request,
+                                                   ServerHttpRequest serverHttpRequest, ExchangeFunction exchangeFunction) {
+            if (jwtRequest.getJwt().equals(JwtPath.JwtRequest.JwtOption.request.name())) {
+                return getJwt().flatMap(s -> {
+                    ClientRequest clientRequest = ClientRequest.from(request)
+                            .headers(headers -> {
+                                headers.set(HttpHeaders.ORIGIN, serverHttpRequest.getHeaders().getFirst(HttpHeaders.ORIGIN));
+                                headers.set(HttpHeaders.AUTHORIZATION, s);
+                                LOG.info("added jwt to header from access token http callout");
+                            }).build();
+                    return exchangeFunction.exchange(clientRequest);
+                });
+            }
+            else if (jwtRequest.getJwt().equals(JwtPath.JwtRequest.JwtOption.forward.name())) {
+                ClientRequest clientRequest = ClientRequest.from(request)
+                        .headers(headers -> {
+                            headers.set(HttpHeaders.ORIGIN, serverHttpRequest.getHeaders().getFirst(HttpHeaders.ORIGIN));
+                            headers.set(HttpHeaders.AUTHORIZATION,  serverHttpRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
+                            LOG.info("added jwt to header from access token http callout");
+                        }).build();
+                return exchangeFunction.exchange(clientRequest);
+            }
+            else {
+                LOG.info("don't pass headers to downstream web service");
+                ClientRequest clientRequest = ClientRequest.from(request).build();
+                return exchangeFunction.exchange(clientRequest);
+            }
     }
 
     private Mono<String> getJwt() {
