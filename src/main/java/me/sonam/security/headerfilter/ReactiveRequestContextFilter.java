@@ -1,5 +1,7 @@
 package me.sonam.security.headerfilter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -12,9 +14,13 @@ import reactor.core.publisher.Mono;
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
 
 public class ReactiveRequestContextFilter implements WebFilter {
+    private static final Logger LOG = LoggerFactory.getLogger(ReactiveRequestContextFilter.class);
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
+        LOG.info("request-1: {}", request.getPath());
+
         return chain.filter(exchange)
                 .subscriberContext(ctx -> ctx.put(ReactiveRequestContextHolder.CONTEXT_KEY, request));
     }

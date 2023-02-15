@@ -1,13 +1,28 @@
 package me.sonam.security;
 
+import me.sonam.security.headerfilter.ReactiveRequestContextHolder;
+import me.sonam.security.util.HmacClient;
+import me.sonam.security.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.data.util.Pair;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+
+import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * a basic handler for liveness and readiness endpoints
@@ -15,6 +30,24 @@ import reactor.core.publisher.Mono;
 @Controller
 public class EndpointHandler {
     private static final Logger LOG = LoggerFactory.getLogger(EndpointHandler.class);
+
+    private WebClient webClient;
+
+    @Autowired
+    private HmacClient hmacClient;
+
+    @Value("${jwt-rest-service-accesstoken}")
+    private String jwtRestServiceAccessToken;
+
+    @Value("${jwt-receiver}")
+    private String jwtReceiver;
+
+    @Autowired
+    private ReactiveRequestContextHolder reactiveRequestContextHolder;
+    @PostConstruct
+    public void setWebClient() {
+        webClient = WebClient.builder().filter(reactiveRequestContextHolder.headerFilter()).build();
+    }
 
     public Mono<ServerResponse> liveness(ServerRequest serverRequest) {
         LOG.debug("liveness check");
@@ -49,5 +82,119 @@ public class EndpointHandler {
         LOG.info("authenticate user for authId: {}", authenticationId);
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build();
+    }
+
+    public Mono<ServerResponse> passJwtHeaderToBService(ServerRequest serverRequest) {
+        LOG.debug("pass jwt header to receiveJwtHeader endpoint");
+
+        return callEndpoint(jwtReceiver).flatMap(s ->
+                ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(getMap(Pair.of("message", s)))
+        ).onErrorResume(throwable ->{
+            LOG.error("endpoint call failed: {}", throwable.getMessage());
+            String errorMessage = throwable.getMessage();
+
+            if (throwable instanceof WebClientResponseException) {
+                WebClientResponseException webClientResponseException = (WebClientResponseException) throwable;
+                LOG.error("error body contains: {}", webClientResponseException.getResponseBodyAsString());
+                errorMessage = webClientResponseException.getResponseBodyAsString();
+            }
+            return Mono.error(new SecurityException(errorMessage));
+        } );
+    }
+
+    private Mono<String> callEndpoint(final String endpoint) {
+        LOG.info("call endpoint: {}", endpoint);
+
+
+        WebClient.ResponseSpec responseSpec = webClient.get().uri(endpoint)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve();
+        return responseSpec.bodyToMono(Map.class).map(map -> {
+            LOG.info("response for endpoint '{}' is: {}",endpoint, map);
+            LOG.info("got response message: {}", map.get("message"));
+            return map.get("message").toString();
+        }).onErrorResume(throwable -> {
+            LOG.error("endpoint: '{}' rest call failed: {}", endpoint, throwable.getMessage());
+            String errorMessage = throwable.getMessage();
+
+            if (throwable instanceof WebClientResponseException) {
+                WebClientResponseException webClientResponseException = (WebClientResponseException) throwable;
+                LOG.error("error body contains: {}", webClientResponseException.getResponseBodyAsString());
+                errorMessage = webClientResponseException.getResponseBodyAsString();
+            }
+            return Mono.error(new SecurityException(errorMessage));
+        });
+    }
+
+    public Mono<ServerResponse> callJwtHeaderReceiverFromThis(ServerRequest serverRequest) {
+        LOG.debug("in callJwtHeaderReceiverFromThis, just call jwtReceiver endpoint but without jwt");
+
+        return callEndpoint(jwtReceiver).flatMap(s ->
+                ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(getMap(Pair.of("message", s)))
+        ).onErrorResume(throwable ->{
+            LOG.error("endpoint call failed: {}", throwable.getMessage());
+            String errorMessage = throwable.getMessage();
+
+            if (throwable instanceof WebClientResponseException) {
+                WebClientResponseException webClientResponseException = (WebClientResponseException) throwable;
+                LOG.error("error body contains: {}", webClientResponseException.getResponseBodyAsString());
+                errorMessage = webClientResponseException.getResponseBodyAsString();
+            }
+            return Mono.error(new SecurityException(errorMessage));
+        } );
+    }
+
+    public Mono<ServerResponse> forwardtoken(ServerRequest serverRequest) {
+        LOG.debug("in forwardtoken, just call jwtReceiver endpoint, filter should forward jwt token");
+
+        return callEndpoint(jwtReceiver).flatMap(s ->
+                ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(getMap(Pair.of("message", s)))
+        ).onErrorResume(throwable ->{
+            LOG.error("endpoint call failed: {}", throwable.getMessage());
+            String errorMessage = throwable.getMessage();
+
+            if (throwable instanceof WebClientResponseException) {
+                WebClientResponseException webClientResponseException = (WebClientResponseException) throwable;
+                LOG.error("error body contains: {}", webClientResponseException.getResponseBodyAsString());
+                errorMessage = webClientResponseException.getResponseBodyAsString();
+            }
+            return Mono.error(new SecurityException(errorMessage));
+        } );
+    }
+
+    public Mono<ServerResponse> jwtHeaderReceiver(ServerRequest serverRequest) {
+        LOG.debug("in jwt header receiver service: {}", serverRequest.headers().firstHeader(HttpHeaders.AUTHORIZATION));
+
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            LOG.error("no authentication found");
+        }
+        else {
+            String authenticationId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+            LOG.info("authenticate user for authId: {}", authenticationId);
+        }
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build();
+    }
+
+    public Mono<ServerResponse> notPassJwtHeader(ServerRequest serverRequest) {
+        LOG.debug("readiness delete requires jwt");
+
+        String authenticationId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        LOG.info("authenticate user for authId: {}", authenticationId);
+
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build();
+    }
+
+    public static Map<String, String> getMap(Pair<String, String>... pairs){
+
+        Map<String, String> map = new HashMap<>();
+
+        for(Pair<String, String> pair: pairs) {
+            map.put(pair.getFirst(), pair.getSecond());
+        }
+        return map;
+
     }
 }
