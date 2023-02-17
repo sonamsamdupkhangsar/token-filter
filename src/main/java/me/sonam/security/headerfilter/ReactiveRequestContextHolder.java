@@ -51,60 +51,16 @@ public class ReactiveRequestContextHolder {
     }
 
     public ExchangeFilterFunction headerFilter() {
-
-        return (request, next) -> ReactiveRequestContextHolder.getRequest().flatMap(r ->
-        {
-            List<JwtPath.JwtRequest> jwtRequestList = jwtPath.getJwtRequest();
-            for (JwtPath.JwtRequest jwtRequest : jwtRequestList) {
-                if (jwtRequest.getIn().equals(r.getPath().pathWithinApplication().value()) && jwtRequest.getOut().equals(request.url().getPath())) {
-                    LOG.info("inbound request path and outbound request path both matched");
-                    return Mono.just(jwtRequest).zipWith(Mono.just(r));
-                }
-            }
-            LOG.info("no path match found");
-            return Mono.just(new JwtPath.JwtRequest()).zipWith(Mono.just(r));
-            })
-                .flatMap(objects -> {
-            if (objects.getT1().getIn() != null) {
-                JwtPath.JwtRequest jwtRequest =  objects.getT1();
-                if (jwtRequest.getJwt().equals(JwtPath.JwtRequest.JwtOption.request.name())) {
-                    return getJwt().flatMap(s -> {
-                        ClientRequest clientRequest = ClientRequest.from(request)
-                                .headers(headers -> {
-                                    headers.set(HttpHeaders.ORIGIN, objects.getT2().getHeaders().getFirst(HttpHeaders.ORIGIN));
-                                    headers.set(HttpHeaders.AUTHORIZATION, s);
-                                    LOG.info("added jwt to header from access token http callout");
-                                }).build();
-                        return next.exchange(clientRequest);
-                    });
-                }
-                else {
-                        ClientRequest clientRequest = ClientRequest.from(request)
-                                .headers(headers -> {
-                                    headers.set(HttpHeaders.ORIGIN, objects.getT2().getHeaders().getFirst(HttpHeaders.ORIGIN));
-                                    headers.set(HttpHeaders.AUTHORIZATION,  objects.getT2().getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
-                                    LOG.info("added jwt to header from access token http callout");
-                                }).build();
-                        return next.exchange(clientRequest);
-                    }
-            }
-            else {
-                LOG.info("just do nothing to add to header");
-                ClientRequest clientRequest = ClientRequest.from(request).build();
-                return next.exchange(clientRequest);
-            }
-        });
-    }
-
-
-    public ExchangeFilterFunction headerFilter2() {
-
+        LOG.info("calling new headerFilter");
         return (request, next) -> ReactiveRequestContextHolder.getRequest().flatMap(r ->
                 {
+                LOG.info("in path: {}, outbound path: {}",r.getPath().pathWithinApplication().value(),
+                        request.url().getPath());
 
                     List<JwtPath.JwtRequest> jwtRequestList = jwtPath.getJwtRequest();
                     for (JwtPath.JwtRequest jwtRequest : jwtRequestList) {
-                        if (jwtRequest.getIn().equals(r.getPath().pathWithinApplication().value()) && jwtRequest.getOut().equals(request.url().getPath())) {
+                        if (r.getPath().pathWithinApplication().value().matches(jwtRequest.getIn()) &&
+                                request.url().getPath().matches(jwtRequest.getOut())) {
                             LOG.info("inbound request path and outbound request path both matched");
                             return getClientResponse(jwtRequest, request, r, next);
                         }

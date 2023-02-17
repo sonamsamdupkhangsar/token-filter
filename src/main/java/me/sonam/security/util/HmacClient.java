@@ -5,13 +5,13 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class HmacClient {
-    @Value("${hmackey.clientId}")
+    @Value("${hmackey.clientId:}")
     private String clientId;
 
-    @Value("${hmackey.hmacMD5Algorithm}")
+    @Value("${hmackey.hmacMD5Algorithm:}")
     private String md5Algoirthm;
 
-    @Value("${hmackey.secretkey}")
+    @Value("${hmackey.secretkey:}")
     private String secretKey;
 
     public HmacClient() {
