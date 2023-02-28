@@ -119,7 +119,7 @@ public class JwtValidation {
         final String clientId = "12411221-3232-dummy";
         final String audience = "";
 
-        me.sonam.security.jwt.JwtBody jwtBody = new me.sonam.security.jwt.JwtBody(subject, scopes, clientId, audience, role, groups, 10);
+        me.sonam.security.jwt.JwtBody jwtBody = new me.sonam.security.jwt.JwtBody(subject, scopes, clientId, audience, role, groups, 10, null);
         Mono<String> jwtTokenString = jwtCreator.create(jwtBody);
 
         Mono<Jwt> jwtMono = jwtTokenString.flatMap(token -> rPublicKeyJwtDecoder.decode(token));
@@ -177,7 +177,7 @@ public class JwtValidation {
         final String clientId = "12411221-3232-dummy";
         final String audience = "";
 
-        me.sonam.security.jwt.JwtBody jwtBody = new me.sonam.security.jwt.JwtBody(subject, scopes, clientId, audience, role, groups, 1);
+        me.sonam.security.jwt.JwtBody jwtBody = new me.sonam.security.jwt.JwtBody(subject, scopes, clientId, audience, role, groups, 1,null);
         Mono<String> jwtTokenString = jwtCreator.create(jwtBody);
 
         jwtTokenString.map(jwtToken -> {

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-@ConfigurationProperties("me.sonam.jwt-validator")
+@ConfigurationProperties
 public class PermitPath {
     private List<Path> permitpath = new ArrayList();
 

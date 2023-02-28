@@ -45,10 +45,6 @@ You also have to ensure your application is scanned too.  So you may have to add
 
 You can override permitted paths that don't require jwt validation in your application.yaml as following:
 ```
-permitPaths: /api/health/*
-```
-2.0.1-snapshot version now uses:
-```
 me.sonam.jwt-validator:
   permitpath:
     - path: /users
@@ -63,6 +59,27 @@ me.sonam.jwt-validator:
       httpmethods: HEAD, POST
 ```
 <br />
+This jwt-validator can also request jwt token to be created or requested from the jwt-rest-service to be sent to a service that requires a jwt token.  This can be done
+using the following configuration example:
+
+```
+jwtrequest:
+  - in: /api/health/passheader
+    out: /api/health/jwtreceiver
+    jwt: request
+  - in: /api/health/passheader
+    out: /api/health/liveness
+    jwt: forward
+  - in: /api/health/forwardtoken
+    out: /api/health/jwtreceiver
+    jwt: forward
+```
+In the above first example of `in` and `out`, the `in` and `out` path is matched by the `ReactiveRequestContextHolder` web filter for a request inbound path and a another request that is going outbound.  If the in-path and out-path matches then a `request` will be made
+to a jwt-rest-service to create a new jwt token.  
+
+In the second example of `in` and `out`, if there is a jwt token in the inbound request then it will be `forward`ed to the downstream service.
+
+
 
 Fore more on how to use this `jwt-validator` from github to another github repository follow [How to use maven library from github in your maven project?](https://sonamsamdupkhangsar.github.io/pulling-down-github-maven-library/)
 

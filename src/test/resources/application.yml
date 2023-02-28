@@ -14,7 +14,7 @@ management:
     health:
       show-details: always
 
-server2:
+server:
   #  port: 8080
   port: 9001
 
@@ -32,22 +32,31 @@ allow:
   - path: /api/health/readiness
 
 # working today.  Use this for now
-me.sonam.jwt-validator:
-  permitpath:
-    - path: /users
-      httpMethods: POST, GET
-    - path: /user/create
-      httpMethods: POST
-    - path: /api/health/readiness
-      httpMethods: GET
-    - path: /api/health/readiness
-      httpMethods: POST
-    - path: /api/health/liveness
-      httpmethods: HEAD, POST
+
+permitpath:
+  - path: /users
+    httpMethods: POST, GET
+  - path: /user/create
+    httpMethods: POST
+  - path: /api/health/readiness
+    httpMethods: GET
+  - path: /api/health/readiness
+    httpMethods: POST
+  - path: /api/health/liveness
+    httpmethods: HEAD, POST
+  - path: /api/health/jwtreceiver
+    httpmethods: GET
+  - path: /api/health/passheader
+    httpmethods: GET
+  - path: /api/health/calljwtreceiver
+    httpmethods: GET
+
 
 
 #permitPaths: /api/health/readiness
-jwt-rest-service-public-key-id: http://localhost:{port}/jwt-rest-service/publickeys/{keyId}
+jwt-rest-service-public-key-id: http://localhost:{port}/jwts/publickeys/{keyId}
+jwt-rest-service-accesstoken: http://localhost:{port}/jwts/accesstoken
+jwt-receiver: http://localhost:9001/api/health/jwtreceiver
 
 jwt:
   secret: mysecret
@@ -58,3 +67,20 @@ spring:
     url: r2dbc:h2:mem:///contentitem?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     name: sa
     password:
+
+hmackey:
+  clientId: jwt-validator
+  hmacMD5Algorithm: HmacMD5
+  secretKey: mysecret
+
+# this is to call jwt-rest-service accesstoken for matching inbound and outbound
+jwtrequest:
+  - in: /api/health/passheader
+    out: /api/health/jwtreceiver
+    jwt: request
+  - in: /api/health/passheader
+    out: /api/health/liveness
+    jwt: forward
+  - in: /api/health/forwardtoken
+    out: /api/health/jwtreceiver
+    jwt: forward

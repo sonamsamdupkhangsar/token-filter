@@ -32,7 +32,15 @@ public class EndpointRouter {
                 .andRoute(POST("/api/health/readiness").and(accept(MediaType.APPLICATION_JSON)),
                 livenessReadinessHandler::readinessPost)
                 .andRoute(DELETE("/api/health/readiness").and(accept(MediaType.APPLICATION_JSON)),
-                        livenessReadinessHandler::readinessDelete);
+                        livenessReadinessHandler::readinessDelete)
+                .andRoute(GET("/api/health/passheader").and(accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::passJwtHeaderToBService)
+                .andRoute(GET("/api/health/jwtreceiver").and(accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::jwtHeaderReceiver)
+                .andRoute(GET("/api/health/calljwtreceiver").and(accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::callJwtHeaderReceiverFromThis)
+                .andRoute(GET("/api/health/forwardtoken").and(accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::forwardtoken);
 
     }
 }
