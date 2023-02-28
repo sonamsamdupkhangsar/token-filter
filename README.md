@@ -45,7 +45,6 @@ You also have to ensure your application is scanned too.  So you may have to add
 
 You can override permitted paths that don't require jwt validation in your application.yaml as following:
 ```
-
 permitpath:
   - path: /users
     httpMethods: POST, GET
