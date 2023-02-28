@@ -32,24 +32,24 @@ allow:
   - path: /api/health/readiness
 
 # working today.  Use this for now
-me.sonam.jwt-validator:
-  permitpath:
-    - path: /users
-      httpMethods: POST, GET
-    - path: /user/create
-      httpMethods: POST
-    - path: /api/health/readiness
-      httpMethods: GET
-    - path: /api/health/readiness
-      httpMethods: POST
-    - path: /api/health/liveness
-      httpmethods: HEAD, POST
-    - path: /api/health/jwtreceiver
-      httpmethods: GET
-    - path: /api/health/passheader
-      httpmethods: GET
-    - path: /api/health/calljwtreceiver
-      httpmethods: GET
+
+permitpath:
+  - path: /users
+    httpMethods: POST, GET
+  - path: /user/create
+    httpMethods: POST
+  - path: /api/health/readiness
+    httpMethods: GET
+  - path: /api/health/readiness
+    httpMethods: POST
+  - path: /api/health/liveness
+    httpmethods: HEAD, POST
+  - path: /api/health/jwtreceiver
+    httpmethods: GET
+  - path: /api/health/passheader
+    httpmethods: GET
+  - path: /api/health/calljwtreceiver
+    httpmethods: GET
 
 
 

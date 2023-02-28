@@ -26,7 +26,8 @@ public class ReactiveRequestContextHolder {
     private static final Logger LOG = LoggerFactory.getLogger(ReactiveRequestContextHolder.class);
     static final Class<ServerHttpRequest> CONTEXT_KEY = ServerHttpRequest.class;
 
-    @Value("${jwt-rest-service-accesstoken}")
+    //set default value to empty if this filter is not added
+    @Value("${jwt-rest-service-accesstoken:}")
     private String jwtRestServiceAccessToken;
 
     @Autowired
@@ -80,7 +81,7 @@ public class ReactiveRequestContextHolder {
                     ClientRequest clientRequest = ClientRequest.from(request)
                             .headers(headers -> {
                                 headers.set(HttpHeaders.ORIGIN, serverHttpRequest.getHeaders().getFirst(HttpHeaders.ORIGIN));
-                                headers.set(HttpHeaders.AUTHORIZATION, s);
+                                headers.setBearerAuth(s);
                                 LOG.info("added jwt to header from access token http callout");
                             }).build();
                     return exchangeFunction.exchange(clientRequest);
@@ -91,7 +92,7 @@ public class ReactiveRequestContextHolder {
                         .headers(headers -> {
                             headers.set(HttpHeaders.ORIGIN, serverHttpRequest.getHeaders().getFirst(HttpHeaders.ORIGIN));
                             headers.set(HttpHeaders.AUTHORIZATION,  serverHttpRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
-                            LOG.info("added jwt to header from access token http callout");
+                            LOG.info("forward jwt to header from access token http callout");
                         }).build();
                 return exchangeFunction.exchange(clientRequest);
             }
