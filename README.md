@@ -45,18 +45,18 @@ You also have to ensure your application is scanned too.  So you may have to add
 
 You can override permitted paths that don't require jwt validation in your application.yaml as following:
 ```
-me.sonam.jwt-validator:
-  permitpath:
-    - path: /users
-      httpMethods: POST, GET
-    - path: /user/create
-      httpMethods: POST
-    - path: /api/health/readiness
-      httpMethods: GET
-    - path: /api/health/readiness
-      httpMethods: POST
-    - path: /api/health/liveness
-      httpmethods: HEAD, POST
+
+permitpath:
+  - path: /users
+    httpMethods: POST, GET
+  - path: /user/create
+    httpMethods: POST
+  - path: /api/health/readiness
+    httpMethods: GET
+  - path: /api/health/readiness
+    httpMethods: POST
+  - path: /api/health/liveness
+    httpmethods: HEAD, POST
 ```
 <br />
 This jwt-validator can also request jwt token to be created or requested from the jwt-rest-service to be sent to a service that requires a jwt token.  This can be done
