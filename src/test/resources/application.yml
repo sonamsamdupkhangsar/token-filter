@@ -18,9 +18,6 @@ server:
   #  port: 8080
   port: 9001
 
-# /login, /actuator/health
-permitPaths: /login
-
 # example of a simple 1 level
 allow:
   - path: /users
@@ -30,8 +27,6 @@ allow:
   - path: /api/health/readiness
     httpMethod: HttpMethod.POST
   - path: /api/health/readiness
-
-# working today.  Use this for now
 
 permitpath:
   - path: /users
@@ -51,12 +46,16 @@ permitpath:
   - path: /api/health/calljwtreceiver
     httpmethods: GET
 
+# this is used for getting accesstoken by header filter
+jwt-service:
+  root: http://localhost:{port}
+  public-key-id: /jwts/publickeys/{keyId}
+  accesstoken: /jwts/accesstoken
 
-
-#permitPaths: /api/health/readiness
-jwt-rest-service-public-key-id: http://localhost:{port}/jwts/publickeys/{keyId}
-jwt-rest-service-accesstoken: http://localhost:{port}/jwts/accesstoken
-jwt-receiver: http://localhost:9001/api/health/jwtreceiver
+# this is for testing
+jwt-receiver:
+  root: http://localhost:${server.port}
+  receiver: /api/health/jwtreceiver
 
 jwt:
   secret: mysecret
@@ -68,9 +67,9 @@ spring:
     name: sa
     password:
 
-hmackey:
+hmacKey:
   clientId: jwt-validator
-  hmacMD5Algorithm: HmacMD5
+  algorithm: HmacMD5
   secretKey: mysecret
 
 # this is to call jwt-rest-service accesstoken for matching inbound and outbound

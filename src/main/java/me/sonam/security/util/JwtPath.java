@@ -68,5 +68,14 @@ public class JwtPath {
         public void setJwt(String jwt) {
             this.jwt = jwt;
         }
+
+        @Override
+        public String toString() {
+            return "JwtRequest{" +
+                    "in='" + in + '\'' +
+                    ", out='" + out + '\'' +
+                    ", jwt='" + jwt + '\'' +
+                    '}';
+        }
     }
 }

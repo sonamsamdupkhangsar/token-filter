@@ -36,14 +36,15 @@ public class EndpointHandler {
     @Autowired
     private HmacClient hmacClient;
 
-    @Value("${jwt-rest-service-accesstoken}")
+    @Value("${jwt-service.root}${jwt-service.accesstoken}")
     private String jwtRestServiceAccessToken;
 
-    @Value("${jwt-receiver}")
+    @Value("${jwt-receiver.root}${jwt-receiver.receiver}")
     private String jwtReceiver;
 
     @Autowired
     private ReactiveRequestContextHolder reactiveRequestContextHolder;
+
     @PostConstruct
     public void setWebClient() {
         webClient = WebClient.builder().filter(reactiveRequestContextHolder.headerFilter()).build();

@@ -5,21 +5,21 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class HmacClient {
-    @Value("${hmackey.clientId:}")
+    @Value("${hmacKey.clientId:}")
     private String clientId;
 
-    @Value("${hmackey.hmacMD5Algorithm:}")
-    private String md5Algoirthm;
+    @Value("${hmacKey.algorithm:}")
+    private String algorithm;
 
-    @Value("${hmackey.secretkey:}")
+    @Value("${hmacKey.secretKey:}")
     private String secretKey;
 
     public HmacClient() {
 
     }
-    public HmacClient(String clientId, String md5Algoirthm, String secretKey) {
+    public HmacClient(String clientId, String algorithm, String secretKey) {
         this.clientId = clientId;
-        this.md5Algoirthm = md5Algoirthm;
+        this.algorithm = algorithm;
         this.secretKey = secretKey;
     }
 
@@ -27,11 +27,20 @@ public class HmacClient {
         return clientId;
     }
 
-    public String getMd5Algoirthm() {
-        return md5Algoirthm;
+    public String getAlgorithm() {
+        return algorithm;
     }
 
     public String getSecretKey() {
         return secretKey;
+    }
+
+    @Override
+    public String toString() {
+        return "HmacClient{" +
+                "clientId='" + clientId + '\'' +
+                ", algorithm='" + algorithm + '\'' +
+                ", secretKey='" + secretKey + '\'' +
+                '}';
     }
 }

@@ -32,8 +32,8 @@ import java.util.*;
 public class PublicKeyJwtDecoder implements ReactiveJwtDecoder  {
     private static final Logger LOG = LoggerFactory.getLogger(PublicKeyJwtDecoder.class);
 
-    @Value("${jwt-rest-service-public-key-id}")
-    private String jwtRestServicePublicKeyId;
+    @Value("${jwt-service.root}${jwt-service.public-key-id}")
+    private String jwtPublicKeyIdEndpoint;
 
     private Map<UUID, Key> keyMap = new HashMap<>();
 
@@ -64,7 +64,7 @@ public class PublicKeyJwtDecoder implements ReactiveJwtDecoder  {
                 })
                 .flatMap(key -> validate(jwtToken, key))
                 .onErrorResume(throwable -> {
-                    LOG.error("failed to valilidated jwtToken, error: {}", throwable.getMessage());
+                    LOG.error("failed to validate jwtToken, error: {}", throwable.getMessage());
                     return Mono.error(new SecurityException("failed to validate jwt token"));
                 });
     }
@@ -166,7 +166,7 @@ public class PublicKeyJwtDecoder implements ReactiveJwtDecoder  {
             LOG.debug("returning keyId: {}", jwtBody.getKeyId());
             return Mono.just(jwtBody.getKeyId());
         } catch (JsonProcessingException e) {
-            LOG.error("failed to convert header to sonams jwt header, error: {}", e.getMessage());
+            LOG.error("failed to convert header to jwt header, error: {}", e.getMessage());
             return Mono.empty();
         }
 
@@ -175,7 +175,8 @@ public class PublicKeyJwtDecoder implements ReactiveJwtDecoder  {
     private Mono<Key> getPublicKeyFromRestService(UUID keyId) {
         LOG.debug("get publicKey for keyId");
 
-        final String keyIdString = jwtRestServicePublicKeyId.replace("{keyId}", keyId.toString());
+        final String keyIdString = jwtPublicKeyIdEndpoint.replace("{keyId}", keyId.toString());
+        LOG.info("keyIdString: {}", keyIdString);
 
         WebClient.ResponseSpec spec = webClient.get().uri(keyIdString).retrieve();
 

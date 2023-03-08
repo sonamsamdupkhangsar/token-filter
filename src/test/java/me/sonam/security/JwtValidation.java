@@ -62,7 +62,7 @@ public class JwtValidation {
 
     private static MockWebServer mockWebServer;
 
-    private static String jwtRestServicePublicKeyId ="http://localhost:{port}/jwt-rest-service/publickeys/{keyId}";
+    //private static String jwtRestServicePublicKeyId ="http://localhost:{port}/jwt-rest-service/publickeys/{keyId}";
 
     /**
      * this method will update the 'jwt-rest-service-public-key-id' endpoint address to the mockWebServer port
@@ -72,8 +72,9 @@ public class JwtValidation {
      */
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry r) throws IOException {
-        r.add("jwt-rest-service-public-key-id", () -> jwtRestServicePublicKeyId.replace("{port}",
-                mockWebServer.getPort()+""));
+        /*r.add("jwt-rest-service-public-key-id", () -> jwtRestServicePublicKeyId.replace("{port}",
+                mockWebServer.getPort()+""));*/
+        r.add("jwt-service.root", () -> "http://localhost:"+ mockWebServer.getPort());
         LOG.info("updated jwtRestServicePublicKeyId property");
     }
 
@@ -109,8 +110,8 @@ public class JwtValidation {
         Key publicKey = rPublicKeyJwtDecoder.loadPublicKey(jwtKey.getPublicKey());
         LOG.info("loaded publicKey object");
 
-
-        mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(jwtKey.getPublicKey()));
+        final String keyMapJsonResponse = "{\"key\": \""+jwtKey.getPublicKey()+"\"}";
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200).setHeader("Content-Type", "application/json").setBody(keyMapJsonResponse));
 
         final String role = JwtBody.RoleEnum.admin.toString();
         final String groups = "Admin, Cameramen, Driver, foodballer";
