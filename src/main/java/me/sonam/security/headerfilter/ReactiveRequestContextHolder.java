@@ -25,8 +25,8 @@ public class ReactiveRequestContextHolder {
     static final Class<ServerHttpRequest> CONTEXT_KEY = ServerHttpRequest.class;
 
     //set default value to empty if this filter is not added
-    @Value("${jwt-rest-service-accesstoken:}")
-    private String jwtRestServiceAccessToken;
+    @Value("${jwt-service.root:}${jwt-service.accesstoken:}")
+    private String jwtAccessTokenEndpoint;
 
     @Autowired
     private JwtPath jwtPath;
@@ -112,15 +112,15 @@ public class ReactiveRequestContextHolder {
                 "  \"expiresInSeconds\": 300\n" +
                 "}\n";
 
-        final String hmac = Util.getHmac(hmacClient.getMd5Algoirthm(), jsonString, hmacClient.getSecretKey());
-        LOG.info("creating hmac for jwt-rest-service: {}", jwtRestServiceAccessToken);
-        WebClient.ResponseSpec responseSpec = webClient.post().uri(jwtRestServiceAccessToken)
+        final String hmac = Util.getHmac(hmacClient.getAlgorithm(), jsonString, hmacClient.getSecretKey());
+        LOG.info("creating hmac for jwt-service: {}", jwtAccessTokenEndpoint);
+        WebClient.ResponseSpec responseSpec = webClient.post().uri(jwtAccessTokenEndpoint)
                 .headers(httpHeaders -> httpHeaders.add(HttpHeaders.AUTHORIZATION, hmac))
                 .bodyValue(jsonString)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve();
         return responseSpec.bodyToMono(Map.class).map(map -> {
-            LOG.debug("response for '{}' is in map: {}",jwtRestServiceAccessToken, map);
+            LOG.debug("response for '{}' is in map: {}", jwtAccessTokenEndpoint, map);
             if (map.get("token") != null) {
                 return map.get("token").toString();
             }

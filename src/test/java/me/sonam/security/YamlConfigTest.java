@@ -2,6 +2,7 @@ package me.sonam.security;
 
 import lombok.extern.java.Log;
 import me.sonam.security.property.PermitPath;
+import me.sonam.security.util.HmacClient;
 import me.sonam.security.util.JwtPath;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,19 +29,27 @@ public class YamlConfigTest {
     private PermitPath permitPath;
 
     @Autowired
+    private HmacClient hmacClient;
+
+    @Autowired
     private JwtPath jwtPath;
 
     @Test
     public void jwtPath() {
         LOG.info("jwt.path: {}", jwtPath.getJwtRequest().size());
-        assertThat(jwtPath.getJwtRequest().size()).isEqualTo(2);
+        assertThat(jwtPath.getJwtRequest().size()).isEqualTo(3);
 
         assertThat(jwtPath.getJwtRequest().get(0).getIn()).isEqualTo("/api/health/passheader");
-        assertThat(jwtPath.getJwtRequest().get(0).getOut()).isEqualTo("/jwts/accesstoken");
+        assertThat(jwtPath.getJwtRequest().get(0).getOut()).isEqualTo("/api/health/jwtreceiver");
+        assertThat(jwtPath.getJwtRequest().get(0).getJwt()).isEqualTo("request");
 
         assertThat(jwtPath.getJwtRequest().get(1).getIn()).isEqualTo("/api/health/passheader");
-        assertThat(jwtPath.getJwtRequest().get(1).getOut()).isEqualTo("/api/health/jwtreceiver");
+        assertThat(jwtPath.getJwtRequest().get(1).getOut()).isEqualTo("/api/health/liveness");
+        assertThat(jwtPath.getJwtRequest().get(1).getJwt()).isEqualTo("forward");
 
+        assertThat(jwtPath.getJwtRequest().get(2).getIn()).isEqualTo("/api/health/forwardtoken");
+        assertThat(jwtPath.getJwtRequest().get(2).getOut()).isEqualTo("/api/health/jwtreceiver");
+        assertThat(jwtPath.getJwtRequest().get(2).getJwt()).isEqualTo("forward");
     }
     @Test
     public void yamlTest() {
@@ -49,5 +58,15 @@ public class YamlConfigTest {
         permitPath.getPermitpath().forEach(path -> {
             LOG.info("path: {}, method: {}", path.getPath(), path.getHttpMethods());
         });
+    }
+
+    @Test
+    public void hmacKeyTest() {
+        LOG.info("test hmacClient");
+        LOG.info("hmacClient {}", hmacClient);
+
+        assertThat(hmacClient.getAlgorithm()).isEqualTo("HmacMD5");
+        assertThat(hmacClient.getClientId()).isEqualTo("jwt-validator");
+        assertThat(hmacClient.getSecretKey()).isEqualTo("mysecret");
     }
 }

@@ -54,9 +54,9 @@ public class JwtHeaderPassIntegTest {
     ReactiveJwtDecoder jwtDecoder;
     private static MockWebServer mockWebServer;
 
-    private static String jwtReceiverEndpoint = "http://localhost:{port}/api/health/jwtreceiver";
+    private static String jwtReceiverEndpoint = "http://localhost:{port}";///api/health/jwtreceiver";
     private static String apiPassHeaderEndpoint = "http://localhost:{port}/api/health/passheader";
-    private static String jwtRestServiceAccesstoken = "http://localhost:{port}/jwts/accesstoken";
+    private static String jwtRestServiceAccesstoken = "http://localhost:{port}";
     @Autowired
     private ServerProperties serverProperties;
 
@@ -83,10 +83,10 @@ public class JwtHeaderPassIntegTest {
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry r) throws IOException {
-        r.add("api-health-passheader", () -> apiPassHeaderEndpoint.replace("{port}", mockWebServer.getPort() + ""));
-        r.add("jwt-rest-service-accesstoken", () -> jwtRestServiceAccesstoken.replace("{port}", mockWebServer.getPort()+""));
+       // r.add("api-health-passheader", () -> apiPassHeaderEndpoint.replace("{port}", mockWebServer.getPort() + ""));
+        r.add("jwt-service.root", () -> "http://localhost:"+ mockWebServer.getPort());
 
-       // r.add("jwt-receiver", () -> jwtReceiverEndpoint.replace("{port}", serverProperties.getPort()+""));
+        //r.add("jwt-receiver.root", () -> jwtReceiverEndpoint.replace("{port}", serverProperties.getPort()+""));
 
         LOG.info("mockWebServer.port: {}", mockWebServer.getPort());
     }
