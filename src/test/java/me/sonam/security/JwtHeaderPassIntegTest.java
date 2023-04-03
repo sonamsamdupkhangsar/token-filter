@@ -20,12 +20,15 @@ import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -97,6 +100,21 @@ public class JwtHeaderPassIntegTest {
         client.get().uri("/api/health/jwtreceiver")
                 .exchange().expectStatus().isOk();
     }
+
+    @Test
+    public void demoClientErrorRetrieve() throws InterruptedException {
+        LOG.info("readiness delete requires jwt, should get bad request");
+
+        final String authenticationId = "dave";
+        Jwt jwt = jwt(authenticationId);
+        when(this.jwtDecoder.decode(anyString())).thenReturn(Mono.just(jwt));
+
+        LOG.info("call passheader endpoint");
+        client.get().uri("/api/health/callthrowerror")
+                .exchange().expectStatus().is5xxServerError();
+
+    }
+
 
     @Test
     public void passHeaderJwt() throws InterruptedException {

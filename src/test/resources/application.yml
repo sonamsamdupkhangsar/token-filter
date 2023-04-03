@@ -16,7 +16,7 @@ management:
 
 server:
   #  port: 8080
-  port: 9001
+  port: 10001
 
 # example of a simple 1 level
 allow:
@@ -44,6 +44,10 @@ permitpath:
   - path: /api/health/passheader
     httpmethods: GET
   - path: /api/health/calljwtreceiver
+    httpmethods: GET
+  - path: /api/health/callthrowerror
+    httpmethods: GET
+  - path: /api/health/throwerror
     httpmethods: GET
 
 # this is used for getting accesstoken by header filter

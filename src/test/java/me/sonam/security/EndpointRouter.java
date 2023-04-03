@@ -40,7 +40,11 @@ public class EndpointRouter {
                 .andRoute(GET("/api/health/calljwtreceiver").and(accept(MediaType.APPLICATION_JSON)),
                         livenessReadinessHandler::callJwtHeaderReceiverFromThis)
                 .andRoute(GET("/api/health/forwardtoken").and(accept(MediaType.APPLICATION_JSON)),
-                        livenessReadinessHandler::forwardtoken);
+                        livenessReadinessHandler::forwardtoken)
+                .andRoute(GET("/api/health/callthrowerror").and(accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::callthrowError)
+                .andRoute(GET("/api/health/throwerror").and(accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::throwError);
 
     }
 }
