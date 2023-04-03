@@ -42,6 +42,9 @@ public class EndpointHandler {
     @Value("${jwt-receiver.root}${jwt-receiver.receiver}")
     private String jwtReceiver;
 
+    @Value("${jwt-receiver.root}")
+    private String localHost;
+
     @Autowired
     private ReactiveRequestContextHolder reactiveRequestContextHolder;
 
@@ -106,7 +109,6 @@ public class EndpointHandler {
 
     private Mono<String> callEndpoint(final String endpoint) {
         LOG.info("call endpoint: {}", endpoint);
-
 
         WebClient.ResponseSpec responseSpec = webClient.get().uri(endpoint)
                 .accept(MediaType.APPLICATION_JSON)
@@ -186,6 +188,36 @@ public class EndpointHandler {
         LOG.info("authenticate user for authId: {}", authenticationId);
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build();
+    }
+    public Mono<ServerResponse> callthrowError(ServerRequest serverRequest) {
+        LOG.debug("call throw error");
+
+        final String endpoint = localHost+"/api/health/throwerror";
+
+        WebClient.ResponseSpec responseSpec = webClient.get().uri(endpoint)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve();
+
+        return responseSpec.bodyToMono(Map.class).
+            flatMap(s ->
+                    ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(getMap(Pair.of("message", s.toString()))))
+        .onErrorResume(throwable -> {
+            LOG.error("endpoint: '{}' rest call failed: {}", endpoint, throwable.getMessage());
+            String errorMessage = throwable.getMessage();
+
+            if (throwable instanceof WebClientResponseException) {
+                WebClientResponseException webClientResponseException = (WebClientResponseException) throwable;
+                LOG.error("error body contains: {}", webClientResponseException.getResponseBodyAsString());
+                errorMessage = webClientResponseException.getResponseBodyAsString();
+            }
+            return Mono.error(new SecurityException(errorMessage));
+        });
+    }
+
+    public Mono<ServerResponse> throwError(ServerRequest serverRequest) {
+        LOG.info("throwing error");
+        return ServerResponse.badRequest().bodyValue("throwing error");
     }
 
     public static Map<String, String> getMap(Pair<String, String>... pairs){

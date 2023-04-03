@@ -39,6 +39,7 @@ public class YamlConfigTest {
         LOG.info("jwt.path: {}", jwtPath.getJwtRequest().size());
         assertThat(jwtPath.getJwtRequest().size()).isEqualTo(3);
 
+        LOG.info("jwtPath[0].toString: {}", jwtPath.getJwtRequest().get(0).toString());
         assertThat(jwtPath.getJwtRequest().get(0).getIn()).isEqualTo("/api/health/passheader");
         assertThat(jwtPath.getJwtRequest().get(0).getOut()).isEqualTo("/api/health/jwtreceiver");
         assertThat(jwtPath.getJwtRequest().get(0).getJwt()).isEqualTo("request");
