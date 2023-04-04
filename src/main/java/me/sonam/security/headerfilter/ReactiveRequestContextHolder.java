@@ -37,6 +37,7 @@ public class ReactiveRequestContextHolder {
     @Autowired
     private WebClient.Builder webClientBuilder;
 
+
     public static Mono<ServerHttpRequest> getRequest() {
         return Mono.subscriberContext()
                 .map(ctx -> ctx.get(CONTEXT_KEY)).map(serverHttpRequest -> {
