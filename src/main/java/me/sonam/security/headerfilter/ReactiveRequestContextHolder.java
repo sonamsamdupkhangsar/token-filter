@@ -34,12 +34,8 @@ public class ReactiveRequestContextHolder {
     @Autowired
     private HmacClient hmacClient;
 
-    private WebClient webClient;
-
-    @PostConstruct
-    public void setWebClient() {
-        webClient = WebClient.builder().build();
-    }
+    @Autowired
+    private WebClient.Builder webClientBuilder;
 
     public static Mono<ServerHttpRequest> getRequest() {
         return Mono.subscriberContext()
@@ -114,7 +110,7 @@ public class ReactiveRequestContextHolder {
 
         final String hmac = Util.getHmac(hmacClient.getAlgorithm(), jsonString, hmacClient.getSecretKey());
         LOG.info("creating hmac for jwt-service: {}", jwtAccessTokenEndpoint);
-        WebClient.ResponseSpec responseSpec = webClient.post().uri(jwtAccessTokenEndpoint)
+        WebClient.ResponseSpec responseSpec = webClientBuilder.build().post().uri(jwtAccessTokenEndpoint)
                 .headers(httpHeaders -> httpHeaders.add(HttpHeaders.AUTHORIZATION, hmac))
                 .bodyValue(jsonString)
                 .accept(MediaType.APPLICATION_JSON)

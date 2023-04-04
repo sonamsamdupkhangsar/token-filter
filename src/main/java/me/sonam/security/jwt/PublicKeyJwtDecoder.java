@@ -7,6 +7,7 @@ import me.sonam.security.JwtBody;
 import me.sonam.security.SecurityException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
@@ -38,11 +39,10 @@ public class PublicKeyJwtDecoder implements ReactiveJwtDecoder  {
     private Map<UUID, Key> keyMap = new HashMap<>();
 
 
-    private WebClient webClient;
+    @Autowired
+    private WebClient.Builder webClientBuilder;
 
-    public PublicKeyJwtDecoder(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.build();
-        LOG.trace("initialized webClient: {}", webClient);
+    public PublicKeyJwtDecoder() {
     }
 
     @Override
@@ -178,7 +178,7 @@ public class PublicKeyJwtDecoder implements ReactiveJwtDecoder  {
         final String keyIdString = jwtPublicKeyIdEndpoint.replace("{keyId}", keyId.toString());
         LOG.info("keyIdString: {}", keyIdString);
 
-        WebClient.ResponseSpec spec = webClient.get().uri(keyIdString).retrieve();
+        WebClient.ResponseSpec spec = webClientBuilder.build().get().uri(keyIdString).retrieve();
 
         return spec.bodyToMono(Map.class).map(map -> {
             LOG.debug("public key string retrieved {}", map.get("key"));
