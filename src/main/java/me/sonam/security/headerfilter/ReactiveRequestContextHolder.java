@@ -7,6 +7,7 @@ import me.sonam.security.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -27,6 +28,8 @@ public class ReactiveRequestContextHolder {
     //set default value to empty if this filter is not added
     @Value("${jwt-service.root:}${jwt-service.accesstoken:}")
     private String jwtAccessTokenEndpoint;
+    @Value("${jwt-service.accesstoken:}")
+    private String accessTokenPath;
 
     @Autowired
     private JwtPath jwtPath;
@@ -35,8 +38,8 @@ public class ReactiveRequestContextHolder {
     private HmacClient hmacClient;
 
     @Autowired
+    @Qualifier("loadBalancedWebClient")
     private WebClient.Builder webClientBuilder;
-
 
     public static Mono<ServerHttpRequest> getRequest() {
         return Mono.subscriberContext()
@@ -50,21 +53,28 @@ public class ReactiveRequestContextHolder {
         LOG.info("calling new headerFilter");
         return (request, next) -> ReactiveRequestContextHolder.getRequest().flatMap(r ->
                 {
-                LOG.info("in path: {}, outbound path: {}",r.getPath().pathWithinApplication().value(),
-                        request.url().getPath());
-
-                    List<JwtPath.JwtRequest> jwtRequestList = jwtPath.getJwtRequest();
-                    for (JwtPath.JwtRequest jwtRequest : jwtRequestList) {
-                        if (r.getPath().pathWithinApplication().value().matches(jwtRequest.getIn()) &&
-                                request.url().getPath().matches(jwtRequest.getOut())) {
-                            LOG.info("inbound request path and outbound request path both matched");
-                            return getClientResponse(jwtRequest, request, r, next);
-                        }
+                    if (request.url().getPath().equals(accessTokenPath)) {
+                        LOG.info("don't call itself if using the same webclient builder");
+                        ClientRequest clientRequest = ClientRequest.from(request).build();
+                        return next.exchange(clientRequest);
                     }
-                    LOG.info("no path match found");
-                    LOG.info("just do nothing to add to header");
-                    ClientRequest clientRequest = ClientRequest.from(request).build();
-                    return next.exchange(clientRequest);
+                    else {
+                        LOG.info("in path: {}, outbound path: {}", r.getPath().pathWithinApplication().value(),
+                                request.url().getPath());
+
+                        List<JwtPath.JwtRequest> jwtRequestList = jwtPath.getJwtRequest();
+                        for (JwtPath.JwtRequest jwtRequest : jwtRequestList) {
+                            if (r.getPath().pathWithinApplication().value().matches(jwtRequest.getIn()) &&
+                                    request.url().getPath().matches(jwtRequest.getOut())) {
+                                LOG.info("inbound request path and outbound request path both matched");
+                                return getClientResponse(jwtRequest, request, r, next);
+                            }
+                        }
+                        LOG.info("no path match found");
+                        LOG.info("just do nothing to add to header");
+                        ClientRequest clientRequest = ClientRequest.from(request).build();
+                        return next.exchange(clientRequest);
+                    }
                 });
 
     }

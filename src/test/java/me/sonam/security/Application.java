@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.r2dbc.connection.init.ConnectionFactoryInitializer;
 import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @SpringBootApplication
 public class Application implements CommandLineRunner {
@@ -39,5 +40,10 @@ public class Application implements CommandLineRunner {
         return initializer;
     }
 
+    @Bean("loadBalancedWebClient")
+    public WebClient.Builder webClientBuilder() {
+        LOG.info("returning load balanced webclient part 2");
+        return WebClient.builder();
+    }
 
 }

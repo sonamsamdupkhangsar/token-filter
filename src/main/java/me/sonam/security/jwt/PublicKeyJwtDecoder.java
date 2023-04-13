@@ -8,7 +8,9 @@ import me.sonam.security.SecurityException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.stereotype.Component;
@@ -38,8 +40,8 @@ public class PublicKeyJwtDecoder implements ReactiveJwtDecoder  {
 
     private Map<UUID, Key> keyMap = new HashMap<>();
 
-
     @Autowired
+    @Qualifier("loadBalancedWebClient")
     private WebClient.Builder webClientBuilder;
 
     public PublicKeyJwtDecoder() {
@@ -61,7 +63,8 @@ public class PublicKeyJwtDecoder implements ReactiveJwtDecoder  {
                         LOG.info("return monoKey from keymap for uuid: {}", uuid);
                         return Mono.just(keyMap.get(uuid));
                     }
-                })
+                })//it is possible that the line 62 can return an empty or null value
+                // if this map was empty for whaterver reason.  restart is an option.
                 .flatMap(key -> validate(jwtToken, key))
                 .onErrorResume(throwable -> {
                     LOG.error("failed to validate jwtToken, error: {}", throwable.getMessage());
