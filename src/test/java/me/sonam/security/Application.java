@@ -39,4 +39,9 @@ public class Application implements CommandLineRunner {
         //initializer.setDatabaseCleaner(new ResourceDatabasePopulator(new ClassPathResource("cleanup.sql")));
         return initializer;
     }
+
+    @Bean("loadBalancedWebClient") //this will override the bean defined in {JwtHeaderWebClientConfig.class}
+    public WebClient.Builder testWebClient() {
+        return WebClient.builder();
+    }
 }
