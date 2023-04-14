@@ -39,11 +39,4 @@ public class Application implements CommandLineRunner {
         //initializer.setDatabaseCleaner(new ResourceDatabasePopulator(new ClassPathResource("cleanup.sql")));
         return initializer;
     }
-
-    @Bean("loadBalancedWebClient")
-    public WebClient.Builder webClientBuilder() {
-        LOG.info("returning load balanced webclient part 2");
-        return WebClient.builder();
-    }
-
 }

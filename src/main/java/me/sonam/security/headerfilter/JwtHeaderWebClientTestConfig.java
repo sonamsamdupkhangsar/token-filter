@@ -8,14 +8,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.reactive.function.client.WebClient;
 
-@Profile("!localdevtest")
+@Profile("localdevtest")
 @Configuration
-public class JwtHeaderWebClientConfig {
-    private static final Logger LOG = LoggerFactory.getLogger(JwtHeaderWebClientConfig.class);
-    @LoadBalanced
+public class JwtHeaderWebClientTestConfig {
+    private static final Logger LOG = LoggerFactory.getLogger(JwtHeaderWebClientTestConfig.class);
     @Bean("loadBalancedWebClient")
     public WebClient.Builder webClientBuilder() {
-        LOG.info("returning jwt-validator loadBalancedWebClient");
+        LOG.info("returning jwt-validator non-loadBalanced webClient for testing profile only");
         return WebClient.builder();
     }
 }

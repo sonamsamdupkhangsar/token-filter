@@ -50,7 +50,7 @@ public class ReactiveRequestContextHolder {
     }
 
     public ExchangeFilterFunction headerFilter() {
-        LOG.info("calling new headerFilter");
+        LOG.info("in headerFilter()");
         return (request, next) -> ReactiveRequestContextHolder.getRequest().flatMap(r ->
                 {
                     if (request.url().getPath().equals(accessTokenPath)) {
