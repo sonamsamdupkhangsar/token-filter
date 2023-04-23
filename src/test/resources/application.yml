@@ -15,9 +15,11 @@ management:
       show-details: always
 
 server:
-  #  port: 8080
   port: 10001
 
+eureka:
+  client:
+    enabled: false
 # example of a simple 1 level
 allow:
   - path: /users

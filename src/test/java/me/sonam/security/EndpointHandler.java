@@ -6,6 +6,7 @@ import me.sonam.security.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -31,8 +32,6 @@ import java.util.Map;
 public class EndpointHandler {
     private static final Logger LOG = LoggerFactory.getLogger(EndpointHandler.class);
 
-    private WebClient webClient;
-
     @Autowired
     private HmacClient hmacClient;
 
@@ -48,9 +47,11 @@ public class EndpointHandler {
     @Autowired
     private ReactiveRequestContextHolder reactiveRequestContextHolder;
 
+    private WebClient.Builder webClientBuilder = WebClient.builder();
+
     @PostConstruct
     public void setWebClient() {
-        webClient = WebClient.builder().filter(reactiveRequestContextHolder.headerFilter()).build();
+        webClientBuilder.filter(reactiveRequestContextHolder.headerFilter()).build();
     }
 
     public Mono<ServerResponse> liveness(ServerRequest serverRequest) {
@@ -110,7 +111,7 @@ public class EndpointHandler {
     private Mono<String> callEndpoint(final String endpoint) {
         LOG.info("call endpoint: {}", endpoint);
 
-        WebClient.ResponseSpec responseSpec = webClient.get().uri(endpoint)
+        WebClient.ResponseSpec responseSpec = webClientBuilder.build().get().uri(endpoint)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve();
         return responseSpec.bodyToMono(Map.class).map(map -> {
@@ -194,7 +195,7 @@ public class EndpointHandler {
 
         final String endpoint = localHost+"/api/health/throwerror";
 
-        WebClient.ResponseSpec responseSpec = webClient.get().uri(endpoint)
+        WebClient.ResponseSpec responseSpec = webClientBuilder.build().get().uri(endpoint)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve();
 
@@ -216,7 +217,7 @@ public class EndpointHandler {
     }
 
     public Mono<ServerResponse> throwError(ServerRequest serverRequest) {
-        LOG.info("throwing error");
+        LOG.info("throwing error from path /api/health/throwerror");
         return ServerResponse.badRequest().bodyValue("throwing error");
     }
 

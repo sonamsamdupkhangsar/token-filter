@@ -1,6 +1,8 @@
 package me.sonam.security;
 
 import io.r2dbc.spi.ConnectionFactory;
+import me.sonam.security.headerfilter.ReactiveRequestContextHolder;
+import me.sonam.security.jwt.PublicKeyJwtDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.r2dbc.connection.init.ConnectionFactoryInitializer;
 import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @SpringBootApplication
 public class Application implements CommandLineRunner {
@@ -39,5 +42,19 @@ public class Application implements CommandLineRunner {
         return initializer;
     }
 
+    @Bean
+    public WebClient.Builder testWebClient() {
+        return WebClient.builder();
+    }
+
+    @Bean
+    public PublicKeyJwtDecoder publicKeyJwtDecoder() {
+        return new PublicKeyJwtDecoder(testWebClient());
+    }
+
+    @Bean
+    public ReactiveRequestContextHolder reactiveRequestContextHolder() {
+        return new ReactiveRequestContextHolder(testWebClient());
+    }
 
 }

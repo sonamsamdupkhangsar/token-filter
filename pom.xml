@@ -12,10 +12,12 @@
 
     <groupId>me.sonam</groupId>
     <artifactId>jwt-validator</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
     <name>jwt-validator</name>
     <description>This is my spring security library for validating jwt token.</description>
-
+    <properties>
+        <spring-cloud.version>2021.0.4</spring-cloud.version>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>me.sonam</groupId>
@@ -28,10 +30,18 @@
             <artifactId>spring-boot-starter-webflux</artifactId>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -142,6 +152,15 @@
             <url>https://maven.pkg.github.com/sonamsamdupkhangsar/jwt-validator</url>
         </repository>
     </distributionManagement>
-
-
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>

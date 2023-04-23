@@ -72,8 +72,6 @@ public class JwtValidation {
      */
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry r) throws IOException {
-        /*r.add("jwt-rest-service-public-key-id", () -> jwtRestServicePublicKeyId.replace("{port}",
-                mockWebServer.getPort()+""));*/
         r.add("jwt-service.root", () -> "http://localhost:"+ mockWebServer.getPort());
         LOG.info("updated jwtRestServicePublicKeyId property");
     }
@@ -121,8 +119,10 @@ public class JwtValidation {
         final String audience = "";
 
         me.sonam.security.jwt.JwtBody jwtBody = new me.sonam.security.jwt.JwtBody(subject, scopes, clientId, audience, role, groups, 10, null);
+        LOG.info("request to create jwtTokenString from jwtBody object");
         Mono<String> jwtTokenString = jwtCreator.create(jwtBody);
 
+        LOG.info("validate the jwtTokenString with decoder");
         Mono<Jwt> jwtMono = jwtTokenString.flatMap(token -> rPublicKeyJwtDecoder.decode(token));
 
         jwtMono.as(StepVerifier::create).assertNext(jwt -> {

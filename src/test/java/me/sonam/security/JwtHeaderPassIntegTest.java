@@ -19,6 +19,8 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -62,6 +64,7 @@ public class JwtHeaderPassIntegTest {
     private static String jwtRestServiceAccesstoken = "http://localhost:{port}";
     @Autowired
     private ServerProperties serverProperties;
+
 
     @Before
     public void setUp() {
