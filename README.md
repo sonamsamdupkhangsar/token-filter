@@ -78,6 +78,71 @@ to a jwt-rest-service to create a new jwt token.
 
 In the second example of `in` and `out`, if there is a jwt token in the inbound request then it will be `forward`ed to the downstream service.
 
+This `jwt-validator` is meant to be deployed using a Eureka discovery service.  Therefore, this uses `loadbalanced` webclients.  The following is an example of how to configure the filter and the validator:
+```
+@Profile("!localdevtest")
+@Configuration
+public class WebClientConfig {
+    private static final Logger LOG = LoggerFactory.getLogger(WebClientConfig.class);
+    @LoadBalanced
+    @Bean
+    public WebClient.Builder webClientBuilder() {
+        LOG.info("returning load balanced webclient part");
+        return WebClient.builder();
+    }
+    @LoadBalanced
+    @Bean("noFilter")
+    public WebClient.Builder webClientBuilderNoFilter() {
+        LOG.info("returning for noFilter load balanced webclient part");
+        return WebClient.builder();
+    }
+
+    @Bean
+    public PublicKeyJwtDecoder publicKeyJwtDecoder() {
+        return new PublicKeyJwtDecoder(webClientBuilderNoFilter());
+    }
+
+    @Bean
+    public ReactiveRequestContextHolder reactiveRequestContextHolder() {
+        return new ReactiveRequestContextHolder(webClientBuilderNoFilter());
+    }
+
+    @Bean
+    public SimpleAuthenticationService simpleAuthenticationService() {
+        return new SimpleAuthenticationService(webClientBuilder());
+    }
+}
+```
+The regular loadbalanced webclient will be used for the business service such as `SimpleAuthenticationService` or any other business service.  The `noFilter` beans are used by the `publicKeyJwtDecoder` and the `reactiveRequestContextHolder`.
+
+Similarly, for testing the config can use non-loadbalanced webclient such as:
+```
+@Profile("localdevtest")
+@Configuration
+public class WebClientConfig {
+    private static final Logger LOG = LoggerFactory.getLogger(WebClientConfig.class);
+    @Bean
+    public WebClient.Builder webClientBuilder() {
+        LOG.info("returning load balanced webclient part 2");
+        return WebClient.builder();
+    }
+    @Bean
+    public PublicKeyJwtDecoder publicKeyJwtDecoder() {
+        return new PublicKeyJwtDecoder(webClientBuilder());
+    }
+
+    @Bean
+    public ReactiveRequestContextHolder reactiveRequestContextHolder() {
+        return new ReactiveRequestContextHolder(webClientBuilder());
+    }
+
+    @Bean
+    public SimpleAuthenticationService userAccountService() {
+        return new SimpleAuthenticationService(webClientBuilder());
+    }
+}
+```
+
 
 
 Fore more on how to use this `jwt-validator` from github to another github repository follow [How to use maven library from github in your maven project?](https://sonamsamdupkhangsar.github.io/pulling-down-github-maven-library/)

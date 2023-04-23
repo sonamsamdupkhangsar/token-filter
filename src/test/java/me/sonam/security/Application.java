@@ -1,6 +1,8 @@
 package me.sonam.security;
 
 import io.r2dbc.spi.ConnectionFactory;
+import me.sonam.security.headerfilter.ReactiveRequestContextHolder;
+import me.sonam.security.jwt.PublicKeyJwtDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +42,19 @@ public class Application implements CommandLineRunner {
         return initializer;
     }
 
-    @Bean("loadBalancedWebClient") //this will override the bean defined in {JwtHeaderWebClientConfig.class}
+    @Bean
     public WebClient.Builder testWebClient() {
         return WebClient.builder();
     }
+
+    @Bean
+    public PublicKeyJwtDecoder publicKeyJwtDecoder() {
+        return new PublicKeyJwtDecoder(testWebClient());
+    }
+
+    @Bean
+    public ReactiveRequestContextHolder reactiveRequestContextHolder() {
+        return new ReactiveRequestContextHolder(testWebClient());
+    }
+
 }

@@ -31,7 +31,7 @@ import java.util.*;
  * This implementation of {@link ReactiveJwtDecoder} is used by {@link me.sonam.security.AuthenticationManager}
  * for decoding a string JWT token and returning a OAuth2 JWT token type.
  */
-@Component
+//@Component
 public class PublicKeyJwtDecoder implements ReactiveJwtDecoder  {
     private static final Logger LOG = LoggerFactory.getLogger(PublicKeyJwtDecoder.class);
 
@@ -40,11 +40,13 @@ public class PublicKeyJwtDecoder implements ReactiveJwtDecoder  {
 
     private Map<UUID, Key> keyMap = new HashMap<>();
 
-    @Autowired
-    @Qualifier("loadBalancedWebClient")
     private WebClient.Builder webClientBuilder;
 
     public PublicKeyJwtDecoder() {
+    }
+
+    public PublicKeyJwtDecoder(WebClient.Builder webClientBuilder) {
+        this.webClientBuilder = webClientBuilder;
     }
 
     @Override
