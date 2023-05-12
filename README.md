@@ -1,16 +1,11 @@
 # jwt-validator
-This is a security library to validate JWT token issued using the [jwt-issuer](https://github.com/sonamsamdupkhangsar/jwt-issuer) library.
+This is a security library to validate JWT token issued by a spring-authorization-server implementation of OAuth 2.1 and OpenID Connect 1.0.
 
 ## Use case
-This library is used for securing access to a web based application by requiring all request to contain a JWT token.  This library will inspect all request for a JWT string token.  
+This library is used for securing access to api endpoints and also allowing access to certain health endpoints without requiring access-tokens.
 
 ## Workflow of Decoding a Jwt string token
-`PublicKeyJwtDecoder.class` will take the Jwt string.  It will parse the `keyId` of the Jwt token to get the id of the KeyPair.  It will make a request to fetch the RSA public-key from another rest-service like [jwt-rest-service](https://github.com/sonamsamdupkhangsar/jwt-rest-service) that uses the `PublicKeyJwtCreator.class` for creating the Jwt token and which stores the RSA key-pair. 
- 
- The validator service will then use the public key to validate the token has not been tampered and return a OAuth2 JWT token type.
-  
- ## Token Validator
- Token validators should use the library provided here for securing web app.
+The endpoints are assesed for jwt validation using the jwt-issuer endpoints as defined in the configuration.
 
  ## Building package
  `mvn -s settings.xml clean package`
@@ -55,8 +50,14 @@ permitpath:
   - path: /api/health/readiness
     httpMethods: POST
   - path: /api/health/liveness
-    httpmethods: HEAD, POST
+    httpMethods: HEAD, POST
+  - path: /api/scope/read
+    scopes: message:read      
 ```
+
+If certain api endpoint requires a scope validation check then that can be specified as
+ `scopes: message:read`. If both httpMethds and scopes is defined then the scopes will be applied only.
+
 <br />
 This jwt-validator can also request jwt token to be created or requested from the jwt-rest-service to be sent to a service that requires a jwt token.  This can be done
 using the following configuration example:
@@ -143,6 +144,9 @@ public class WebClientConfig {
 }
 ```
 
+curl -X POST 'http://localhost:9000/oauth2/token?grant_type=client_credentials' \  
+--header 'Authorization: Basic b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA=='
+{"access_token":"eyJraWQiOiIxZDA2NmM0NS1hMDVmLTRhMjUtOWYwYS1hM2NiZTgxZmNmYWYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJvYXV0aC1jbGllbnQiLCJhdWQiOiJvYXV0aC1jbGllbnQiLCJuYmYiOjE2ODM3NzEwOTAsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6OTAwMCIsImV4cCI6MTY4Mzc3MTM5MCwiaWF0IjoxNjgzNzcxMDkwfQ.d0pIwbTTF3NdMQ0x_ateveA551OuiLce7O0jKAzbmPpjTvXxq82RJVIHOdqW_MrRIW-yApt1HUE85wbPRS7C7KXYjuNeY73uva5KYNGGmGL__wokUvOQerohDv6PbLYupoIK3lx63OUYz3atSimXZ48tSHzdnNtMAh9Kw7sRE86UZLjzXk80WIQ5UNVY7_r6mwLrNiz_jjxEP2hW7HOCbR42bi3GL9u9veYR2p9nggDTwom8dN0zeIxGuWRbPPv4v8WPUlg8egUAEJadAiXC7LzEn_apvH_zkAx-ZRhqic4I_EdoWv7MUjyl0B4n2olvMeQwhM9S2OmnZDdrlNf8NQ","token_type":"Bearer","expires_in":299}%
 
 
 Fore more on how to use this `jwt-validator` from github to another github repository follow [How to use maven library from github in your maven project?](https://sonamsamdupkhangsar.github.io/pulling-down-github-maven-library/)

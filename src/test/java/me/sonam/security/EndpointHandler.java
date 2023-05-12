@@ -1,15 +1,11 @@
 package me.sonam.security;
 
+import jakarta.annotation.PostConstruct;
 import me.sonam.security.headerfilter.ReactiveRequestContextHolder;
-import me.sonam.security.util.HmacClient;
-import me.sonam.security.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -21,7 +17,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.PostConstruct;
+//import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,10 +28,7 @@ import java.util.Map;
 public class EndpointHandler {
     private static final Logger LOG = LoggerFactory.getLogger(EndpointHandler.class);
 
-    @Autowired
-    private HmacClient hmacClient;
-
-    @Value("${jwt-service.root}${jwt-service.accesstoken}")
+    @Value("${auth-server.root}${auth-server.oauth2token}")
     private String jwtRestServiceAccessToken;
 
     @Value("${jwt-receiver.root}${jwt-receiver.receiver}")
@@ -82,9 +75,6 @@ public class EndpointHandler {
 
     public Mono<ServerResponse> readinessDelete(ServerRequest serverRequest) {
         LOG.debug("readiness delete requires jwt");
-
-        String authenticationId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        LOG.info("authenticate user for authId: {}", authenticationId);
 
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build();
     }
@@ -219,6 +209,11 @@ public class EndpointHandler {
     public Mono<ServerResponse> throwError(ServerRequest serverRequest) {
         LOG.info("throwing error from path /api/health/throwerror");
         return ServerResponse.badRequest().bodyValue("throwing error");
+    }
+
+    public Mono<ServerResponse> scopeEndpoint(ServerRequest serverRequest) {
+        LOG.debug("scope read check endpoint");
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build();
     }
 
     public static Map<String, String> getMap(Pair<String, String>... pairs){

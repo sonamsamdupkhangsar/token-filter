@@ -33,7 +33,9 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
     @Override
     @SuppressWarnings("unchecked")
     public Mono<Authentication> authenticate(Authentication authentication) {
+        LOG.info("authentication: {},\n authorities: {}", authentication, authentication.getAuthorities());
         String authToken = authentication.getCredentials().toString();
+        LOG.info("authToken: {}", authToken);
 
         return jwtDecoder.decode(authToken).map(jwt -> {
             LOG.debug("returning UsernamePasswordAuthenticationToken: jwt.subject: {}", jwt.getSubject());

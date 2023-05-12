@@ -44,7 +44,9 @@ public class EndpointRouter {
                 .andRoute(GET("/api/health/callthrowerror").and(accept(MediaType.APPLICATION_JSON)),
                         livenessReadinessHandler::callthrowError)
                 .andRoute(GET("/api/health/throwerror").and(accept(MediaType.APPLICATION_JSON)),
-                        livenessReadinessHandler::throwError);
+                        livenessReadinessHandler::throwError)
+                .andRoute(GET("/api/scope/read").and(accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::scopeEndpoint);
 
     }
 }

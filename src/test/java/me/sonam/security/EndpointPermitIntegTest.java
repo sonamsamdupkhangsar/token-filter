@@ -1,5 +1,7 @@
 package me.sonam.security;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.java.Log;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +19,9 @@ import org.springframework.test.web.reactive.server.FluxExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
+import java.security.Key;
+import java.time.Duration;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -38,6 +42,36 @@ public class EndpointPermitIntegTest {
 
   @MockBean
   ReactiveJwtDecoder jwtDecoder;
+
+  @Test
+  public void scopeReadCheck() {
+    LOG.info("api/scope/read check");
+    final String authenticationId = "dave";
+    Jwt jwt = jwt(authenticationId);
+
+    LOG.info("the following is needed to return the correct jwt");
+    when(this.jwtDecoder.decode(anyString())).thenReturn(Mono.just(jwt));
+
+    final String jwtString = createJwt("sonam", "message:read");
+    client.get().uri("/api/scope/read")
+           .headers(addJwt(jwtString)) //this is not the actual one
+            .exchange().expectStatus().isOk();
+  }
+
+  @Test
+  public void apiCallFailScope() {
+    LOG.info("ap/scope/read check fail test");
+    final String authenticationId = "dave";
+    Jwt jwt = jwt(authenticationId, "message:none");
+
+    when(this.jwtDecoder.decode(anyString())).thenReturn(Mono.just(jwt));
+
+    final String jwtString = createJwt("sonam", "message:none");
+    client.get().uri("/api/scope/read")
+            .headers(addJwt(jwtString))
+            .exchange().expectStatus().isForbidden();
+  }
+
 
   @Test
   public void readinessEndpointPermittedPublic() {
@@ -61,20 +95,6 @@ public class EndpointPermitIntegTest {
     client.delete().uri("/api/health/readiness")
             .exchange().expectStatus().isUnauthorized();
   }
-
-  @Test
-  public void readinessDeleteSendJwt() {
-    LOG.info("readiness delete requires jwt, should get bad request");
-
-    final String authenticationId = "dave";
-    Jwt jwt = jwt(authenticationId);
-    when(this.jwtDecoder.decode(anyString())).thenReturn(Mono.just(jwt));
-
-    client.delete().uri("/api/health/readiness")
-            .headers(addJwt(jwt))
-            .exchange().expectStatus().isOk();
-  }
-
 
   @Test
   public void livenessEndpoindRequiresJwtWithJwt() {
@@ -114,11 +134,53 @@ public class EndpointPermitIntegTest {
 
 
   private Jwt jwt(String subjectName) {
-    return new Jwt("token", null, null,
-            Map.of("alg", "none"), Map.of("sub", subjectName));
+    return new Jwt("thisismytoken", null, null,
+            Map.of("alg", "none"), Map.of("sub", subjectName, "scope", "message:read"));
+  }
+  private Jwt jwt(String subjectName, String scope) {
+    return new Jwt("thisismytoken", null, null,
+            Map.of("alg", "none"), Map.of("sub", subjectName, "scope", scope));
   }
 
   private Consumer<HttpHeaders> addJwt(Jwt jwt) {
+
+    LOG.info("add tokenValue: {}", jwt.getTokenValue());
     return headers -> headers.setBearerAuth(jwt.getTokenValue());
+  }
+
+  private Consumer<HttpHeaders> addJwt(final String jwt) {
+
+    LOG.info("add jwt: {}", jwt);
+    return headers -> headers.setBearerAuth(jwt);
+  }
+  private String createJwt(final String subject, final String scope) {
+
+    Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+    Date issueDate = calendar.getTime();
+
+    Duration duration = Duration.ofSeconds(60);
+
+    calendar.add(Calendar.SECOND, (int)duration.getSeconds());
+
+    Date expireDate = calendar.getTime();
+
+    LOG.debug("load private key");
+
+    LOG.debug("add claims to jwt");
+    Map<String, Object> claimsMap = new HashMap<>();
+    claimsMap.put("clientId", "123-client-id");
+    claimsMap.put("scope", List.of(scope));
+    claimsMap.put("role", List.of("admin", "manager", "user"));
+
+    String jwt = Jwts.builder()
+            .setSubject(subject)
+            .setIssuer("http://localhost:9000")
+            .setAudience("http://localhost:9000")
+            .setIssuedAt(issueDate)
+            .addClaims(claimsMap)
+            .setExpiration(expireDate)
+            .setId(UUID.randomUUID().toString())
+            .compact();
+    return jwt;
   }
 }

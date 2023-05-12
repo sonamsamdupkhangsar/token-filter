@@ -6,6 +6,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.server.ServerWebExchange;
+
+
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
@@ -21,7 +23,6 @@ public class ReactiveRequestContextFilter implements WebFilter {
         ServerHttpRequest request = exchange.getRequest();
         LOG.debug("request: {}", request.getPath());
 
-        return chain.filter(exchange)
-                .subscriberContext(ctx -> ctx.put(ReactiveRequestContextHolder.CONTEXT_KEY, request));
+        return chain.filter(exchange).contextWrite(context -> context.put(ReactiveRequestContextHolder.CONTEXT_KEY, request));
     }
 }

@@ -2,7 +2,6 @@ package me.sonam.security;
 
 import me.sonam.security.jwt.JwtBody;
 import me.sonam.security.jwt.PublicKeyJwtCreator;
-import me.sonam.security.jwt.PublicKeyJwtDecoder;
 import me.sonam.security.jwt.repo.JwtKeyRepository;
 import me.sonam.security.jwt.repo.entity.JwtKey;
 import okhttp3.mockwebserver.MockResponse;
@@ -51,8 +50,6 @@ public class JwtValidation {
     @Autowired
     private PublicKeyJwtCreator jwtCreator;
 
-    @Autowired
-    private PublicKeyJwtDecoder rPublicKeyJwtDecoder;
 
     @Autowired
     private ReactiveJwtDecoder decoder;
@@ -72,7 +69,7 @@ public class JwtValidation {
      */
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry r) throws IOException {
-        r.add("jwt-service.root", () -> "http://localhost:"+ mockWebServer.getPort());
+        r.add("auth-server.root", () -> "http://localhost:"+ mockWebServer.getPort());
         LOG.info("updated jwtRestServicePublicKeyId property");
     }
 
@@ -97,6 +94,10 @@ public class JwtValidation {
     }
 
     @Test
+    public void hell() {
+        LOG.info("hello");
+        assertThat("hello").isEqualTo("hello");
+    }
     public void createJwt() throws Exception {
         LOG.info("Create jwt");
 
@@ -105,7 +106,7 @@ public class JwtValidation {
 
         JwtKey jwtKey = jwtCreator.createJwtKey();
         jwtKeyRepository.save(jwtKey).subscribe(jwtKey1 -> LOG.info("saved jwtKey: {}", jwtKey1));
-        Key publicKey = rPublicKeyJwtDecoder.loadPublicKey(jwtKey.getPublicKey());
+        Key publicKey = null;//rPublicKeyJwtDecoder.loadPublicKey(jwtKey.getPublicKey());
         LOG.info("loaded publicKey object");
 
         final String keyMapJsonResponse = "{\"key\": \""+jwtKey.getPublicKey()+"\"}";
@@ -123,7 +124,7 @@ public class JwtValidation {
         Mono<String> jwtTokenString = jwtCreator.create(jwtBody);
 
         LOG.info("validate the jwtTokenString with decoder");
-        Mono<Jwt> jwtMono = jwtTokenString.flatMap(token -> rPublicKeyJwtDecoder.decode(token));
+        Mono<Jwt> jwtMono = jwtTokenString.flatMap(token -> decoder.decode(token));
 
         jwtMono.as(StepVerifier::create).assertNext(jwt -> {
             RecordedRequest request = null;

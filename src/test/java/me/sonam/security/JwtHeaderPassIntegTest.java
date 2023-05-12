@@ -90,7 +90,7 @@ public class JwtHeaderPassIntegTest {
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry r) throws IOException {
        // r.add("api-health-passheader", () -> apiPassHeaderEndpoint.replace("{port}", mockWebServer.getPort() + ""));
-        r.add("jwt-service.root", () -> "http://localhost:"+ mockWebServer.getPort());
+        r.add("auth-server.root", () -> "http://localhost:"+ mockWebServer.getPort());
 
         //r.add("jwt-receiver.root", () -> jwtReceiverEndpoint.replace("{port}", serverProperties.getPort()+""));
 
@@ -129,7 +129,7 @@ public class JwtHeaderPassIntegTest {
 
         final String jwtString= "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzb25hbSIsImlzcyI6InNvbmFtLmNsb3VkIiwiYXVkIjoic29uYW0uY2xvdWQiLCJqdGkiOiJmMTY2NjM1OS05YTViLTQ3NzMtOWUyNy00OGU0OTFlNDYzNGIifQ.KGFBUjghvcmNGDH0eM17S9pWkoLwbvDaDBGAx2AyB41yZ_8-WewTriR08JdjLskw1dsRYpMh9idxQ4BS6xmOCQ";
 
-        final String jwtTokenMsg = " {\"token\":\""+jwtString+"\"}";
+        final String jwtTokenMsg = " {\"access_token\":\""+jwtString+"\"}";
         mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json")
                 .setResponseCode(200).setBody(jwtTokenMsg));
 
@@ -142,7 +142,7 @@ public class JwtHeaderPassIntegTest {
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
-        assertThat(recordedRequest.getPath()).isEqualTo("/jwts/accesstoken");
+        assertThat(recordedRequest.getPath()).isEqualTo("/oauth2/token?grant_type=client_credentials");
         assertThat(recordedRequest.getMethod()).isEqualTo("POST");
     }
 
@@ -170,7 +170,7 @@ public class JwtHeaderPassIntegTest {
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
-        assertThat(recordedRequest.getPath()).isEqualTo("/jwts/accesstoken");
+        assertThat(recordedRequest.getPath()).isEqualTo("/oauth2/token?grant_type=client_credentials");
         assertThat(recordedRequest.getMethod()).isEqualTo("POST");
     }
 
@@ -184,7 +184,7 @@ public class JwtHeaderPassIntegTest {
         when(this.jwtDecoder.decode(anyString())).thenReturn(Mono.just(jwt));
 
         LOG.info("call passheader endpoint");
-        client.get().uri("/api/health/calljwtreceiver")
+        client.get().uri("/api/health/calljwtreceiver")//.headers(addJwt(jwt))
                 .exchange().expectStatus().isOk();
     }
 

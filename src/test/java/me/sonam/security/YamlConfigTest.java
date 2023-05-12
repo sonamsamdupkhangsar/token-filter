@@ -2,7 +2,6 @@ package me.sonam.security;
 
 import lombok.extern.java.Log;
 import me.sonam.security.property.PermitPath;
-import me.sonam.security.util.HmacClient;
 import me.sonam.security.util.JwtPath;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,13 +22,7 @@ public class YamlConfigTest {
     private static final Logger LOG = LoggerFactory.getLogger(YamlConfigTest.class);
 
     @Autowired
-    private AllowProps allowProps;
-
-    @Autowired
     private PermitPath permitPath;
-
-    @Autowired
-    private HmacClient hmacClient;
 
     @Autowired
     private JwtPath jwtPath;
@@ -55,19 +48,8 @@ public class YamlConfigTest {
     @Test
     public void yamlTest() {
         LOG.info("permitPath: {}", permitPath);
-        LOG.info("allowProps: {}", allowProps);
         permitPath.getPermitpath().forEach(path -> {
             LOG.info("path: {}, method: {}", path.getPath(), path.getHttpMethods());
         });
-    }
-
-    @Test
-    public void hmacKeyTest() {
-        LOG.info("test hmacClient");
-        LOG.info("hmacClient {}", hmacClient);
-
-        assertThat(hmacClient.getAlgorithm()).isEqualTo("HmacMD5");
-        assertThat(hmacClient.getClientId()).isEqualTo("jwt-validator");
-        assertThat(hmacClient.getSecretKey()).isEqualTo("mysecret");
     }
 }

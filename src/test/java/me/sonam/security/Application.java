@@ -2,10 +2,8 @@ package me.sonam.security;
 
 import io.r2dbc.spi.ConnectionFactory;
 import me.sonam.security.headerfilter.ReactiveRequestContextHolder;
-import me.sonam.security.jwt.PublicKeyJwtDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -23,11 +21,10 @@ public class Application implements CommandLineRunner {
         SpringApplication.run(Application.class, args);
     }
 
-    @Autowired
-    private AllowProps allow;
+
     @Override
     public void run(String... args) {
-        System.out.println(allow);
+
     }
 
     @Bean()
@@ -45,11 +42,6 @@ public class Application implements CommandLineRunner {
     @Bean
     public WebClient.Builder testWebClient() {
         return WebClient.builder();
-    }
-
-    @Bean
-    public PublicKeyJwtDecoder publicKeyJwtDecoder() {
-        return new PublicKeyJwtDecoder(testWebClient());
     }
 
     @Bean
