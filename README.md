@@ -1,11 +1,11 @@
 # jwt-validator
-This is a security library to validate JWT token issued by a spring-authorization-server implementation of OAuth 2.1 and OpenID Connect 1.0.
+This is a security library to validate JWT token issued by a spring-authorization-server that implements OAuth 2.1 and OpenID Connect 1.0 specifications.
 
 ## Use case
 This library is used for securing access to api endpoints and also allowing access to certain health endpoints without requiring access-tokens.
 
 ## Workflow of Decoding a Jwt string token
-The endpoints are assesed for jwt validation using the jwt-issuer endpoints as defined in the configuration.
+The endpoints are assesed for jwt validation using the jwt issuer endpoints as defined in the configuration.
 
  ## Building package
  `mvn -s settings.xml clean package`
