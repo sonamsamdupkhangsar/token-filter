@@ -30,20 +30,20 @@ public class YamlConfigTest {
     @Test
     public void jwtPath() {
         LOG.info("jwt.path: {}", jwtPath.getJwtRequest().size());
-        assertThat(jwtPath.getJwtRequest().size()).isEqualTo(3);
+        assertThat(jwtPath.getJwtRequest().size()).isEqualTo(4);
 
         LOG.info("jwtPath[0].toString: {}", jwtPath.getJwtRequest().get(0).toString());
         assertThat(jwtPath.getJwtRequest().get(0).getIn()).isEqualTo("/api/health/passheader");
         assertThat(jwtPath.getJwtRequest().get(0).getOut()).isEqualTo("/api/health/jwtreceiver");
-        assertThat(jwtPath.getJwtRequest().get(0).getJwt()).isEqualTo("request");
+        assertThat(jwtPath.getJwtRequest().get(0).getAccessToken().getOption().name()).isEqualTo("request");
 
         assertThat(jwtPath.getJwtRequest().get(1).getIn()).isEqualTo("/api/health/passheader");
         assertThat(jwtPath.getJwtRequest().get(1).getOut()).isEqualTo("/api/health/liveness");
-        assertThat(jwtPath.getJwtRequest().get(1).getJwt()).isEqualTo("forward");
+        assertThat(jwtPath.getJwtRequest().get(1).getAccessToken().getOption().name()).isEqualTo("forward");
 
         assertThat(jwtPath.getJwtRequest().get(2).getIn()).isEqualTo("/api/health/forwardtoken");
         assertThat(jwtPath.getJwtRequest().get(2).getOut()).isEqualTo("/api/health/jwtreceiver");
-        assertThat(jwtPath.getJwtRequest().get(2).getJwt()).isEqualTo("forward");
+        assertThat(jwtPath.getJwtRequest().get(2).getAccessToken().getOption().name()).isEqualTo("forward");
     }
     @Test
     public void yamlTest() {

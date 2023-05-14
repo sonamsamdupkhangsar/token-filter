@@ -52,7 +52,7 @@ public class EndpointPermitIntegTest {
     LOG.info("the following is needed to return the correct jwt");
     when(this.jwtDecoder.decode(anyString())).thenReturn(Mono.just(jwt));
 
-    final String jwtString = createJwt("sonam", "message:read");
+    final String jwtString = createJwt("sonam", "message.read");
     client.get().uri("/api/scope/read")
            .headers(addJwt(jwtString)) //this is not the actual one
             .exchange().expectStatus().isOk();
@@ -135,7 +135,7 @@ public class EndpointPermitIntegTest {
 
   private Jwt jwt(String subjectName) {
     return new Jwt("thisismytoken", null, null,
-            Map.of("alg", "none"), Map.of("sub", subjectName, "scope", "message:read"));
+            Map.of("alg", "none"), Map.of("sub", subjectName, "scope", "message.read"));
   }
   private Jwt jwt(String subjectName, String scope) {
     return new Jwt("thisismytoken", null, null,
@@ -153,7 +153,7 @@ public class EndpointPermitIntegTest {
     LOG.info("add jwt: {}", jwt);
     return headers -> headers.setBearerAuth(jwt);
   }
-  private String createJwt(final String subject, final String scope) {
+  private String createJwt(final String subject, final String... scopes) {
 
     Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
     Date issueDate = calendar.getTime();
@@ -169,7 +169,7 @@ public class EndpointPermitIntegTest {
     LOG.debug("add claims to jwt");
     Map<String, Object> claimsMap = new HashMap<>();
     claimsMap.put("clientId", "123-client-id");
-    claimsMap.put("scope", List.of(scope));
+    claimsMap.put("scope", List.of(scopes));
     claimsMap.put("role", List.of("admin", "manager", "user"));
 
     String jwt = Jwts.builder()

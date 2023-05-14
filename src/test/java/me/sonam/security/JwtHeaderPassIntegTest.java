@@ -142,7 +142,7 @@ public class JwtHeaderPassIntegTest {
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
-        assertThat(recordedRequest.getPath()).isEqualTo("/oauth2/token?grant_type=client_credentials");
+        assertThat(recordedRequest.getPath()).startsWith("/oauth2/token?grant_type=client_credentials");
         assertThat(recordedRequest.getMethod()).isEqualTo("POST");
     }
 
@@ -170,7 +170,7 @@ public class JwtHeaderPassIntegTest {
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
-        assertThat(recordedRequest.getPath()).isEqualTo("/oauth2/token?grant_type=client_credentials");
+        assertThat(recordedRequest.getPath()).startsWith("/oauth2/token?grant_type=client_credentials");
         assertThat(recordedRequest.getMethod()).isEqualTo("POST");
     }
 

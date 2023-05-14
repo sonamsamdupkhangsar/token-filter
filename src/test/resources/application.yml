@@ -29,8 +29,10 @@ permitpath:
     scopes: SCOPE_message:read
   - path: /api/health/readiness
     httpMethods: GET, POST
+  - path: /api/scope/callread
+    httpMethods: GET
   - path: /api/scope/read
-    scopes: message:read
+    scopes: message.read, message.write
 #  - path: /api/health/readiness
 #    httpMethods: POST
   - path: /api/health/liveness
@@ -49,7 +51,9 @@ permitpath:
 # this is used for getting accesstoken by header filter
 auth-server:
   root: http://localhost:{port}
-  oauth2token: /oauth2/token?grant_type=client_credentials
+  oauth2token:
+    path: /oauth2/token
+    params: ?grant_type=client_credentials
 
 # this is for testing
 jwt-receiver:
@@ -68,7 +72,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://idp.example.com/issuer
+          issuer-uri: http://localhost:9000
 # this issuer-uri is used for discovering the authorization server's public keys and to use them for validating jwt.
 # for spring.security.oauth2.resourceserver.jwt.issuer-uri: check link
 # https://docs.spring.io/spring-security/reference/reactive/oauth2/resource-server/jwt.html
@@ -80,13 +84,24 @@ base64EncodedClientIdAndSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
 jwtrequest:
   - in: /api/health/passheader
     out: /api/health/jwtreceiver
-    jwt: request
+    accessToken:
+      option: request
+      scopes: message.read message.write
+      base64EncodedClientIdSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
   - in: /api/health/passheader
     out: /api/health/liveness
-    jwt: forward
+    accessToken:
+      option: forward
   - in: /api/health/forwardtoken
     out: /api/health/jwtreceiver
-    jwt: forward
+    accessToken:
+      option: forward
+  - in: /api/scope/callread
+    out: /api/scope/read
+    accessToken:
+      option: request
+      scopes: message.read
+      base64EncodedClientIdSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
 
 #hmacKey:
 #  clientId: jwt-validator

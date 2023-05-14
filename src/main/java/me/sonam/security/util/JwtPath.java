@@ -34,13 +34,12 @@ public class JwtPath {
         });
     }
 
+
+
     public static class JwtRequest {
         private String in;
         private String out;
-        private String jwt;
-        public enum JwtOption {
-            forward, request, doNothing
-        }
+        private AccessToken accessToken;
 
         public JwtRequest() {
         }
@@ -61,12 +60,12 @@ public class JwtPath {
             this.out = out;
         }
 
-        public String getJwt() {
-            return jwt;
+        public AccessToken getAccessToken() {
+            return accessToken;
         }
 
-        public void setJwt(String jwt) {
-            this.jwt = jwt;
+        public void setAccessToken(AccessToken accessToken) {
+            this.accessToken = accessToken;
         }
 
         @Override
@@ -74,8 +73,43 @@ public class JwtPath {
             return "JwtRequest{" +
                     "in='" + in + '\'' +
                     ", out='" + out + '\'' +
-                    ", jwt='" + jwt + '\'' +
+                    ", accessToken='" + accessToken + '\'' +
                     '}';
+        }
+
+        public static class AccessToken {
+            public static enum JwtOption {
+                forward, request, doNothing
+            }
+
+            private JwtOption option;
+            private String scopes;
+            private String base64EncodedClientIdSecret;
+
+            public AccessToken(String option, String scopes, String base64EncodedClientIdSecret) {
+                this.option = JwtOption.valueOf(option);
+                this.scopes = scopes;
+                this.base64EncodedClientIdSecret = base64EncodedClientIdSecret;
+            }
+
+            public JwtOption getOption() {
+                return option;
+            }
+            public String getScopes() {
+                return scopes;
+            }
+            public String getBase64EncodedClientIdSecret() {
+                return base64EncodedClientIdSecret;
+            }
+
+            @Override
+            public String toString() {
+                return "AccessToken{" +
+                        "option=" + option +
+                        ", scopes='" + scopes + '\'' +
+                        ", base64EncodedClientIdSecret='" + base64EncodedClientIdSecret + '\'' +
+                        '}';
+            }
         }
     }
 }

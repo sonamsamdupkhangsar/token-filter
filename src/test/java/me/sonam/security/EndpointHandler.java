@@ -28,9 +28,6 @@ import java.util.Map;
 public class EndpointHandler {
     private static final Logger LOG = LoggerFactory.getLogger(EndpointHandler.class);
 
-    @Value("${auth-server.root}${auth-server.oauth2token}")
-    private String jwtRestServiceAccessToken;
-
     @Value("${jwt-receiver.root}${jwt-receiver.receiver}")
     private String jwtReceiver;
 
@@ -40,7 +37,11 @@ public class EndpointHandler {
     @Autowired
     private ReactiveRequestContextHolder reactiveRequestContextHolder;
 
-    private WebClient.Builder webClientBuilder = WebClient.builder();
+    private WebClient.Builder webClientBuilder;
+
+    public EndpointHandler(WebClient.Builder webClientBuilder) {
+        this.webClientBuilder = webClientBuilder;
+    }
 
     @PostConstruct
     public void setWebClient() {
@@ -214,6 +215,29 @@ public class EndpointHandler {
     public Mono<ServerResponse> scopeEndpoint(ServerRequest serverRequest) {
         LOG.debug("scope read check endpoint");
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build();
+    }
+
+    public Mono<ServerResponse> callScopeEndpoint(ServerRequest serverRequest) {
+        LOG.debug("this will call scopeEndpoint with a jwt token from localhost environment");
+        final String apiScopeReadEndpoint = localHost + "/api/scope/read";
+
+        return webClientBuilder.build().get().uri(apiScopeReadEndpoint)
+                .retrieve()
+                .bodyToMono(String.class).flatMap(s -> {
+                    LOG.info("response from api/scope/read is {}", s);
+                    return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue(s);
+                })
+                .onErrorResume(throwable -> {
+                    LOG.error("endpoint: '{}' rest call failed: {}", apiScopeReadEndpoint, throwable.getMessage());
+                    String errorMessage = throwable.getMessage();
+
+                    if (throwable instanceof WebClientResponseException) {
+                        WebClientResponseException webClientResponseException = (WebClientResponseException) throwable;
+                        LOG.error("error body contains: {}", webClientResponseException.getResponseBodyAsString());
+                        errorMessage = webClientResponseException.getResponseBodyAsString();
+                    }
+                    return Mono.error(new SecurityException(errorMessage));
+                });
     }
 
     public static Map<String, String> getMap(Pair<String, String>... pairs){
