@@ -29,11 +29,12 @@ import static org.mockito.Mockito.when;
 /**
  * this is not meant to be run as a test case.  This is for connecting to a remote authorization server
  * to verify scoping function using the client credential flow.
+ * To run it uncomment the annotations and  apply test to see {@link #scopeReadCheck()} method
  */
-@AutoConfigureWebTestClient
+/*@AutoConfigureWebTestClient
 @SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Log
-@RunWith(SpringRunner.class)
+@RunWith(SpringRunner.class)*/
 public class LocalhostIdpJwt {
     private static final Logger LOG = LoggerFactory.getLogger(LocalhostIdpJwt.class);
 
@@ -46,13 +47,15 @@ public class LocalhostIdpJwt {
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry r) throws IOException {
         // r.add("api-health-passheader", () -> apiPassHeaderEndpoint.replace("{port}", mockWebServer.getPort() + ""));
-        r.add("auth-server.root", () -> "http://localhost:9000" );
+        r.add("auth-server.root", () -> "http://localhost:9000");
     }
 
-        @Test
-        public void hello() {
+    @Test
+    public void hello() {
         LOG.info("hello");
-        }
+    }
+
+    // @Test
     public void scopeReadCheck() {
 
         LOG.info("api/scope/callread check");
