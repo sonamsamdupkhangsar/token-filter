@@ -132,9 +132,13 @@ public class WebClientConfig {
 }
 ```
 
-curl -X POST 'http://localhost:9000/oauth2/token?grant_type=client_credentials' \  
---header 'Authorization: Basic b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA=='
-{"access_token":"eyJraWQiOiIxZDA2NmM0NS1hMDVmLTRhMjUtOWYwYS1hM2NiZTgxZmNmYWYiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJvYXV0aC1jbGllbnQiLCJhdWQiOiJvYXV0aC1jbGllbnQiLCJuYmYiOjE2ODM3NzEwOTAsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6OTAwMCIsImV4cCI6MTY4Mzc3MTM5MCwiaWF0IjoxNjgzNzcxMDkwfQ.d0pIwbTTF3NdMQ0x_ateveA551OuiLce7O0jKAzbmPpjTvXxq82RJVIHOdqW_MrRIW-yApt1HUE85wbPRS7C7KXYjuNeY73uva5KYNGGmGL__wokUvOQerohDv6PbLYupoIK3lx63OUYz3atSimXZ48tSHzdnNtMAh9Kw7sRE86UZLjzXk80WIQ5UNVY7_r6mwLrNiz_jjxEP2hW7HOCbR42bi3GL9u9veYR2p9nggDTwom8dN0zeIxGuWRbPPv4v8WPUlg8egUAEJadAiXC7LzEn_apvH_zkAx-ZRhqic4I_EdoWv7MUjyl0B4n2olvMeQwhM9S2OmnZDdrlNf8NQ","token_type":"Bearer","expires_in":299}%
+### How to use curl to get access-token using Client Credentials Flow
+`curl -X POST 'http://localhost:9000/oauth2/token?grant_type=client_credentials&scope=message.read%20message.write' \
+--header 'Authorization: Basic b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA=='`
+The following is the response from the authorization server:
+`
+{"access_token":"eyJraWQiOiJmY2UzYWU2My0wZjNhLTQ1OWYtODkwOS1lN2JiOWM3M2NkODkiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJvYXV0aC1jbGllbnQiLCJhdWQiOiJvYXV0aC1jbGllbnQiLCJuYmYiOjE2ODQxMTU0MzksInNjb3BlIjpbIm1lc3NhZ2UucmVhZCIsIm1lc3NhZ2Uud3JpdGUiXSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo5MDAwIiwiZXhwIjoxNjg0MTE1NzM5LCJpYXQiOjE2ODQxMTU0MzksImF1dGhvcml0aWVzIjpbIm1lc3NhZ2UucmVhZCIsIm1lc3NhZ2Uud3JpdGUiXX0.g__CojLV9yD-KEzIHDimmAbomap3vvgfK4KiMVJn8GvPZesD1d3QLGkzNXA_J4DHZt5VbWFbh6Q0iE2gx5bWmzsMKFDiVot2w-b79rhXE22JnlhX2uvYUO_APum3TQGvy0QCIoOXug98HqoiLyveyVZVMkTcwlO2zZyajR8QdGN3B7U9C47-mlZ0ZAahb_cXHdyGaM68ibaXcEArIrwRtprcSA82EJCy3XRoz_5eKo8-qldjsmXwQ2km4otJ4QHnw7zjJ0FZytLUGxAvlJjqpULCstCkuKM7BBFQZHkzjHhjdajPWHhwzTmKTXywJW2780ckssS_9UzggZfc0RXa6w","scope":"message.read message.write","token_type":"Bearer","expires_in":299}`
+
 
 
 Fore more on how to use this `jwt-validator` from github to another github repository follow [How to use maven library from github in your maven project?](https://sonamsamdupkhangsar.github.io/pulling-down-github-maven-library/)
