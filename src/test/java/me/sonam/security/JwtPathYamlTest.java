@@ -18,8 +18,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @Log
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Application.class})
-public class YamlConfigTest {
-    private static final Logger LOG = LoggerFactory.getLogger(YamlConfigTest.class);
+public class JwtPathYamlTest {
+    private static final Logger LOG = LoggerFactory.getLogger(JwtPathYamlTest.class);
 
     @Autowired
     private PermitPath permitPath;
@@ -36,14 +36,35 @@ public class YamlConfigTest {
         assertThat(jwtPath.getJwtRequest().get(0).getIn()).isEqualTo("/api/health/passheader");
         assertThat(jwtPath.getJwtRequest().get(0).getOut()).isEqualTo("/api/health/jwtreceiver");
         assertThat(jwtPath.getJwtRequest().get(0).getAccessToken().getOption().name()).isEqualTo("request");
+        assertThat(jwtPath.getJwtRequest().get(0).getAccessToken().getOption().name()).isNotEqualTo("doNothing");
+        assertThat(jwtPath.getJwtRequest().get(0).getAccessToken().getScopes()).isEqualTo("message.read message.write");
+        assertThat(jwtPath.getJwtRequest().get(0).getAccessToken().getScopes()).isNotEqualTo("message.read");
+        assertThat(jwtPath.getJwtRequest().get(0).getAccessToken().getBase64EncodedClientIdSecret()).isEqualTo("b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==");
+        assertThat(jwtPath.getJwtRequest().get(0).getAccessToken().getBase64EncodedClientIdSecret()).isNotEqualTo("randomstring");
+
 
         assertThat(jwtPath.getJwtRequest().get(1).getIn()).isEqualTo("/api/health/passheader");
         assertThat(jwtPath.getJwtRequest().get(1).getOut()).isEqualTo("/api/health/liveness");
         assertThat(jwtPath.getJwtRequest().get(1).getAccessToken().getOption().name()).isEqualTo("forward");
+        assertThat(jwtPath.getJwtRequest().get(1).getAccessToken().getOption().name()).isNotEqualTo("request");
+        assertThat(jwtPath.getJwtRequest().get(1).getAccessToken().getScopes()).isNull();
+        assertThat(jwtPath.getJwtRequest().get(1).getAccessToken().getBase64EncodedClientIdSecret()).isNull();
 
         assertThat(jwtPath.getJwtRequest().get(2).getIn()).isEqualTo("/api/health/forwardtoken");
         assertThat(jwtPath.getJwtRequest().get(2).getOut()).isEqualTo("/api/health/jwtreceiver");
         assertThat(jwtPath.getJwtRequest().get(2).getAccessToken().getOption().name()).isEqualTo("forward");
+        assertThat(jwtPath.getJwtRequest().get(2).getAccessToken().getScopes()).isNull();
+        assertThat(jwtPath.getJwtRequest().get(2).getAccessToken().getBase64EncodedClientIdSecret()).isNull();
+
+        assertThat(jwtPath.getJwtRequest().get(3).getIn()).isEqualTo("/api/scope/callread");
+        assertThat(jwtPath.getJwtRequest().get(3).getOut()).isEqualTo("/api/scope/read");
+        assertThat(jwtPath.getJwtRequest().get(3).getAccessToken().getOption().name()).isEqualTo("request");
+        assertThat(jwtPath.getJwtRequest().get(3).getAccessToken().getOption().name()).isNotEqualTo("doNothing");
+        assertThat(jwtPath.getJwtRequest().get(3).getAccessToken().getScopes()).isEqualTo("message.read");
+        assertThat(jwtPath.getJwtRequest().get(3).getAccessToken().getScopes()).isNotEqualTo("message.read message.write");
+        assertThat(jwtPath.getJwtRequest().get(3).getAccessToken().getBase64EncodedClientIdSecret()).isEqualTo("b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==");
+        assertThat(jwtPath.getJwtRequest().get(3).getAccessToken().getBase64EncodedClientIdSecret()).isNotEqualTo("randomstring");
+
     }
     @Test
     public void yamlTest() {
