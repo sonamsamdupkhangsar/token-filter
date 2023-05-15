@@ -26,15 +26,13 @@ permitpath:
     httpMethods: POST, GET
   - path: /user/create
     httpMethods: POST
-    scopes: SCOPE_message:read
+    scopes: message.read
   - path: /api/health/readiness
     httpMethods: GET, POST
   - path: /api/scope/callread
     httpMethods: GET
   - path: /api/scope/read
     scopes: message.read, message.write
-#  - path: /api/health/readiness
-#    httpMethods: POST
   - path: /api/health/liveness
     httpMethods: HEAD, POST
   - path: /api/health/jwtreceiver
