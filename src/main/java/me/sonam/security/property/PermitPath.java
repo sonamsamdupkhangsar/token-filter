@@ -28,6 +28,8 @@ public class PermitPath {
 
     public static class Path {
         private String path;
+        // if scopes is defined then it will take precedence over httpMethods values
+        private String scopes;
         private String httpMethods;
 
         public String getPath() {
@@ -46,11 +48,20 @@ public class PermitPath {
             this.httpMethods = httpMethods;
         }
 
+        public String getScopes() {
+            return scopes;
+        }
+
+        public void setScopes(String scopes) {
+            this.scopes = scopes;
+        }
+
         @Override
         public String toString() {
             return "PermitPath{" +
                     "path='" + path + '\'' +
                     ", httpMethods='" + httpMethods + '\'' +
+                    ", scopes='" + scopes + '\'' +
                     '}';
         }
     }

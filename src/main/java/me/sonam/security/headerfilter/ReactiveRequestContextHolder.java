@@ -1,9 +1,7 @@
 package me.sonam.security.headerfilter;
 
 import me.sonam.security.SecurityException;
-import me.sonam.security.util.HmacClient;
 import me.sonam.security.util.JwtPath;
-import me.sonam.security.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,16 +21,19 @@ public class ReactiveRequestContextHolder {
     static final Class<ServerHttpRequest> CONTEXT_KEY = ServerHttpRequest.class;
 
     //set default value to empty if this filter is not added
-    @Value("${jwt-service.root:}${jwt-service.accesstoken:}")
-    private String jwtAccessTokenEndpoint;
-    @Value("${jwt-service.accesstoken:}")
+    //the following is the endpoint for provision of accesstoken from https://{host}:{port}/oauth2/token
+    @Value("${auth-server.root:}${auth-server.oauth2token.path}${auth-server.oauth2token.params}")
+    private String oauth2TokenEndpoint;
+    @Value("${auth-server.oauth2token.path:}")
     private String accessTokenPath;
 
     @Autowired
     private JwtPath jwtPath;
 
-    @Autowired
-    private HmacClient hmacClient;
+    // base64 encoded of clientId and secret if jwt requested for outgoing call
+    // based on jwtrequest outbound call.
+    @Value("${base64EncodedClientIdAndSecret:}")
+    private String base64EncodedClientIdAndSecret;
 
     private WebClient.Builder webClientBuilder;
 
@@ -41,7 +42,7 @@ public class ReactiveRequestContextHolder {
     }
 
     public static Mono<ServerHttpRequest> getRequest() {
-        return Mono.subscriberContext()
+        return Mono.deferContextual(Mono::just)// returns .Mono<ContextView>
                 .map(ctx -> ctx.get(CONTEXT_KEY)).map(serverHttpRequest -> {
                     LOG.info("serverHttpRequest: {}", serverHttpRequest.getPath());
                     return serverHttpRequest;
@@ -52,6 +53,8 @@ public class ReactiveRequestContextHolder {
         LOG.info("in headerFilter()");
         return (request, next) -> ReactiveRequestContextHolder.getRequest().flatMap(r ->
                 {
+                    LOG.info("request path: {}, accessTokenPath: {}", request.url().getPath(), accessTokenPath);
+
                     if (request.url().getPath().equals(accessTokenPath)) {
                         LOG.info("don't call itself if using the same webclient builder");
                         ClientRequest clientRequest = ClientRequest.from(request).build();
@@ -80,8 +83,8 @@ public class ReactiveRequestContextHolder {
 
     private Mono<ClientResponse> getClientResponse(JwtPath.JwtRequest jwtRequest, ClientRequest request,
                                                    ServerHttpRequest serverHttpRequest, ExchangeFunction exchangeFunction) {
-            if (jwtRequest.getJwt().equals(JwtPath.JwtRequest.JwtOption.request.name())) {
-                return getJwt().flatMap(s -> {
+            if (jwtRequest.getAccessToken().getOption().name().equals(JwtPath.JwtRequest.AccessToken.JwtOption.request.name())) {
+                return getJwt(jwtRequest.getAccessToken()).flatMap(s -> {
                     ClientRequest clientRequest = ClientRequest.from(request)
                             .headers(headers -> {
                                 headers.set(HttpHeaders.ORIGIN, serverHttpRequest.getHeaders().getFirst(HttpHeaders.ORIGIN));
@@ -91,7 +94,7 @@ public class ReactiveRequestContextHolder {
                     return exchangeFunction.exchange(clientRequest);
                 });
             }
-            else if (jwtRequest.getJwt().equals(JwtPath.JwtRequest.JwtOption.forward.name())) {
+            else if (jwtRequest.getAccessToken().getOption().name().equals(JwtPath.JwtRequest.AccessToken.JwtOption.forward.name())) {
                 ClientRequest clientRequest = ClientRequest.from(request)
                         .headers(headers -> {
                             headers.set(HttpHeaders.ORIGIN, serverHttpRequest.getHeaders().getFirst(HttpHeaders.ORIGIN));
@@ -107,28 +110,27 @@ public class ReactiveRequestContextHolder {
             }
     }
 
-    private Mono<String> getJwt() {
-        final String jsonString = "{\n" +
-                "  \"sub\": \""+hmacClient.getClientId()+"\",\n" +
-                "  \"scope\": \""+hmacClient.getClientId()+"\",\n" +
-                "  \"clientId\": \""+hmacClient.getClientId()+"\",\n" +
-                "  \"aud\": \"service\",\n" +
-                "  \"role\": \"service\",\n" +
-                "  \"groups\": \"service\",\n" +
-                "  \"expiresInSeconds\": 300\n" +
-                "}\n";
+    private Mono<String> getJwt(JwtPath.JwtRequest.AccessToken accessToken) {
+        LOG.info("get access token using base64EncodedClientIdAndSecret: {}," +
+                " b64ClientIdAndSecret: {}, scopes: {}", oauth2TokenEndpoint,
+                accessToken.getBase64EncodedClientIdSecret(),
+                accessToken.getScopes());
+        final StringBuilder oauthEndpointWithScope = new StringBuilder(oauth2TokenEndpoint);
 
-        final String hmac = Util.getHmac(hmacClient.getAlgorithm(), jsonString, hmacClient.getSecretKey());
-        LOG.info("creating hmac for jwt-service: {}", jwtAccessTokenEndpoint);
-        WebClient.ResponseSpec responseSpec = webClientBuilder.build().post().uri(jwtAccessTokenEndpoint)
-                .headers(httpHeaders -> httpHeaders.add(HttpHeaders.AUTHORIZATION, hmac))
-                .bodyValue(jsonString)
+        if (accessToken.getScopes() != null && !accessToken.getScopes().trim().isEmpty()) {
+            oauthEndpointWithScope.append("&scope=").append(accessToken.getScopes()).toString();
+        }
+
+        LOG.info("sending oauth2TokenEndpointWithScopes: {}", oauthEndpointWithScope);
+
+        WebClient.ResponseSpec responseSpec = webClientBuilder.build().post().uri(oauthEndpointWithScope.toString())
+                .headers(httpHeaders -> httpHeaders.setBasicAuth(accessToken.getBase64EncodedClientIdSecret()))
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve();
         return responseSpec.bodyToMono(Map.class).map(map -> {
-            LOG.debug("response for '{}' is in map: {}", jwtAccessTokenEndpoint, map);
-            if (map.get("token") != null) {
-                return map.get("token").toString();
+            LOG.debug("response for '{}' is in map: {}", oauth2TokenEndpoint, map);
+            if (map.get("access_token") != null) {
+                return map.get("access_token").toString();
             }
             else {
                 LOG.error("nothing to return");

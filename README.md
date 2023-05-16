@@ -1,16 +1,8 @@
 # jwt-validator
-This is a security library to validate JWT token issued using the [jwt-issuer](https://github.com/sonamsamdupkhangsar/jwt-issuer) library.
+This is a security library to validate JWT token issued by a spring-authorization-server that implements OAuth 2.1 and OpenID Connect 1.0 specifications.
 
 ## Use case
-This library is used for securing access to a web based application by requiring all request to contain a JWT token.  This library will inspect all request for a JWT string token.  
-
-## Workflow of Decoding a Jwt string token
-`PublicKeyJwtDecoder.class` will take the Jwt string.  It will parse the `keyId` of the Jwt token to get the id of the KeyPair.  It will make a request to fetch the RSA public-key from another rest-service like [jwt-rest-service](https://github.com/sonamsamdupkhangsar/jwt-rest-service) that uses the `PublicKeyJwtCreator.class` for creating the Jwt token and which stores the RSA key-pair. 
- 
- The validator service will then use the public key to validate the token has not been tampered and return a OAuth2 JWT token type.
-  
- ## Token Validator
- Token validators should use the library provided here for securing web app.
+This library is used for securing access to api endpoints and also allowing access to certain health endpoints that shouldn't require access-tokens.
 
  ## Building package
  `mvn -s settings.xml clean package`
@@ -24,7 +16,7 @@ To use this `jwt-validator` in your maven based project include the following in
 <dependency>
   <groupId>me.sonam</groupId>
   <artifactId>jwt-validator</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.3-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -42,41 +34,45 @@ or do
 
 You also have to ensure your application is scanned too.  So you may have to add additional package to scan as well as shown above.
 
+The following example shows the endpoints that can be allowed to such as the
+`/api/health/readiness` endpoint which don't require any access-tokens.  In this endpoint, both `GET` and `POST` methods are allowed without a token.  
+For `/api/scope/read` endpoint a access-token is required that must have a scope of either
+`message.read` or `message.write`.
 
-You can override permitted paths that don't require jwt validation in your application.yaml as following:
 ```
 permitpath:
-  - path: /users
-    httpMethods: POST, GET
-  - path: /user/create
-    httpMethods: POST
   - path: /api/health/readiness
+    httpMethods: GET, POST
+  - path: /api/scope/callread
     httpMethods: GET
-  - path: /api/health/readiness
-    httpMethods: POST
-  - path: /api/health/liveness
-    httpmethods: HEAD, POST
+  - path: /api/scope/read
+    scopes: message.read, message.write    
 ```
-<br />
-This jwt-validator can also request jwt token to be created or requested from the jwt-rest-service to be sent to a service that requires a jwt token.  This can be done
+
+This jwt-validator library can also request access-token to be created from the spring authorization server using `Client Credentials Flow` token.  This can be done
 using the following configuration example:
 
 ```
 jwtrequest:
-  - in: /api/health/passheader
-    out: /api/health/jwtreceiver
-    jwt: request
+  - in: /api/scope/callread
+    out: /api/scope/read
+    accessToken:
+      option: request
+      scopes: message.read
+      base64EncodedClientIdSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
   - in: /api/health/passheader
     out: /api/health/liveness
-    jwt: forward
+    accessToken:
+      option: forward
   - in: /api/health/forwardtoken
     out: /api/health/jwtreceiver
-    jwt: forward
+    accessToken:
+      option: forward
 ```
-In the above first example of `in` and `out`, the `in` and `out` path is matched by the `ReactiveRequestContextHolder` web filter for a request inbound path and a another request that is going outbound.  If the in-path and out-path matches then a `request` will be made
-to a jwt-rest-service to create a new jwt token.  
+In the above example, the `in` defines the inbound request path of `/api/scope/callread` and `out` defines the outbound request going out to another api `/api/scope/read`. The `accessToken` section indicates whether to use Client Credentials Flow to generate a access-token when `option` field has a value of `request`.  The `scopes` sections indicates the scopes to request from the authorization server.  The scopes can include multiple scope values such as "message.read message.write".
+The `base64EncodedClientIdSecret` is the ClientId and Client Secret values encoded using base64.
 
-In the second example of `in` and `out`, if there is a jwt token in the inbound request then it will be `forward`ed to the downstream service.
+You can also forward the inbound access-token using the `accessToken` of `option` with `forward` value or not send it to outbound api with `doNothing` value.
 
 This `jwt-validator` is meant to be deployed using a Eureka discovery service.  Therefore, this uses `loadbalanced` webclients.  The following is an example of how to configure the filter and the validator:
 ```
@@ -84,22 +80,19 @@ This `jwt-validator` is meant to be deployed using a Eureka discovery service.  
 @Configuration
 public class WebClientConfig {
     private static final Logger LOG = LoggerFactory.getLogger(WebClientConfig.class);
+    
     @LoadBalanced
     @Bean
     public WebClient.Builder webClientBuilder() {
         LOG.info("returning load balanced webclient part");
         return WebClient.builder();
     }
+    
     @LoadBalanced
-    @Bean("noFilter")
-    public WebClient.Builder webClientBuilderNoFilter() {
-        LOG.info("returning for noFilter load balanced webclient part");
-        return WebClient.builder();
-    }
-
     @Bean
-    public PublicKeyJwtDecoder publicKeyJwtDecoder() {
-        return new PublicKeyJwtDecoder(webClientBuilderNoFilter());
+    public WebClient.Builder webClientBuilderNoFilter() {
+        LOG.info("returning another loadbalanced webclient");
+        return WebClient.builder();
     }
 
     @Bean
@@ -113,7 +106,7 @@ public class WebClientConfig {
     }
 }
 ```
-The regular loadbalanced webclient will be used for the business service such as `SimpleAuthenticationService` or any other business service.  The `noFilter` beans are used by the `publicKeyJwtDecoder` and the `reactiveRequestContextHolder`.
+The loadbalanced webclient will be used for the business service such as `SimpleAuthenticationService` or any other business service.  The `noFilter` beans are used by the `ReactiveRequestContextHolder` service for Client Credentials Flow filter.
 
 Similarly, for testing the config can use non-loadbalanced webclient such as:
 ```
@@ -125,10 +118,6 @@ public class WebClientConfig {
     public WebClient.Builder webClientBuilder() {
         LOG.info("returning load balanced webclient part 2");
         return WebClient.builder();
-    }
-    @Bean
-    public PublicKeyJwtDecoder publicKeyJwtDecoder() {
-        return new PublicKeyJwtDecoder(webClientBuilder());
     }
 
     @Bean
@@ -142,6 +131,15 @@ public class WebClientConfig {
     }
 }
 ```
+
+### How to use curl to get access-token using Client Credentials Flow
+`curl -X POST 'http://localhost:9000/oauth2/token?grant_type=client_credentials&scope=message.read%20message.write' \
+--header 'Authorization: Basic b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA=='`
+
+
+The following is the response from the authorization server:
+
+`{"access_token":"eyJraWQiOiJmY2UzYWU2My0wZjNhLTQ1OWYtODkwOS1lN2JiOWM3M2NkODkiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJvYXV0aC1jbGllbnQiLCJhdWQiOiJvYXV0aC1jbGllbnQiLCJuYmYiOjE2ODQxMTU0MzksInNjb3BlIjpbIm1lc3NhZ2UucmVhZCIsIm1lc3NhZ2Uud3JpdGUiXSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo5MDAwIiwiZXhwIjoxNjg0MTE1NzM5LCJpYXQiOjE2ODQxMTU0MzksImF1dGhvcml0aWVzIjpbIm1lc3NhZ2UucmVhZCIsIm1lc3NhZ2Uud3JpdGUiXX0.g__CojLV9yD-KEzIHDimmAbomap3vvgfK4KiMVJn8GvPZesD1d3QLGkzNXA_J4DHZt5VbWFbh6Q0iE2gx5bWmzsMKFDiVot2w-b79rhXE22JnlhX2uvYUO_APum3TQGvy0QCIoOXug98HqoiLyveyVZVMkTcwlO2zZyajR8QdGN3B7U9C47-mlZ0ZAahb_cXHdyGaM68ibaXcEArIrwRtprcSA82EJCy3XRoz_5eKo8-qldjsmXwQ2km4otJ4QHnw7zjJ0FZytLUGxAvlJjqpULCstCkuKM7BBFQZHkzjHhjdajPWHhwzTmKTXywJW2780ckssS_9UzggZfc0RXa6w","scope":"message.read message.write","token_type":"Bearer","expires_in":299}`
 
 
 
