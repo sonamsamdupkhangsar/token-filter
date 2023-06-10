@@ -34,6 +34,7 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
         return Mono.justOrEmpty(swe.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
                 .filter(authHeader -> authHeader.startsWith("Bearer "))
                 .flatMap(authHeader -> {
+                    LOG.info("getting authToken: {}", authHeader);
                     String authToken = authHeader.substring(7);
                     Authentication auth = new UsernamePasswordAuthenticationToken(authToken, authToken);
                     return this.authenticationManager.authenticate(auth).map(SecurityContextImpl::new);

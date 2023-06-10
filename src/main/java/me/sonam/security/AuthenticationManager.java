@@ -15,6 +15,11 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+
+/**
+ * This class is not needed anymore because jwt decode will be done using the AuthorizationServer Oauth2 issuer url.
+ * leaving it here for now without activation?
+ */
 import java.util.List;
 
 @Component
@@ -33,6 +38,7 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
     @Override
     @SuppressWarnings("unchecked")
     public Mono<Authentication> authenticate(Authentication authentication) {
+        LOG.info("reactiveJwtDecoder: {}", jwtDecoder);
         LOG.info("authentication: {},\n authorities: {}", authentication, authentication.getAuthorities());
         String authToken = authentication.getCredentials().toString();
         LOG.info("authToken: {}", authToken);

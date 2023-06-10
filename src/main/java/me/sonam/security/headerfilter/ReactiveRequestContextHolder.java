@@ -22,7 +22,7 @@ public class ReactiveRequestContextHolder {
 
     //set default value to empty if this filter is not added
     //the following is the endpoint for provision of accesstoken from https://{host}:{port}/oauth2/token
-    @Value("${auth-server.root:}${auth-server.oauth2token.path}${auth-server.oauth2token.params}")
+    @Value("${auth-server.root:}${auth-server.oauth2token.path:}${auth-server.oauth2token.params:}")
     private String oauth2TokenEndpoint;
     @Value("${auth-server.oauth2token.path:}")
     private String accessTokenPath;

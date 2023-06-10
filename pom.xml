@@ -12,7 +12,7 @@
 
     <groupId>me.sonam</groupId>
     <artifactId>jwt-validator</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.4-SNAPSHOT</version>
     <name>jwt-validator</name>
     <description>This is my spring security library for validating jwt token.</description>
     <properties>
