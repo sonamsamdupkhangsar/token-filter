@@ -48,7 +48,9 @@ public class EndpointRouter {
                 .andRoute(GET("/api/scope/read").and(accept(MediaType.APPLICATION_JSON)),
                         livenessReadinessHandler::scopeEndpoint)
                 .andRoute(GET("/api/scope/callread").and(accept(MediaType.APPLICATION_JSON)),
-                        livenessReadinessHandler::callScopeEndpoint);
+                        livenessReadinessHandler::callScopeEndpoint)
+                .andRoute(GET("/api/scope/jwtrequired").and(accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::jwtRequired);
 
     }
 }

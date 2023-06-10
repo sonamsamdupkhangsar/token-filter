@@ -47,29 +47,44 @@ public class SecurityConfiguration {
                 .pathMatchers(HttpMethod.OPTIONS)
                 .permitAll();
          permitPath.getPermitpath().forEach(path -> {
-             LOG.info("applying permitPath: {}", path);
+             LOG.info("path: '{}'", path);
+
              if (path.getScopes() != null) {
-                 LOG.info("scope is not null, apply scope over httpMethod");
+                 LOG.debug("scope is not null");
+
+                 if (path.getHttpMethods() != null) {
+                     LOG.debug("apply scope with httpMethods to path");
+
                      Arrays.stream(path.getScopes().split(","))
-                             .forEach(s1 -> {
-                                 LOG.info("path: '{}', apply hasAuthority(scope) {}", path.getPath(), s1);
-                                 spec.pathMatchers(path.getPath()).hasAuthority("SCOPE_"+s1);
+                             .forEach(scope -> {
+                                 Arrays.stream(path.getHttpMethods().split(",")).forEach(httpMethod -> {
+                                     LOG.debug("apply permit for httpMethod: '{}' to path: '{}', with scope: '{}'",
+                                             HttpMethod.valueOf(httpMethod.trim()), path.getPath(), scope);
+                                     spec.pathMatchers(HttpMethod.POST, path.getPath()).hasAuthority("SCOPE_" + scope);
+                                 });
                              });
+                 }
+                 else {
+                     Arrays.stream(path.getScopes().split(","))
+                             .forEach(scope -> {
+                                 LOG.debug("apply permit to path: '{}', with scope: '{}'", path.getPath(), scope);
+                                 spec.pathMatchers(path.getPath()).hasAuthority("SCOPE_" + scope);
+                             });
+                 }
              }
              else {
                  if (path.getHttpMethods() == null) {
-                     LOG.info("scope is null and path.httpMethods is null then permitAll to path");
+                     LOG.info("scope is null and path.httpMethods is null so permitAll to path: '{}'", path.getPath());
                      spec.pathMatchers(path.getPath()).permitAll();
                  }
                  else {
-                     LOG.info("apply individual httpMethods");
+                     LOG.info("permit for individual httpMethods");
                      Arrays.stream(path.getHttpMethods().split(","))
-                             .forEach(s -> {
-                                 LOG.info("path {}", path.getPath());
-                                 LOG.info("add httpPath.valueOf({}): {} to path {}",
-                                         s, HttpMethod.valueOf(s.trim()), path.getPath());
+                             .forEach(httpMethod -> {
+                                 LOG.debug("permit httpMethod: '{}' to path: '{}'",
+                                         httpMethod, path.getPath());
                                  spec.pathMatchers(HttpMethod.valueOf(
-                                         s.trim()), path.getPath()).permitAll();
+                                         httpMethod.trim()), path.getPath()).permitAll();
                              });
                  }
              }

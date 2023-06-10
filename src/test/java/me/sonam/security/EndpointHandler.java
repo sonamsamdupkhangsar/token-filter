@@ -17,7 +17,6 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
-//import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -238,6 +237,11 @@ public class EndpointHandler {
                     }
                     return Mono.error(new SecurityException(errorMessage));
                 });
+    }
+
+    public Mono<ServerResponse> jwtRequired(ServerRequest serverRequest) {
+        LOG.info("this endpoint requires jwt");
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build();
     }
 
     public static Map<String, String> getMap(Pair<String, String>... pairs){

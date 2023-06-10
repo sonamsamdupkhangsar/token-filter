@@ -70,7 +70,7 @@ jwtrequest:
       option: forward
 ```
 In the above example, the `in` defines the inbound request path of `/api/scope/callread` and `out` defines the outbound request going out to another api `/api/scope/read`. The `accessToken` section indicates whether to use Client Credentials Flow to generate a access-token when `option` field has a value of `request`.  The `scopes` sections indicates the scopes to request from the authorization server.  The scopes can include multiple scope values such as "message.read message.write".
-The `base64EncodedClientIdSecret` is the ClientId and Client Secret values encoded using base64.
+The `base64EncodedClientIdSecret` is the ClientId and Client Secret values encoded using base64.  On mac use `echo -n 'oauth-client:oauth-secret' | openssl base64` to encode your username and password.
 
 You can also forward the inbound access-token using the `accessToken` of `option` with `forward` value or not send it to outbound api with `doNothing` value.
 

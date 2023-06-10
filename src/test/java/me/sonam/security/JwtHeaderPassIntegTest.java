@@ -97,11 +97,11 @@ public class JwtHeaderPassIntegTest {
         LOG.info("mockWebServer.port: {}", mockWebServer.getPort());
     }
     @Test
-    public void noPassHeaderJwt() {
-        LOG.info("readiness delete requires jwt, should get bad request");
+    public void jwtRequired() {
+        LOG.info("jwtrequired requires jwt, should get unauthorized response");
 
-        client.get().uri("/api/health/jwtreceiver")
-                .exchange().expectStatus().isOk();
+        client.get().uri("/api/health/jwtrequired")
+                .exchange().expectStatus().isUnauthorized();
     }
 
     @Test
