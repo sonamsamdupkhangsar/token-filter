@@ -22,9 +22,29 @@ eureka:
     enabled: false
 
 permitpath:
-  - path: /api/scope/read
+  - path: /users
+    httpMethods: POST, GET
+  - path: /user/create
     httpMethods: POST
+    scopes: message.read
+  - path: /api/health/readiness
+    httpMethods: GET, POST
+  - path: /api/scope/callread
+    httpMethods: GET
+  - path: /api/scope/read
     scopes: message.read, message.write
+  - path: /api/health/liveness
+    httpMethods: HEAD, POST
+  - path: /api/health/jwtreceiver
+    httpMethods: GET
+  - path: /api/health/passheader
+    httpMethods: GET
+  - path: /api/health/calljwtreceiver
+    httpMethods: GET
+  - path: /api/health/callthrowerror
+    httpMethods: GET
+  - path: /api/health/throwerror
+    httpMethods: GET
 
 # this is used for getting accesstoken by header filter
 auth-server:
