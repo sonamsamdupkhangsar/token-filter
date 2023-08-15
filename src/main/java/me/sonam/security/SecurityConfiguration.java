@@ -25,11 +25,6 @@ public class SecurityConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(SecurityConfiguration.class);
 
     @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private SecurityContextRepository securityContextRepository;
-
-    @Autowired
     private PermitPath permitPath;
 
     @Bean
@@ -41,8 +36,6 @@ public class SecurityConfiguration {
                 .csrf().disable()
                 .formLogin().disable()
                 .httpBasic().disable()
-                .authenticationManager(authenticationManager)
-                .securityContextRepository(securityContextRepository)
                 .authorizeExchange()
                 .pathMatchers(HttpMethod.OPTIONS)
                 .permitAll();

@@ -9,7 +9,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -140,12 +143,21 @@ public class EndpointHandler {
         } );
     }
 
+    private User user;
+    public void setUser(@AuthenticationPrincipal User user) {
+        this.user = user;
+    }
+
     public Mono<ServerResponse> forwardtoken(ServerRequest serverRequest) {
         LOG.debug("in forwardtoken, just call jwtReceiver endpoint, filter should forward jwt token");
 
-        return callEndpoint(jwtReceiver).flatMap(s ->
-                ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(getMap(Pair.of("message", s)))
+        //LOG.info("user logged in is {}", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        return serverRequest.principal().flatMap(principal -> callEndpoint(jwtReceiver).flatMap(s ->
+                        {
+                            LOG.info("principal: {}", principal.getName());
+                return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(getMap(Pair.of("message", "got message from jwtReceiver endpoint: "+ s)));
+    }
         ).onErrorResume(throwable ->{
             LOG.error("endpoint call failed: {}", throwable.getMessage());
             String errorMessage = throwable.getMessage();
@@ -156,20 +168,16 @@ public class EndpointHandler {
                 errorMessage = webClientResponseException.getResponseBodyAsString();
             }
             return Mono.error(new SecurityException(errorMessage));
-        } );
+        } )
+        );
     }
 
     public Mono<ServerResponse> jwtHeaderReceiver(ServerRequest serverRequest) {
         LOG.debug("in jwt header receiver service: {}", serverRequest.headers().firstHeader(HttpHeaders.AUTHORIZATION));
 
-        if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            LOG.error("no authentication found");
-        }
-        else {
-            String authenticationId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-            LOG.info("authenticate user for authId: {}", authenticationId);
-        }
-        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build();
+        return serverRequest.principal().flatMap(principal -> ServerResponse.ok().
+                contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("message", "logged-in user: "+ principal.getName())));
     }
 
     public Mono<ServerResponse> notPassJwtHeader(ServerRequest serverRequest) {
