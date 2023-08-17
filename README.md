@@ -1,26 +1,27 @@
-# jwt-validator
-This is a security library to validate JWT token issued by a spring-authorization-server that implements OAuth 2.1 and OpenID Connect 1.0 specifications.
+# token-path-security
+This library uses spring security to check for OAuth token scopes that are configured using properties and to allow paths to be accessed for such as `/api/health/liveness` endpoints.
+This library can help in forwarding access-tokens to other downstream services or can generate one using client-credential flow. 
 
-## Use case
-This library is used for securing access to api endpoints and also allowing access to certain health endpoints that shouldn't require access-tokens.
 
- ## Building package
- `mvn -s settings.xml clean package`
- Use the settings.xml file included and specify the personal token in a environment variable for PERSONAL_ACCESS_TOKEN as `export PERSONAL_ACCESS_TOKEN=1234-dummy-value`
- 
- The `deploy.yml` in building maven package does this.
- 
 ## How to use this in your Spring Maven based project
-To use this `jwt-validator` in your maven based project include the following in your pom.xml as:
+To use this `token-path-security` in your maven based project include the following in your pom.xml as:
 ```
 <dependency>
   <groupId>me.sonam</groupId>
-  <artifactId>jwt-validator</artifactId>
+  <artifactId>token-path-security</artifactId>
   <version>1.3-SNAPSHOT</version>
 </dependency>
 ```
 
-Then in your class you have to enable component scan as following to pick up this security library package:
+Or in gradle:
+
+```
+dependencies {
+ implementation 'me.sonam:token-path-security:1.0.4-SNAPSHOT'
+}
+```
+
+Then in your class you have to enable component scan as following to pick up this  library package:
 
 ``` 
 @ComponentScan(basePackages = {"me.sonam.security"})
@@ -49,7 +50,7 @@ permitpath:
     scopes: message.read, message.write    
 ```
 
-This jwt-validator library can also request access-token to be created from the spring authorization server using `Client Credentials Flow` token.  This can be done
+This token-path-security library can also request access-token to be created from the spring authorization server using `Client Credentials Flow` token.  This can be done
 using the following configuration example:
 
 ```
@@ -74,7 +75,7 @@ The `base64EncodedClientIdSecret` is the ClientId and Client Secret values encod
 
 You can also forward the inbound access-token using the `accessToken` of `option` with `forward` value or not send it to outbound api with `doNothing` value.
 
-This `jwt-validator` is meant to be deployed using a Eureka discovery service.  Therefore, this uses `loadbalanced` webclients.  The following is an example of how to configure the filter and the validator:
+This `token-path-security` is meant to be deployed using a Eureka discovery service.  Therefore, this uses `loadbalanced` webclients.  The following is an example of how to configure the filter and the validator:
 ```
 @Profile("!localdevtest")
 @Configuration
@@ -143,5 +144,5 @@ The following is the response from the authorization server:
 
 
 
-Fore more on how to use this `jwt-validator` from github to another github repository follow [How to use maven library from github in your maven project?](https://sonamsamdupkhangsar.github.io/pulling-down-github-maven-library/)
+Fore more on how to use this `token-path-security` from github to another github repository follow [How to use maven library from github in your maven project?](https://sonamsamdupkhangsar.github.io/pulling-down-github-maven-library/)
 

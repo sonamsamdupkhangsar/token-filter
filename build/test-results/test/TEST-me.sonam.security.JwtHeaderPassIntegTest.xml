@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="me.sonam.security.JwtHeaderPassIntegTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2023-08-17T21:50:12" hostname="Sonams-MacBook-Pro.local" time="2.493">
+  <properties/>
+  <testcase name="demoClientErrorRetrieve()" classname="me.sonam.security.JwtHeaderPassIntegTest" time="2.176"/>
+  <testcase name="callJwtReceiver()" classname="me.sonam.security.JwtHeaderPassIntegTest" time="0.077"/>
+  <testcase name="forwardtoken()" classname="me.sonam.security.JwtHeaderPassIntegTest" time="0.043"/>
+  <testcase name="callWithJwtToken()" classname="me.sonam.security.JwtHeaderPassIntegTest" time="0.126"/>
+  <testcase name="passHeaderJwt()" classname="me.sonam.security.JwtHeaderPassIntegTest" time="0.034"/>
+  <testcase name="jwtRequired()" classname="me.sonam.security.JwtHeaderPassIntegTest" time="0.024"/>
+  <system-out><![CDATA[15:50:07.669 [Test worker] INFO me.sonam.security.JwtHeaderPassIntegTest -- host: localhost, port: 56731
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.1.0)
+
+2023-08-17T15:50:08.079-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : mockWebServer.port: 56731
+2023-08-17T15:50:08.091-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : Starting JwtHeaderPassIntegTest using Java 17.0.7 with PID 20821 (started by sonamsamdupkhangsar in /Users/sonamsamdupkhangsar/Documents/github/jwt-validator)
+2023-08-17T15:50:08.092-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : Running with Spring Boot v3.1.0, Spring v6.0.9
+2023-08-17T15:50:08.092-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : No active profile set, falling back to 1 default profile: "default"
+2023-08-17T15:50:09.770-06:00  INFO 20821 --- [    Test worker] m.s.s.h.ReactiveRequestContextHolder     : in headerFilter()
+2023-08-17T15:50:09.906-06:00  INFO 20821 --- [    Test worker] me.sonam.security.EndpointRouter         : building email router function
+2023-08-17T15:50:09.928-06:00  INFO 20821 --- [    Test worker] me.sonam.security.R2DBCConfiguration     : creating H2ConnectionFactory..
+2023-08-17T15:50:09.932-06:00  INFO 20821 --- [    Test worker] me.sonam.security.R2DBCConfiguration     : created H2ConnectionFactory.
+2023-08-17T15:50:10.356-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permitPath: Permit{path=[PermitPath{path='/users', httpMethods='POST, GET', scopes='null'}, PermitPath{path='/user/create', httpMethods='POST', scopes='message.read'}, PermitPath{path='/api/health/readiness', httpMethods='GET, POST', scopes='null'}, PermitPath{path='/api/scope/callread', httpMethods='GET', scopes='null'}, PermitPath{path='/api/scope/read', httpMethods='null', scopes='message.read, message.write'}, PermitPath{path='/api/health/liveness', httpMethods='HEAD, POST', scopes='null'}, PermitPath{path='/api/health/jwtreceiver', httpMethods='GET', scopes='null'}, PermitPath{path='/api/health/passheader', httpMethods='GET', scopes='null'}, PermitPath{path='/api/health/calljwtreceiver', httpMethods='GET', scopes='null'}, PermitPath{path='/api/health/callthrowerror', httpMethods='GET', scopes='null'}, PermitPath{path='/api/health/throwerror', httpMethods='GET', scopes='null'}]}
+2023-08-17T15:50:10.372-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/users', httpMethods='POST, GET', scopes='null'}'
+2023-08-17T15:50:10.373-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit for individual httpMethods
+2023-08-17T15:50:10.374-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: 'POST' to path: '/users'
+2023-08-17T15:50:10.377-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: ' GET' to path: '/users'
+2023-08-17T15:50:10.377-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/user/create', httpMethods='POST', scopes='message.read'}'
+2023-08-17T15:50:10.377-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : scope is not null
+2023-08-17T15:50:10.378-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : apply scope with httpMethods to path
+2023-08-17T15:50:10.379-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : apply permit for httpMethod: 'POST' to path: '/user/create', with scope: 'message.read'
+2023-08-17T15:50:10.382-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/api/health/readiness', httpMethods='GET, POST', scopes='null'}'
+2023-08-17T15:50:10.383-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit for individual httpMethods
+2023-08-17T15:50:10.383-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: 'GET' to path: '/api/health/readiness'
+2023-08-17T15:50:10.383-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: ' POST' to path: '/api/health/readiness'
+2023-08-17T15:50:10.384-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/api/scope/callread', httpMethods='GET', scopes='null'}'
+2023-08-17T15:50:10.384-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit for individual httpMethods
+2023-08-17T15:50:10.384-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: 'GET' to path: '/api/scope/callread'
+2023-08-17T15:50:10.384-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/api/scope/read', httpMethods='null', scopes='message.read, message.write'}'
+2023-08-17T15:50:10.385-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : scope is not null
+2023-08-17T15:50:10.386-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : apply permit to path: '/api/scope/read', with scope: 'message.read'
+2023-08-17T15:50:10.386-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : apply permit to path: '/api/scope/read', with scope: ' message.write'
+2023-08-17T15:50:10.386-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/api/health/liveness', httpMethods='HEAD, POST', scopes='null'}'
+2023-08-17T15:50:10.387-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit for individual httpMethods
+2023-08-17T15:50:10.387-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: 'HEAD' to path: '/api/health/liveness'
+2023-08-17T15:50:10.387-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: ' POST' to path: '/api/health/liveness'
+2023-08-17T15:50:10.387-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/api/health/jwtreceiver', httpMethods='GET', scopes='null'}'
+2023-08-17T15:50:10.387-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit for individual httpMethods
+2023-08-17T15:50:10.388-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: 'GET' to path: '/api/health/jwtreceiver'
+2023-08-17T15:50:10.388-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/api/health/passheader', httpMethods='GET', scopes='null'}'
+2023-08-17T15:50:10.389-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit for individual httpMethods
+2023-08-17T15:50:10.390-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: 'GET' to path: '/api/health/passheader'
+2023-08-17T15:50:10.390-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/api/health/calljwtreceiver', httpMethods='GET', scopes='null'}'
+2023-08-17T15:50:10.390-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit for individual httpMethods
+2023-08-17T15:50:10.391-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: 'GET' to path: '/api/health/calljwtreceiver'
+2023-08-17T15:50:10.391-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/api/health/callthrowerror', httpMethods='GET', scopes='null'}'
+2023-08-17T15:50:10.391-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit for individual httpMethods
+2023-08-17T15:50:10.392-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: 'GET' to path: '/api/health/callthrowerror'
+2023-08-17T15:50:10.392-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/api/health/throwerror', httpMethods='GET', scopes='null'}'
+2023-08-17T15:50:10.392-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit for individual httpMethods
+2023-08-17T15:50:10.392-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: 'GET' to path: '/api/health/throwerror'
+2023-08-17T15:50:12.366-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : Started JwtHeaderPassIntegTest in 4.622 seconds (process running for 5.704)
+2023-08-17T15:50:12.871-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : readiness delete requires jwt, should get bad request
+2023-08-17T15:50:12.898-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : call passheader endpoint
+2023-08-17T15:50:14.488-06:00 DEBUG 20821 --- [     parallel-1] m.s.s.h.ReactiveRequestContextFilter     : request: /api/health/callthrowerror
+2023-08-17T15:50:14.506-06:00 DEBUG 20821 --- [     parallel-1] me.sonam.security.EndpointHandler        : call throw error
+2023-08-17T15:50:14.523-06:00  INFO 20821 --- [     parallel-1] m.s.s.h.ReactiveRequestContextHolder     : serverHttpRequest: /api/health/callthrowerror
+2023-08-17T15:50:14.523-06:00  INFO 20821 --- [     parallel-1] m.s.s.h.ReactiveRequestContextHolder     : request path: /api/health/throwerror, accessTokenPath: /oauth2/token
+2023-08-17T15:50:14.523-06:00  INFO 20821 --- [     parallel-1] m.s.s.h.ReactiveRequestContextHolder     : in path: /api/health/callthrowerror, outbound path: /api/health/throwerror
+2023-08-17T15:50:14.524-06:00  INFO 20821 --- [     parallel-1] m.s.s.h.ReactiveRequestContextHolder     : no path match found
+2023-08-17T15:50:14.524-06:00  INFO 20821 --- [     parallel-1] m.s.s.h.ReactiveRequestContextHolder     : just do nothing to add to header
+2023-08-17T15:50:14.619-06:00 ERROR 20821 --- [ctor-http-nio-5] me.sonam.security.EndpointHandler        : endpoint: 'http://localhost:56731/api/health/throwerror' rest call failed: 400 Bad Request from GET http://localhost:56731/api/health/throwerror
+2023-08-17T15:50:14.619-06:00 ERROR 20821 --- [ctor-http-nio-5] me.sonam.security.EndpointHandler        : error body contains: bad request
+2023-08-17T15:50:14.628-06:00 ERROR 20821 --- [ctor-http-nio-5] a.w.r.e.AbstractErrorWebExceptionHandler : [14a54157-1]  500 Server Error for HTTP GET "/api/health/callthrowerror"
+
+me.sonam.security.SecurityException: bad request
+	at me.sonam.security.EndpointHandler.lambda$callthrowError$11(EndpointHandler.java:213) ~[test/:na]
+	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException: 
+Error has been observed at the following site(s):
+	*__checkpoint ⇢ me.sonam.security.headerfilter.ReactiveRequestContextFilter$$SpringCGLIB$$0 [DefaultWebFilterChain]
+	*__checkpoint ⇢ org.springframework.security.web.server.authorization.AuthorizationWebFilter [DefaultWebFilterChain]
+	*__checkpoint ⇢ org.springframework.security.web.server.authorization.ExceptionTranslationWebFilter [DefaultWebFilterChain]
+	*__checkpoint ⇢ org.springframework.security.web.server.authentication.logout.LogoutWebFilter [DefaultWebFilterChain]
+	*__checkpoint ⇢ org.springframework.security.web.server.savedrequest.ServerRequestCacheWebFilter [DefaultWebFilterChain]
+	*__checkpoint ⇢ org.springframework.security.web.server.context.SecurityContextServerWebExchangeWebFilter [DefaultWebFilterChain]
+	*__checkpoint ⇢ org.springframework.security.web.server.authentication.AuthenticationWebFilter [DefaultWebFilterChain]
+	*__checkpoint ⇢ org.springframework.security.web.server.context.ReactorContextWebFilter [DefaultWebFilterChain]
+	*__checkpoint ⇢ org.springframework.security.web.server.header.HttpHeaderWriterWebFilter [DefaultWebFilterChain]
+	*__checkpoint ⇢ org.springframework.security.config.web.server.ServerHttpSecurity$ServerWebExchangeReactorContextWebFilter [DefaultWebFilterChain]
+	*__checkpoint ⇢ org.springframework.security.web.server.WebFilterChainProxy [DefaultWebFilterChain]
+	*__checkpoint ⇢ HTTP GET "/api/health/callthrowerror" [ExceptionHandlingWebHandler]
+Original Stack Trace:
+		at me.sonam.security.EndpointHandler.lambda$callthrowError$11(EndpointHandler.java:213) ~[test/:na]
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:94) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.MonoFlatMap$FlatMapMain.onError(MonoFlatMap.java:180) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.MonoFlatMap$FlatMapMain.secondError(MonoFlatMap.java:241) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.MonoFlatMap$FlatMapInner.onError(MonoFlatMap.java:315) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.onError(Operators.java:2210) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.MonoFlatMap$FlatMapMain.onError(MonoFlatMap.java:180) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:106) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.onError(MonoIgnoreThen.java:278) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.subscribeNext(MonoIgnoreThen.java:231) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.onComplete(MonoIgnoreThen.java:203) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.onComplete(Operators.java:2205) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.MonoIgnoreElements$IgnoreElementsSubscriber.onComplete(MonoIgnoreElements.java:89) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.FluxMapFuseable$MapFuseableSubscriber.onComplete(FluxMapFuseable.java:152) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.FluxMap$MapSubscriber.onComplete(FluxMap.java:144) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onComplete(FluxPeek.java:260) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.FluxMap$MapSubscriber.onComplete(FluxMap.java:144) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.Operators.complete(Operators.java:137) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.netty.channel.FluxReceive.startReceiver(FluxReceive.java:179) ~[reactor-netty-core-1.1.7.jar:1.1.7]
+		at reactor.netty.channel.FluxReceive.subscribe(FluxReceive.java:145) ~[reactor-netty-core-1.1.7.jar:1.1.7]
+		at reactor.core.publisher.InternalFluxOperator.subscribe(InternalFluxOperator.java:62) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.netty.ByteBufFlux.subscribe(ByteBufFlux.java:340) ~[reactor-netty-core-1.1.7.jar:1.1.7]
+		at reactor.core.publisher.Mono.subscribe(Mono.java:4485) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.subscribeNext(MonoIgnoreThen.java:263) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.MonoIgnoreThen.subscribe(MonoIgnoreThen.java:51) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.Mono.subscribe(Mono.java:4485) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.MonoFlatMap$FlatMapMain.secondError(MonoFlatMap.java:241) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.MonoFlatMap$FlatMapInner.onError(MonoFlatMap.java:315) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.onError(MonoIgnoreThen.java:278) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.subscribeNext(MonoIgnoreThen.java:231) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.onComplete(MonoIgnoreThen.java:203) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.onComplete(Operators.java:2205) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.MonoIgnoreElements$IgnoreElementsSubscriber.onComplete(MonoIgnoreElements.java:89) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.FluxMapFuseable$MapFuseableSubscriber.onComplete(FluxMapFuseable.java:152) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.FluxMap$MapSubscriber.onComplete(FluxMap.java:144) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onComplete(FluxPeek.java:260) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.FluxMap$MapSubscriber.onComplete(FluxMap.java:144) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.Operators.complete(Operators.java:137) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.netty.channel.FluxReceive.startReceiver(FluxReceive.java:179) ~[reactor-netty-core-1.1.7.jar:1.1.7]
+		at reactor.netty.channel.FluxReceive.subscribe(FluxReceive.java:145) ~[reactor-netty-core-1.1.7.jar:1.1.7]
+		at reactor.core.publisher.InternalFluxOperator.subscribe(InternalFluxOperator.java:62) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.netty.ByteBufFlux.subscribe(ByteBufFlux.java:340) ~[reactor-netty-core-1.1.7.jar:1.1.7]
+		at reactor.core.publisher.Mono.subscribe(Mono.java:4485) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.subscribeNext(MonoIgnoreThen.java:263) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.MonoIgnoreThen.subscribe(MonoIgnoreThen.java:51) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.MonoFlatMap$FlatMapMain.onNext(MonoFlatMap.java:165) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.FluxMap$MapSubscriber.onNext(FluxMap.java:122) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.FluxOnErrorReturn$ReturnSubscriber.onNext(FluxOnErrorReturn.java:162) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.FluxDefaultIfEmpty$DefaultIfEmptySubscriber.onNext(FluxDefaultIfEmpty.java:122) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.FluxMapFuseable$MapFuseableSubscriber.onNext(FluxMapFuseable.java:129) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onNext(FluxContextWrite.java:107) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.FluxMapFuseable$MapFuseableConditionalSubscriber.onNext(FluxMapFuseable.java:299) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.FluxFilterFuseable$FilterFuseableConditionalSubscriber.onNext(FluxFilterFuseable.java:337) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.Operators$BaseFluxToMonoOperator.completePossiblyEmpty(Operators.java:2071) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.MonoCollect$CollectSubscriber.onComplete(MonoCollect.java:145) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.FluxMap$MapSubscriber.onComplete(FluxMap.java:144) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onComplete(FluxPeek.java:260) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.core.publisher.FluxMap$MapSubscriber.onComplete(FluxMap.java:144) ~[reactor-core-3.5.6.jar:3.5.6]
+		at reactor.netty.channel.FluxReceive.onInboundComplete(FluxReceive.java:413) ~[reactor-netty-core-1.1.7.jar:1.1.7]
+		at reactor.netty.channel.ChannelOperations.onInboundComplete(ChannelOperations.java:431) ~[reactor-netty-core-1.1.7.jar:1.1.7]
+		at reactor.netty.channel.ChannelOperations.terminate(ChannelOperations.java:485) ~[reactor-netty-core-1.1.7.jar:1.1.7]
+		at reactor.netty.http.client.HttpClientOperations.onInboundNext(HttpClientOperations.java:712) ~[reactor-netty-http-1.1.7.jar:1.1.7]
+		at reactor.netty.channel.ChannelOperationsHandler.channelRead(ChannelOperationsHandler.java:113) ~[reactor-netty-core-1.1.7.jar:1.1.7]
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:444) ~[netty-transport-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420) ~[netty-transport-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412) ~[netty-transport-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.handler.codec.MessageToMessageDecoder.channelRead(MessageToMessageDecoder.java:103) ~[netty-codec-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:444) ~[netty-transport-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420) ~[netty-transport-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412) ~[netty-transport-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.channel.CombinedChannelDuplexHandler$DelegatingChannelHandlerContext.fireChannelRead(CombinedChannelDuplexHandler.java:436) ~[netty-transport-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.handler.codec.ByteToMessageDecoder.fireChannelRead(ByteToMessageDecoder.java:346) ~[netty-codec-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.handler.codec.ByteToMessageDecoder.channelRead(ByteToMessageDecoder.java:318) ~[netty-codec-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.channel.CombinedChannelDuplexHandler.channelRead(CombinedChannelDuplexHandler.java:251) ~[netty-transport-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:442) ~[netty-transport-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420) ~[netty-transport-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:412) ~[netty-transport-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.channel.DefaultChannelPipeline$HeadContext.channelRead(DefaultChannelPipeline.java:1410) ~[netty-transport-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:440) ~[netty-transport-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:420) ~[netty-transport-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.channel.DefaultChannelPipeline.fireChannelRead(DefaultChannelPipeline.java:919) ~[netty-transport-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:166) ~[netty-transport-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:788) ~[netty-transport-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724) ~[netty-transport-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650) ~[netty-transport-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562) ~[netty-transport-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997) ~[netty-common-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) ~[netty-common-4.1.92.Final.jar:4.1.92.Final]
+		at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30) ~[netty-common-4.1.92.Final.jar:4.1.92.Final]
+		at java.base/java.lang.Thread.run(Thread.java:833) ~[na:na]
+
+2023-08-17T15:50:14.816-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : should be acesstoken path for recordedRequest: /api/health/throwerror
+2023-08-17T15:50:14.840-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : this will call `calljwtreceiver` endpoint which will call jwtreceiver endpoint
+2023-08-17T15:50:14.841-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : this will test to ensure service can call another endpoint
+2023-08-17T15:50:14.842-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : call passheader endpoint
+2023-08-17T15:50:14.849-06:00 DEBUG 20821 --- [     parallel-2] m.s.s.h.ReactiveRequestContextFilter     : request: /api/health/calljwtreceiver
+2023-08-17T15:50:14.850-06:00 DEBUG 20821 --- [     parallel-2] me.sonam.security.EndpointHandler        : in callJwtHeaderReceiverFromThis, just call jwtReceiver endpoint but without jwt
+2023-08-17T15:50:14.850-06:00  INFO 20821 --- [     parallel-2] me.sonam.security.EndpointHandler        : call endpoint: http://localhost:56731/api/health/jwtreceiver
+2023-08-17T15:50:14.853-06:00  INFO 20821 --- [     parallel-2] m.s.s.h.ReactiveRequestContextHolder     : serverHttpRequest: /api/health/calljwtreceiver
+2023-08-17T15:50:14.853-06:00  INFO 20821 --- [     parallel-2] m.s.s.h.ReactiveRequestContextHolder     : request path: /api/health/jwtreceiver, accessTokenPath: /oauth2/token
+2023-08-17T15:50:14.853-06:00  INFO 20821 --- [     parallel-2] m.s.s.h.ReactiveRequestContextHolder     : in path: /api/health/calljwtreceiver, outbound path: /api/health/jwtreceiver
+2023-08-17T15:50:14.854-06:00  INFO 20821 --- [     parallel-2] m.s.s.h.ReactiveRequestContextHolder     : no path match found
+2023-08-17T15:50:14.854-06:00  INFO 20821 --- [     parallel-2] m.s.s.h.ReactiveRequestContextHolder     : just do nothing to add to header
+2023-08-17T15:50:14.890-06:00  INFO 20821 --- [ctor-http-nio-5] me.sonam.security.EndpointHandler        : response for endpoint 'http://localhost:56731/api/health/jwtreceiver' is: {message=logged-in user: dave}
+2023-08-17T15:50:14.892-06:00  INFO 20821 --- [ctor-http-nio-5] me.sonam.security.EndpointHandler        : got response message: logged-in user: dave
+2023-08-17T15:50:14.911-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : should be acesstoken path for recordedRequest: /api/health/jwtreceiver
+2023-08-17T15:50:14.920-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : this will call `calljwtreceiver` endpoint which will call jwtreceiver endpoint
+2023-08-17T15:50:14.920-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : this will test to ensure service can call another endpoint
+2023-08-17T15:50:14.921-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : call passheader endpoint
+2023-08-17T15:50:14.941-06:00 DEBUG 20821 --- [     parallel-3] m.s.s.h.ReactiveRequestContextFilter     : request: /api/health/forwardtoken
+2023-08-17T15:50:14.943-06:00 DEBUG 20821 --- [     parallel-3] me.sonam.security.EndpointHandler        : in forwardtoken, just call jwtReceiver endpoint, filter should forward jwt token
+2023-08-17T15:50:14.944-06:00  INFO 20821 --- [     parallel-3] me.sonam.security.EndpointHandler        : call endpoint: http://localhost:56731/api/health/jwtreceiver
+2023-08-17T15:50:14.946-06:00  INFO 20821 --- [     parallel-3] m.s.s.h.ReactiveRequestContextHolder     : serverHttpRequest: /api/health/forwardtoken
+2023-08-17T15:50:14.946-06:00  INFO 20821 --- [     parallel-3] m.s.s.h.ReactiveRequestContextHolder     : request path: /api/health/jwtreceiver, accessTokenPath: /oauth2/token
+2023-08-17T15:50:14.946-06:00  INFO 20821 --- [     parallel-3] m.s.s.h.ReactiveRequestContextHolder     : in path: /api/health/forwardtoken, outbound path: /api/health/jwtreceiver
+2023-08-17T15:50:14.946-06:00  INFO 20821 --- [     parallel-3] m.s.s.h.ReactiveRequestContextHolder     : inbound request path and outbound request path both matched
+2023-08-17T15:50:14.947-06:00  INFO 20821 --- [     parallel-3] m.s.s.h.ReactiveRequestContextHolder     : forward jwt to header from access token http callout
+2023-08-17T15:50:14.953-06:00  INFO 20821 --- [ctor-http-nio-5] me.sonam.security.EndpointHandler        : response for endpoint 'http://localhost:56731/api/health/jwtreceiver' is: {message=logged-in user: dave}
+2023-08-17T15:50:14.953-06:00  INFO 20821 --- [ctor-http-nio-5] me.sonam.security.EndpointHandler        : got response message: logged-in user: dave
+2023-08-17T15:50:14.953-06:00  INFO 20821 --- [ctor-http-nio-5] me.sonam.security.EndpointHandler        : principal: dave
+2023-08-17T15:50:14.957-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : should be acesstoken path for recordedRequest: /api/health/jwtreceiver
+2023-08-17T15:50:14.965-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : readiness delete requires jwt, should get bad request
+2023-08-17T15:50:14.966-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : call passheader endpoint
+2023-08-17T15:50:14.972-06:00 DEBUG 20821 --- [     parallel-4] m.s.s.h.ReactiveRequestContextFilter     : request: /api/health/passheader
+2023-08-17T15:50:14.973-06:00 DEBUG 20821 --- [     parallel-4] me.sonam.security.EndpointHandler        : pass jwt header to receiveJwtHeader endpoint
+2023-08-17T15:50:14.974-06:00  INFO 20821 --- [     parallel-4] me.sonam.security.EndpointHandler        : call endpoint: http://localhost:56731/api/health/jwtreceiver
+2023-08-17T15:50:14.975-06:00  INFO 20821 --- [     parallel-4] m.s.s.h.ReactiveRequestContextHolder     : serverHttpRequest: /api/health/passheader
+2023-08-17T15:50:14.975-06:00  INFO 20821 --- [     parallel-4] m.s.s.h.ReactiveRequestContextHolder     : request path: /api/health/jwtreceiver, accessTokenPath: /oauth2/token
+2023-08-17T15:50:14.975-06:00  INFO 20821 --- [     parallel-4] m.s.s.h.ReactiveRequestContextHolder     : in path: /api/health/passheader, outbound path: /api/health/jwtreceiver
+2023-08-17T15:50:14.976-06:00  INFO 20821 --- [     parallel-4] m.s.s.h.ReactiveRequestContextHolder     : inbound request path and outbound request path both matched
+2023-08-17T15:50:14.976-06:00  INFO 20821 --- [     parallel-4] m.s.s.h.ReactiveRequestContextHolder     : get access token using base64EncodedClientIdAndSecret: http://localhost:56731/oauth2/token?grant_type=client_credentials, b64ClientIdAndSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==, scopes: message.read message.write
+2023-08-17T15:50:14.976-06:00  INFO 20821 --- [     parallel-4] m.s.s.h.ReactiveRequestContextHolder     : sending oauth2TokenEndpointWithScopes: http://localhost:56731/oauth2/token?grant_type=client_credentials&scope=message.read message.write
+2023-08-17T15:50:14.980-06:00  INFO 20821 --- [     parallel-4] m.s.s.h.ReactiveRequestContextHolder     : serverHttpRequest: /api/health/passheader
+2023-08-17T15:50:14.980-06:00  INFO 20821 --- [     parallel-4] m.s.s.h.ReactiveRequestContextHolder     : request path: /oauth2/token, accessTokenPath: /oauth2/token
+2023-08-17T15:50:14.980-06:00  INFO 20821 --- [     parallel-4] m.s.s.h.ReactiveRequestContextHolder     : don't call itself if using the same webclient builder
+2023-08-17T15:50:14.986-06:00 DEBUG 20821 --- [ctor-http-nio-5] m.s.s.h.ReactiveRequestContextHolder     : response for 'http://localhost:56731/oauth2/token?grant_type=client_credentials' is in map: {token=eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzb25hbSIsImlzcyI6InNvbmFtLmNsb3VkIiwiYXVkIjoic29uYW0uY2xvdWQiLCJqdGkiOiJmMTY2NjM1OS05YTViLTQ3NzMtOWUyNy00OGU0OTFlNDYzNGIifQ.KGFBUjghvcmNGDH0eM17S9pWkoLwbvDaDBGAx2AyB41yZ_8-WewTriR08JdjLskw1dsRYpMh9idxQ4BS6xmOCQ}
+2023-08-17T15:50:14.987-06:00 ERROR 20821 --- [ctor-http-nio-5] m.s.s.h.ReactiveRequestContextHolder     : nothing to return
+2023-08-17T15:50:14.988-06:00  INFO 20821 --- [ctor-http-nio-5] m.s.s.h.ReactiveRequestContextHolder     : added jwt to header from access token http callout
+2023-08-17T15:50:14.994-06:00  INFO 20821 --- [ctor-http-nio-5] me.sonam.security.EndpointHandler        : response for endpoint 'http://localhost:56731/api/health/jwtreceiver' is: {message=jwt received endpoint}
+2023-08-17T15:50:14.994-06:00  INFO 20821 --- [ctor-http-nio-5] me.sonam.security.EndpointHandler        : got response message: jwt received endpoint
+2023-08-17T15:50:14.997-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : should be acesstoken path for recordedRequest: /oauth2/token?grant_type=client_credentials&scope=message.read%20message.write
+2023-08-17T15:50:15.094-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : readiness delete requires jwt, should get bad request
+2023-08-17T15:50:15.095-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : call passheader endpoint
+2023-08-17T15:50:15.101-06:00 DEBUG 20821 --- [     parallel-5] m.s.s.h.ReactiveRequestContextFilter     : request: /api/health/passheader
+2023-08-17T15:50:15.102-06:00 DEBUG 20821 --- [     parallel-5] me.sonam.security.EndpointHandler        : pass jwt header to receiveJwtHeader endpoint
+2023-08-17T15:50:15.103-06:00  INFO 20821 --- [     parallel-5] me.sonam.security.EndpointHandler        : call endpoint: http://localhost:56731/api/health/jwtreceiver
+2023-08-17T15:50:15.103-06:00  INFO 20821 --- [     parallel-5] m.s.s.h.ReactiveRequestContextHolder     : serverHttpRequest: /api/health/passheader
+2023-08-17T15:50:15.104-06:00  INFO 20821 --- [     parallel-5] m.s.s.h.ReactiveRequestContextHolder     : request path: /api/health/jwtreceiver, accessTokenPath: /oauth2/token
+2023-08-17T15:50:15.104-06:00  INFO 20821 --- [     parallel-5] m.s.s.h.ReactiveRequestContextHolder     : in path: /api/health/passheader, outbound path: /api/health/jwtreceiver
+2023-08-17T15:50:15.104-06:00  INFO 20821 --- [     parallel-5] m.s.s.h.ReactiveRequestContextHolder     : inbound request path and outbound request path both matched
+2023-08-17T15:50:15.104-06:00  INFO 20821 --- [     parallel-5] m.s.s.h.ReactiveRequestContextHolder     : get access token using base64EncodedClientIdAndSecret: http://localhost:56731/oauth2/token?grant_type=client_credentials, b64ClientIdAndSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==, scopes: message.read message.write
+2023-08-17T15:50:15.104-06:00  INFO 20821 --- [     parallel-5] m.s.s.h.ReactiveRequestContextHolder     : sending oauth2TokenEndpointWithScopes: http://localhost:56731/oauth2/token?grant_type=client_credentials&scope=message.read message.write
+2023-08-17T15:50:15.105-06:00  INFO 20821 --- [     parallel-5] m.s.s.h.ReactiveRequestContextHolder     : serverHttpRequest: /api/health/passheader
+2023-08-17T15:50:15.105-06:00  INFO 20821 --- [     parallel-5] m.s.s.h.ReactiveRequestContextHolder     : request path: /oauth2/token, accessTokenPath: /oauth2/token
+2023-08-17T15:50:15.105-06:00  INFO 20821 --- [     parallel-5] m.s.s.h.ReactiveRequestContextHolder     : don't call itself if using the same webclient builder
+2023-08-17T15:50:15.110-06:00 DEBUG 20821 --- [ctor-http-nio-5] m.s.s.h.ReactiveRequestContextHolder     : response for 'http://localhost:56731/oauth2/token?grant_type=client_credentials' is in map: {access_token=eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzb25hbSIsImlzcyI6InNvbmFtLmNsb3VkIiwiYXVkIjoic29uYW0uY2xvdWQiLCJqdGkiOiJmMTY2NjM1OS05YTViLTQ3NzMtOWUyNy00OGU0OTFlNDYzNGIifQ.KGFBUjghvcmNGDH0eM17S9pWkoLwbvDaDBGAx2AyB41yZ_8-WewTriR08JdjLskw1dsRYpMh9idxQ4BS6xmOCQ}
+2023-08-17T15:50:15.111-06:00  INFO 20821 --- [ctor-http-nio-5] m.s.s.h.ReactiveRequestContextHolder     : added jwt to header from access token http callout
+2023-08-17T15:50:15.115-06:00  INFO 20821 --- [ctor-http-nio-5] me.sonam.security.EndpointHandler        : response for endpoint 'http://localhost:56731/api/health/jwtreceiver' is: {message=jwt received endpoint}
+2023-08-17T15:50:15.116-06:00  INFO 20821 --- [ctor-http-nio-5] me.sonam.security.EndpointHandler        : got response message: jwt received endpoint
+2023-08-17T15:50:15.121-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : should be acesstoken path for recordedRequest: /api/health/jwtreceiver
+2023-08-17T15:50:15.131-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : jwtrequired requires jwt, should get unauthorized response
+2023-08-17T15:50:15.155-06:00  INFO 20821 --- [    Test worker] m.sonam.security.JwtHeaderPassIntegTest  : shutdown and close mockWebServer
+]]></system-out>
+  <system-err><![CDATA[Aug 17, 2023 3:50:07 PM okhttp3.mockwebserver.MockWebServer$start$$inlined$execute$1 run
+INFO: MockWebServer[56731] starting to accept connections
+]]></system-err>
+</testsuite>

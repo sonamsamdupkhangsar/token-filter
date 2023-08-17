@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - NonMockedJwtDecoderIntegTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>NonMockedJwtDecoderIntegTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/me.sonam.security.html">me.sonam.security</a> &gt; NonMockedJwtDecoderIntegTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.048s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">forwardtoken()</td>
+<td class="success">0.048s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>2023-08-17T15:50:15.175-06:00  INFO 20821 --- [    Test worker] m.s.s.NonMockedJwtDecoderIntegTest       : host: localhost, port: 56739
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.1.0)
+
+2023-08-17T15:50:15.234-06:00  INFO 20821 --- [    Test worker] m.s.s.NonMockedJwtDecoderIntegTest       : mockWebServer.port: 56739
+2023-08-17T15:50:15.238-06:00  INFO 20821 --- [    Test worker] m.s.s.NonMockedJwtDecoderIntegTest       : Starting NonMockedJwtDecoderIntegTest using Java 17.0.7 with PID 20821 (started by sonamsamdupkhangsar in /Users/sonamsamdupkhangsar/Documents/github/jwt-validator)
+2023-08-17T15:50:15.238-06:00 DEBUG 20821 --- [    Test worker] m.s.s.NonMockedJwtDecoderIntegTest       : Running with Spring Boot v3.1.0, Spring v6.0.9
+2023-08-17T15:50:15.239-06:00  INFO 20821 --- [    Test worker] m.s.s.NonMockedJwtDecoderIntegTest       : No active profile set, falling back to 1 default profile: &quot;default&quot;
+2023-08-17T15:50:15.701-06:00  INFO 20821 --- [    Test worker] m.s.s.h.ReactiveRequestContextHolder     : in headerFilter()
+2023-08-17T15:50:15.714-06:00  INFO 20821 --- [    Test worker] me.sonam.security.EndpointRouter         : building email router function
+2023-08-17T15:50:15.715-06:00  INFO 20821 --- [    Test worker] me.sonam.security.R2DBCConfiguration     : creating H2ConnectionFactory..
+2023-08-17T15:50:15.715-06:00  INFO 20821 --- [    Test worker] me.sonam.security.R2DBCConfiguration     : created H2ConnectionFactory.
+2023-08-17T15:50:15.771-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permitPath: Permit{path=[PermitPath{path='/users', httpMethods='POST, GET', scopes='null'}, PermitPath{path='/user/create', httpMethods='POST', scopes='message.read'}, PermitPath{path='/api/health/readiness', httpMethods='GET, POST', scopes='null'}, PermitPath{path='/api/scope/callread', httpMethods='GET', scopes='null'}, PermitPath{path='/api/scope/read', httpMethods='null', scopes='message.read, message.write'}, PermitPath{path='/api/health/liveness', httpMethods='HEAD, POST', scopes='null'}, PermitPath{path='/api/health/jwtreceiver', httpMethods='GET', scopes='null'}, PermitPath{path='/api/health/passheader', httpMethods='GET', scopes='null'}, PermitPath{path='/api/health/calljwtreceiver', httpMethods='GET', scopes='null'}, PermitPath{path='/api/health/callthrowerror', httpMethods='GET', scopes='null'}, PermitPath{path='/api/health/throwerror', httpMethods='GET', scopes='null'}]}
+2023-08-17T15:50:15.771-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/users', httpMethods='POST, GET', scopes='null'}'
+2023-08-17T15:50:15.772-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit for individual httpMethods
+2023-08-17T15:50:15.772-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: 'POST' to path: '/users'
+2023-08-17T15:50:15.772-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: ' GET' to path: '/users'
+2023-08-17T15:50:15.772-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/user/create', httpMethods='POST', scopes='message.read'}'
+2023-08-17T15:50:15.772-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : scope is not null
+2023-08-17T15:50:15.772-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : apply scope with httpMethods to path
+2023-08-17T15:50:15.773-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : apply permit for httpMethod: 'POST' to path: '/user/create', with scope: 'message.read'
+2023-08-17T15:50:15.773-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/api/health/readiness', httpMethods='GET, POST', scopes='null'}'
+2023-08-17T15:50:15.773-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit for individual httpMethods
+2023-08-17T15:50:15.773-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: 'GET' to path: '/api/health/readiness'
+2023-08-17T15:50:15.773-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: ' POST' to path: '/api/health/readiness'
+2023-08-17T15:50:15.773-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/api/scope/callread', httpMethods='GET', scopes='null'}'
+2023-08-17T15:50:15.773-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit for individual httpMethods
+2023-08-17T15:50:15.773-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: 'GET' to path: '/api/scope/callread'
+2023-08-17T15:50:15.774-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/api/scope/read', httpMethods='null', scopes='message.read, message.write'}'
+2023-08-17T15:50:15.774-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : scope is not null
+2023-08-17T15:50:15.774-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : apply permit to path: '/api/scope/read', with scope: 'message.read'
+2023-08-17T15:50:15.774-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : apply permit to path: '/api/scope/read', with scope: ' message.write'
+2023-08-17T15:50:15.774-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/api/health/liveness', httpMethods='HEAD, POST', scopes='null'}'
+2023-08-17T15:50:15.774-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit for individual httpMethods
+2023-08-17T15:50:15.775-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: 'HEAD' to path: '/api/health/liveness'
+2023-08-17T15:50:15.775-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: ' POST' to path: '/api/health/liveness'
+2023-08-17T15:50:15.775-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/api/health/jwtreceiver', httpMethods='GET', scopes='null'}'
+2023-08-17T15:50:15.775-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit for individual httpMethods
+2023-08-17T15:50:15.775-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: 'GET' to path: '/api/health/jwtreceiver'
+2023-08-17T15:50:15.775-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/api/health/passheader', httpMethods='GET', scopes='null'}'
+2023-08-17T15:50:15.775-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit for individual httpMethods
+2023-08-17T15:50:15.775-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: 'GET' to path: '/api/health/passheader'
+2023-08-17T15:50:15.776-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/api/health/calljwtreceiver', httpMethods='GET', scopes='null'}'
+2023-08-17T15:50:15.776-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit for individual httpMethods
+2023-08-17T15:50:15.776-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: 'GET' to path: '/api/health/calljwtreceiver'
+2023-08-17T15:50:15.776-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/api/health/callthrowerror', httpMethods='GET', scopes='null'}'
+2023-08-17T15:50:15.776-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit for individual httpMethods
+2023-08-17T15:50:15.776-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: 'GET' to path: '/api/health/callthrowerror'
+2023-08-17T15:50:15.776-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : path: 'PermitPath{path='/api/health/throwerror', httpMethods='GET', scopes='null'}'
+2023-08-17T15:50:15.776-06:00  INFO 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit for individual httpMethods
+2023-08-17T15:50:15.777-06:00 DEBUG 20821 --- [    Test worker] m.sonam.security.SecurityConfiguration   : permit httpMethod: 'GET' to path: '/api/health/throwerror'
+2023-08-17T15:50:15.990-06:00  INFO 20821 --- [    Test worker] m.s.s.NonMockedJwtDecoderIntegTest       : Started NonMockedJwtDecoderIntegTest in 0.811 seconds (process running for 9.328)
+2023-08-17T15:50:16.003-06:00  INFO 20821 --- [    Test worker] m.s.s.NonMockedJwtDecoderIntegTest       : this will call `calljwtreceiver` endpoint which will call jwtreceiver endpoint
+2023-08-17T15:50:16.003-06:00  INFO 20821 --- [    Test worker] m.s.s.NonMockedJwtDecoderIntegTest       : this will test to ensure service can call another endpoint
+2023-08-17T15:50:16.004-06:00  INFO 20821 --- [    Test worker] m.s.s.NonMockedJwtDecoderIntegTest       : call passheader endpoint
+2023-08-17T15:50:16.018-06:00 DEBUG 20821 --- [     parallel-7] m.s.s.h.ReactiveRequestContextFilter     : request: /api/health/forwardtoken
+2023-08-17T15:50:16.018-06:00 DEBUG 20821 --- [     parallel-7] me.sonam.security.EndpointHandler        : in forwardtoken, just call jwtReceiver endpoint, filter should forward jwt token
+2023-08-17T15:50:16.019-06:00  INFO 20821 --- [     parallel-7] me.sonam.security.EndpointHandler        : call endpoint: http://localhost:10001/api/health/jwtreceiver
+2023-08-17T15:50:16.019-06:00  INFO 20821 --- [     parallel-7] m.s.s.h.ReactiveRequestContextHolder     : serverHttpRequest: /api/health/forwardtoken
+2023-08-17T15:50:16.019-06:00  INFO 20821 --- [     parallel-7] m.s.s.h.ReactiveRequestContextHolder     : request path: /api/health/jwtreceiver, accessTokenPath: /oauth2/token
+2023-08-17T15:50:16.019-06:00  INFO 20821 --- [     parallel-7] m.s.s.h.ReactiveRequestContextHolder     : in path: /api/health/forwardtoken, outbound path: /api/health/jwtreceiver
+2023-08-17T15:50:16.019-06:00  INFO 20821 --- [     parallel-7] m.s.s.h.ReactiveRequestContextHolder     : inbound request path and outbound request path both matched
+2023-08-17T15:50:16.020-06:00  INFO 20821 --- [     parallel-7] m.s.s.h.ReactiveRequestContextHolder     : forward jwt to header from access token http callout
+2023-08-17T15:50:16.030-06:00 DEBUG 20821 --- [     parallel-8] m.s.s.h.ReactiveRequestContextFilter     : request: /api/health/jwtreceiver
+2023-08-17T15:50:16.031-06:00 DEBUG 20821 --- [     parallel-8] me.sonam.security.EndpointHandler        : in jwt header receiver service: Bearer 1eyJraWQiOiJhNzZhN2I0My00YTAzLTQ2MzAtYjVlMi0wMTUzMGRlYzk0MGUiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJwcml2YXRlLWNsaWVudCIsImF1ZCI6InByaXZhdGUtY2xpZW50IiwibmJmIjoxNjg3MzY5NDM5LCJzY29wZSI6WyJtZXNzYWdlLnJlYWQiLCJtZXNzYWdlLndyaXRlIl0sImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6OTAwMSIsImV4cCI6MTY4NzM2OTczOSwiaWF0IjoxNjg3MzY5NDM5LCJhdXRob3JpdGllcyI6WyJtZXNzYWdlLnJlYWQiLCJtZXNzYWdlLndyaXRlIl19.chibxXXoYok5YuiTpPqD6yu8k39009oxlv4NrMggfp4wkopLP1RrWnFQ1reeTFhSFXBmNFEHMjJxOkYoj7g3B7UbgtwwjpU40VwzWDSSdJqAJxfkequtJl5D8G43wh3IPG4DpiA-uIUauicbgJmLn9WIF61_rzQCUevD-HzmB3Gv9ESa3tF2YyAve4Vp1bpFZDqwT4ntDzIkwlAMxWgJjREYjgxUA1JCnpgbvk9JFxqa4GSZtXcHfUl40-Rv_uJo1_50EimS306TnOC5pHj5_XxND-rvr4Ay5ewROVDnOwZsFu0JRaPKbiok484hDgTg7wJujzEDr7CyLfNNW7o0Og
+2023-08-17T15:50:16.038-06:00  INFO 20821 --- [ctor-http-nio-9] me.sonam.security.EndpointHandler        : response for endpoint 'http://localhost:10001/api/health/jwtreceiver' is: {message=logged-in user: dave}
+2023-08-17T15:50:16.038-06:00  INFO 20821 --- [ctor-http-nio-9] me.sonam.security.EndpointHandler        : got response message: logged-in user: dave
+2023-08-17T15:50:16.038-06:00  INFO 20821 --- [ctor-http-nio-9] me.sonam.security.EndpointHandler        : principal: dave
+2023-08-17T15:50:16.045-06:00  INFO 20821 --- [    Test worker] m.s.s.NonMockedJwtDecoderIntegTest       : response: {&quot;message&quot;:&quot;got message from jwtReceiver endpoint: logged-in user: dave&quot;}
+2023-08-17T15:50:16.049-06:00  INFO 20821 --- [    Test worker] m.s.s.NonMockedJwtDecoderIntegTest       : shutdown and close mockWebServer
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 8.1.1</a> at Aug 17, 2023, 3:50:18 PM</p>
+</div>
+</div>
+</body>
+</html>
