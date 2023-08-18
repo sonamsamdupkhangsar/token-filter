@@ -1,45 +1,5 @@
 # token-filter
-This library uses spring security to check for OAuth token scopes that are configured using properties and to allow paths to be accessed for such as `/api/health/liveness` endpoints.
-This library can help in forwarding access-tokens to other downstream services or can generate one using client-credential flow. 
-
-
-## How to use this in your Spring Maven based project
-To use this `token-filter` in your maven based project include the following in your pom.xml as:
-```
-<dependency>
-  <groupId>me.sonam</groupId>
-  <artifactId>token-filter</artifactId>
-  <version>1.3-SNAPSHOT</version>
-</dependency>
-```
-
-Or in gradle:
-
-```
-dependencies {
- implementation 'me.sonam:token-filter:1.0.4-SNAPSHOT'
-}
-```
-
-Then in your class you have to enable component scan as following to pick up this  library package:
-
-``` 
-@ComponentScan(basePackages = {"me.sonam.security"})
-```
-
-or do
-
-```
-@SpringBootApplication(scanBasePackages = {"me.sonam", "include.your.app.base.code.package.also.if.needed."})
-```
-
-You also have to ensure your application is scanned too.  So you may have to add additional package to scan as well as shown above.
-
-The following example shows the endpoints that can be allowed to such as the
-`/api/health/readiness` endpoint which don't require any access-tokens.  In this endpoint, both `GET` and `POST` methods are allowed without a token.  
-For `/api/scope/read` endpoint a access-token is required that must have a scope of either
-`message.read` or `message.write`.
-
+This `token-filter` is a library for allowing access to endpoints by specifying their paths in a property file such as:
 ```
 permitpath:
   - path: /api/health/readiness
@@ -49,8 +9,10 @@ permitpath:
   - path: /api/scope/read
     scopes: message.read, message.write    
 ```
+It can also enforce that paths contain Oauth2 scopes within the access-token as well.
+In the above example the first "health" endpoint will be permitted for GET and POST Http methods.  However, the path `/api/scope/read` will require those 2 scopes in jwt token.
 
-This token-filter library can also request access-token to be created from the spring authorization server using `Client Credentials Flow` token.  This can be done
+This token-filter library can filter or forward the access-token to downstream services.  It can also request access-token to be created from the spring authorization server using `Client Credentials Flow` token.  This can be done
 using the following configuration example:
 
 ```
@@ -70,12 +32,49 @@ jwtrequest:
     accessToken:
       option: forward
 ```
-In the above example, the `in` defines the inbound request path of `/api/scope/callread` and `out` defines the outbound request going out to another api `/api/scope/read`. The `accessToken` section indicates whether to use Client Credentials Flow to generate a access-token when `option` field has a value of `request`.  The `scopes` sections indicates the scopes to request from the authorization server.  The scopes can include multiple scope values such as "message.read message.write".
-The `base64EncodedClientIdSecret` is the ClientId and Client Secret values encoded using base64.  On mac use `echo -n 'oauth-client:oauth-secret' | openssl base64` to encode your username and password.
+
+
+In the above example, the `in` defines the inbound request path, in first example of `/api/scope/callread`, and `out` defines the outbound request going out to another api `/api/scope/read`. The `accessToken` section indicates whether to use Client Credentials Flow to generate a access-token when `option` field has a value of `request`.  The `scopes` sections indicates the scopes to request from the authorization server.  The scopes can include multiple scope values such as "message.read message.write".
 
 You can also forward the inbound access-token using the `accessToken` of `option` with `forward` value or not send it to outbound api with `doNothing` value.
 
-This `token-filter` is meant to be deployed using a Eureka discovery service.  Therefore, this uses `loadbalanced` webclients.  The following is an example of how to configure the filter and the validator:
+The `base64EncodedClientIdSecret` is the ClientId and Client Secret values encoded using base64.  On mac use `echo -n 'oauth-client:oauth-secret' | openssl base64` to encode your username and password.
+
+
+## How to use this in your Spring Maven based project
+To use this `token-filter` in your maven based project include the following in your pom.xml as:
+```
+<dependency>
+  <groupId>me.sonam</groupId>
+  <artifactId>token-filter</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
+
+Or in gradle:
+
+```
+dependencies {
+ implementation 'me.sonam:token-filter:1.0.0-SNAPSHOT'
+}
+```
+
+Then in your class you have to enable component scan as following to pick up this  library package:
+
+``` 
+@ComponentScan(basePackages = {"me.sonam.security"})
+```
+
+or do
+
+```
+@SpringBootApplication(scanBasePackages = {"me.sonam", "include.your.app.base.code.package.also.if.needed."})
+```
+
+You also have to ensure your application is scanned too.  So you may have to add additional package to scan as well.
+
+
+This `token-filter` library is meant to be deployed using a Eureka discovery service.  Therefore, this uses `loadbalanced` webclients.  The following is an example of how to configure one for example or use bean override as well.
 ```
 @Profile("!localdevtest")
 @Configuration
@@ -101,6 +100,7 @@ public class WebClientConfig {
         return new ReactiveRequestContextHolder(webClientBuilderNoFilter());
     }
 
+    //this can be your business service for example
     @Bean
     public SimpleAuthenticationService simpleAuthenticationService() {
         return new SimpleAuthenticationService(webClientBuilder());
