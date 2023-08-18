@@ -87,7 +87,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/sonamsamdupkhangsar/token-path-security"
+            url = "https://maven.pkg.github.com/sonamsamdupkhangsar/token-filter"
             credentials {
                 username = System.getenv("USERNAME")
                 password = System.getenv("PERSONAL_ACCESS_TOKEN")
