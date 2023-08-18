@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
  */
 @EnableAutoConfiguration
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(MockitoExtension.class)
 public class JwtHeaderPassIntegTest {
     private static final Logger LOG = LoggerFactory.getLogger(JwtHeaderPassIntegTest.class);
@@ -92,7 +92,7 @@ public class JwtHeaderPassIntegTest {
        // r.add("api-health-passheader", () -> apiPassHeaderEndpoint.replace("{port}", mockWebServer.getPort() + ""));
         r.add("auth-server.root", () -> "http://localhost:"+ mockWebServer.getPort());
 
-        //r.add("jwt-receiver.root", () -> jwtReceiverEndpoint.replace("{port}", serverProperties.getPort()+""));
+        r.add("jwt-receiver.root", () -> jwtReceiverEndpoint.replace("{port}", mockWebServer.getPort()+""));
 
         LOG.info("mockWebServer.port: {}", mockWebServer.getPort());
     }
@@ -112,9 +112,15 @@ public class JwtHeaderPassIntegTest {
         Jwt jwt = jwt(authenticationId);
         when(this.jwtDecoder.decode(anyString())).thenReturn(Mono.just(jwt));
 
+        mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json")
+                .setResponseCode(400).setBody("bad request"));
+
         LOG.info("call passheader endpoint");
         client.get().uri("/api/health/callthrowerror")
                 .exchange().expectStatus().is5xxServerError();
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
+
 
     }
 
@@ -142,8 +148,8 @@ public class JwtHeaderPassIntegTest {
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
-        assertThat(recordedRequest.getPath()).startsWith("/oauth2/token?grant_type=client_credentials");
-        assertThat(recordedRequest.getMethod()).isEqualTo("POST");
+        assertThat(recordedRequest.getPath()).startsWith("/api/health/jwtreceiver");
+        assertThat(recordedRequest.getMethod()).isEqualTo("GET");
     }
 
     @Test
@@ -183,9 +189,15 @@ public class JwtHeaderPassIntegTest {
         Jwt jwt = jwt(authenticationId);
         when(this.jwtDecoder.decode(anyString())).thenReturn(Mono.just(jwt));
 
+        mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json")
+                .setResponseCode(200).setBody("{ \"message\": \"logged-in user: "+authenticationId+"\"}"));
+
         LOG.info("call passheader endpoint");
         client.get().uri("/api/health/calljwtreceiver")//.headers(addJwt(jwt))
                 .exchange().expectStatus().isOk();
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
     }
 
     @Test
@@ -197,10 +209,16 @@ public class JwtHeaderPassIntegTest {
         Jwt jwt = jwt(authenticationId);
         when(this.jwtDecoder.decode(anyString())).thenReturn(Mono.just(jwt));
 
+        mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json")
+                .setResponseCode(200).setBody("{ \"message\": \"logged-in user: "+authenticationId+"\"}"));
+
         LOG.info("call passheader endpoint");
         client.get().uri("/api/health/forwardtoken")
                 .headers(addJwt(jwt))
                 .exchange().expectStatus().isOk();
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
     }
 
 
