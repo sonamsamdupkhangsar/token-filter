@@ -11,7 +11,7 @@ plugins {
 
 group = 'me.sonam'
 version = '1.0.0-SNAPSHOT'
-description = 'jwt-service'
+description = 'token-filter'
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
@@ -25,6 +25,9 @@ ext {
     set('springCloudVersion', "2022.0.3")
 }
 
+bootJar {
+    enabled = false
+}
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.security:spring-security-oauth2-resource-server'

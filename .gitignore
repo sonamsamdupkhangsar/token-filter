@@ -1,6 +1,7 @@
-jwt-validator.iml
+token-filter.iml
 .DS_Store
-target/
+.gradle/
+build/
 .idea/
 # Compiled class file
 *.class

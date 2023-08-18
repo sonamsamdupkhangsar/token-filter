@@ -1,1 +1,0 @@
-CREATE TABLE if not exists Jwt_Key (id UUID PRIMARY KEY, private_key varchar, public_key varchar, revoked boolean);
