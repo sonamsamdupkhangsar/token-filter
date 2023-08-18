@@ -1,14 +1,14 @@
-# token-path-security
+# token-filter
 This library uses spring security to check for OAuth token scopes that are configured using properties and to allow paths to be accessed for such as `/api/health/liveness` endpoints.
 This library can help in forwarding access-tokens to other downstream services or can generate one using client-credential flow. 
 
 
 ## How to use this in your Spring Maven based project
-To use this `token-path-security` in your maven based project include the following in your pom.xml as:
+To use this `token-filter` in your maven based project include the following in your pom.xml as:
 ```
 <dependency>
   <groupId>me.sonam</groupId>
-  <artifactId>token-path-security</artifactId>
+  <artifactId>token-filter</artifactId>
   <version>1.3-SNAPSHOT</version>
 </dependency>
 ```
@@ -17,7 +17,7 @@ Or in gradle:
 
 ```
 dependencies {
- implementation 'me.sonam:token-path-security:1.0.4-SNAPSHOT'
+ implementation 'me.sonam:token-filter:1.0.4-SNAPSHOT'
 }
 ```
 
@@ -50,7 +50,7 @@ permitpath:
     scopes: message.read, message.write    
 ```
 
-This token-path-security library can also request access-token to be created from the spring authorization server using `Client Credentials Flow` token.  This can be done
+This token-filter library can also request access-token to be created from the spring authorization server using `Client Credentials Flow` token.  This can be done
 using the following configuration example:
 
 ```
@@ -75,7 +75,7 @@ The `base64EncodedClientIdSecret` is the ClientId and Client Secret values encod
 
 You can also forward the inbound access-token using the `accessToken` of `option` with `forward` value or not send it to outbound api with `doNothing` value.
 
-This `token-path-security` is meant to be deployed using a Eureka discovery service.  Therefore, this uses `loadbalanced` webclients.  The following is an example of how to configure the filter and the validator:
+This `token-filter` is meant to be deployed using a Eureka discovery service.  Therefore, this uses `loadbalanced` webclients.  The following is an example of how to configure the filter and the validator:
 ```
 @Profile("!localdevtest")
 @Configuration
@@ -144,5 +144,5 @@ The following is the response from the authorization server:
 
 
 
-Fore more on how to use this `token-path-security` from github to another github repository follow [How to use maven library from github in your maven project?](https://sonamsamdupkhangsar.github.io/pulling-down-github-maven-library/)
+Fore more on how to use this `token-filter` from github to another github repository follow [How to use maven library from github in your maven project?](https://sonamsamdupkhangsar.github.io/pulling-down-github-maven-library/)
 
