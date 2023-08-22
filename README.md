@@ -146,3 +146,5 @@ The following is the response from the authorization server:
 
 Fore more on how to use this `token-filter` from github to another github repository follow [How to use maven library from github in your maven project?](https://sonamsamdupkhangsar.github.io/pulling-down-github-maven-library/)
 
+To publish this library to local maven repo:
+`./gradlew publishToMavenLocal `

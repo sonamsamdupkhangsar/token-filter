@@ -75,6 +75,7 @@ spring:
 # for spring.security.oauth2.resourceserver.jwt.issuer-uri: check link
 # https://docs.spring.io/spring-security/reference/reactive/oauth2/resource-server/jwt.html
 
+
 # mac terminal base64 encode "echo -n  'oauth-client:oauth-secret' | openssl base64"
 base64EncodedClientIdAndSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
 
@@ -101,8 +102,8 @@ jwtrequest:
       scopes: message.read
       base64EncodedClientIdSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
 
-#hmacKey:
-#  clientId: jwt-validator
-#  algorithm: HmacMD5
-#  secretKey: mysecret
-
+token:
+  audiences:
+    - oauth-client
+    - my-other-client
+  issuerUri: http://my-server:9001
