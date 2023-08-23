@@ -103,7 +103,5 @@ jwtrequest:
       base64EncodedClientIdSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
 
 token:
-  audiences:
-    - oauth-client
-    - my-other-client
+  audiences: oauth-client  ,  my-other-client
   issuerUri: http://my-server:9001

@@ -25,16 +25,16 @@ public class TokenProperty {
     }
 
     public static class Token {
-        private List<String> audiences = new ArrayList<>();
+        private String audiences;
         private String issuerUri;
         public Token() {
         }
 
-        public List<String> getAudiences() {
+        public String getAudiences() {
             return audiences;
         }
 
-        public void setAudiences(List<String> audiences) {
+        public void setAudiences(String audiences) {
             this.audiences = audiences;
         }
 

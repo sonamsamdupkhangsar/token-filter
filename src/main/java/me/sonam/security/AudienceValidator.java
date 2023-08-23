@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AudienceValidator implements OAuth2TokenValidator<Jwt> {
     private static final Logger LOG = LoggerFactory.getLogger(AudienceValidator.class);
@@ -17,6 +18,14 @@ public class AudienceValidator implements OAuth2TokenValidator<Jwt> {
 
     public AudienceValidator(List<String> audiences) {
         this.audiences = audiences;
+
+        if (LOG.isDebugEnabled()) {
+            this.audiences.forEach(s -> LOG.debug("string: '{}'", s));
+        }
+        this.audiences = this.audiences.stream().map(String::trim).collect(Collectors.toList());
+        if (LOG.isDebugEnabled()) {
+            this.audiences.forEach(s -> LOG.info("after trim: string: '{}'", s));
+        }
     }
 
     OAuth2Error error = new OAuth2Error("invalid_token", "The required audience is missing", null);
