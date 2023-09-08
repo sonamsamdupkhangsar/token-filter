@@ -76,11 +76,6 @@ test {
         //include all integration tests
         includeTestsMatching "*Test*"
     }
-    useJUnitPlatform()
-
-    testLogging {
-        events "failed" // "passed", "skipped", "standardOut", "standardError"
-    }
 }
 
 dependencyManagement {
