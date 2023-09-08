@@ -8,11 +8,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+// this will only test the tokenProperty config for now.
 @SpringBootTest
 public class TokenAudienceAndIssuerCheckIntegTest {
     private static final Logger LOG = LoggerFactory.getLogger(TokenAudienceAndIssuerCheckIntegTest.class);
@@ -20,7 +23,9 @@ public class TokenAudienceAndIssuerCheckIntegTest {
     private WebTestClient client;
     @Autowired
     private TokenProperty tokenProperty;
-
+    @MockBean
+    ReactiveJwtDecoder jwtDecoder; // this is needed otherwise this class will fail because security will try to load auth server
+    // config
     /**
      * this test connects to a live running authorization server
      */
@@ -32,13 +37,13 @@ public class TokenAudienceAndIssuerCheckIntegTest {
         LOG.info("tokenProperty: {}", tokenProperty);
 
         assertThat("hello").isEqualTo("hello");
-       /* assertThat(tokenProperty.getToken().getAudiences().contains("oauth-client")).isTrue();
+        assertThat(tokenProperty.getToken().getAudiences().contains("oauth-client")).isTrue();
         assertThat(tokenProperty.getToken().getAudiences().contains("my-other-client")).isTrue();
         assertThat(tokenProperty.getToken().getAudiences().contains("non-existing-client")).isFalse();
         assertThat(tokenProperty.getToken().getIssuerUri()).isEqualTo("http://my-server:9001");
         assertThat(tokenProperty.getToken().getIssuerUri()).isNotEqualTo("http://my-server");
 
-*/
+
       /*  LOG.info("call passheader endpoint");
         final String b64EncodedCredentials = Base64.getEncoder().encodeToString("oauth-client:oauth-secret".getBytes(StandardCharsets.UTF_8));
 
