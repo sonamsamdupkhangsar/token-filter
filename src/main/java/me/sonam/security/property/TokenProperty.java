@@ -22,6 +22,14 @@ public class TokenProperty {
 
     }
 
+    @Override
+    public String toString() {
+        return "TokenProperty{" +
+                "token=" + token +
+                ", map=" + map +
+                '}';
+    }
+
     public static class Token {
         private String audiences;
         private String issuerUri;

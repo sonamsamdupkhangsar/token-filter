@@ -13,15 +13,12 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-//@EnableAutoConfiguration
-//@ExtendWith(SpringExtension.class)
-//@SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 public class TokenAudienceAndIssuerCheckIntegTest {
     private static final Logger LOG = LoggerFactory.getLogger(TokenAudienceAndIssuerCheckIntegTest.class);
 
-    //@Autowired
     private WebTestClient client;
-    //@Autowired
+    @Autowired
     private TokenProperty tokenProperty;
 
     /**
