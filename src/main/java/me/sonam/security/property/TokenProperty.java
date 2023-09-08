@@ -1,10 +1,8 @@
 package me.sonam.security.property;
 
-import me.sonam.security.util.JwtPath;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +20,14 @@ public class TokenProperty {
 
     public TokenProperty() {
 
+    }
+
+    @Override
+    public String toString() {
+        return "TokenProperty{" +
+                "token=" + token +
+                ", map=" + map +
+                '}';
     }
 
     public static class Token {
