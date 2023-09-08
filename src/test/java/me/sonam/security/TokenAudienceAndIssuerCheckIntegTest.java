@@ -21,7 +21,7 @@ public class TokenAudienceAndIssuerCheckIntegTest {
 
     @Autowired
     private WebTestClient client;
-    @Autowired
+    //@Autowired
     private TokenProperty tokenProperty;
 
     /**
