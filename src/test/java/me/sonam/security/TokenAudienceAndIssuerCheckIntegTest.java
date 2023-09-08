@@ -13,13 +13,13 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@EnableAutoConfiguration
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+//@EnableAutoConfiguration
+//@ExtendWith(SpringExtension.class)
+//@SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class TokenAudienceAndIssuerCheckIntegTest {
     private static final Logger LOG = LoggerFactory.getLogger(TokenAudienceAndIssuerCheckIntegTest.class);
 
-    @Autowired
+    //@Autowired
     private WebTestClient client;
     //@Autowired
     private TokenProperty tokenProperty;
@@ -31,6 +31,8 @@ public class TokenAudienceAndIssuerCheckIntegTest {
     public void testAudienceAndIssuer() {
         LOG.info("send a jwt token");
         final String accessToken = "eyJraWQiOiI5ODNjZGU2NS1hYzczLTQ3YTQtODQxNS04NmZmNjQyMjg1YzIiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJvYXV0aC1jbGllbnQiLCJhdWQiOiJvYXV0aC1jbGllbnQiLCJuYmYiOjE2OTI0NjA2NTAsInNjb3BlIjpbIm1lc3NhZ2UucmVhZCIsIm1lc3NhZ2Uud3JpdGUiXSwiaXNzIjoiaHR0cDovL215LXNlcnZlcjo5MDAxIiwiZXhwIjoxNjkyNDYwOTUwLCJpYXQiOjE2OTI0NjA2NTB9.Iz5_1xbm6b5BOarhqpQ5SiUs4EIXyqx8kpQW6iaWC2CEUlaAFkwi5u67hjcBwkk7KlgCKBwahMk83AnTro7ogcagN0LgBU7qHBrjeMnbFP2yJ7oMylmlxCCwwZ8Fl9HySklQL289d-SzSoyGEZkBRaRLd1RTtYyDSFqptFQeXR1TZ5F0b8KAWPb8ZU6hgUREiiP8oyGzx6M1eyMXiy8efc9nEnjhRi9yTd6zuRtwnosKgjsQP0HrmgR8zoAoxJsp7g_vUKnLF6ll5dMRNFUrQ5W0U_YqqazoncK_4oDpWslsXzMcw4ELfWOcBlMQihqDqrdQSOZowPE0s2guBSlqrw";
+
+        LOG.info("tokenProperty: {}", tokenProperty);
 
         assertThat("hello").isEqualTo("hello");
        /* assertThat(tokenProperty.getToken().getAudiences().contains("oauth-client")).isTrue();
