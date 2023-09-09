@@ -12,8 +12,9 @@ plugins {
     id 'java-library'
     id 'maven-publish'
 }
+
 group = 'me.sonam'
-version = '1.0.1-SNAPSHOT'
+version = '1.0.0-SNAPSHOT'
 description = 'token-filter'
 java.sourceCompatibility = JavaVersion.VERSION_17
 
@@ -107,7 +108,20 @@ publishing {
     }
     publications {
         maven(MavenPublication) {
-            from(components.java)
+            groupId 'me.sonam'
+            artifactId 'token-filter'
+            version '1.0.0-SNAPSHOT'
+
+            from components.java
         }
+    }
+}
+
+tasks.named('jar') {
+    manifest {
+        attributes('Implementation-Title': project.name,
+                'Implementation-Version': project.version,
+                'Implementation-group': project.group
+        )
     }
 }
