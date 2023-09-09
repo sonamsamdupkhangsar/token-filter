@@ -4,11 +4,14 @@ package me.sonam.security;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.Before;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
@@ -32,8 +35,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 
 
 /**
@@ -104,7 +105,7 @@ public class JwtHeaderPassIntegTest {
 
         final String authenticationId = "dave";
         Jwt jwt = jwt(authenticationId);
-        when(this.jwtDecoder.decode(anyString())).thenReturn(Mono.just(jwt));
+        Mockito.when(this.jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(Mono.just(jwt));
 
         mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json")
                 .setResponseCode(400).setBody("bad request"));
@@ -125,7 +126,7 @@ public class JwtHeaderPassIntegTest {
 
         final String authenticationId = "dave";
         Jwt jwt = jwt(authenticationId);
-        when(this.jwtDecoder.decode(anyString())).thenReturn(Mono.just(jwt));
+        Mockito.when(this.jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(Mono.just(jwt));
 
         final String jwtString= "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzb25hbSIsImlzcyI6InNvbmFtLmNsb3VkIiwiYXVkIjoic29uYW0uY2xvdWQiLCJqdGkiOiJmMTY2NjM1OS05YTViLTQ3NzMtOWUyNy00OGU0OTFlNDYzNGIifQ.KGFBUjghvcmNGDH0eM17S9pWkoLwbvDaDBGAx2AyB41yZ_8-WewTriR08JdjLskw1dsRYpMh9idxQ4BS6xmOCQ";
 
@@ -142,8 +143,8 @@ public class JwtHeaderPassIntegTest {
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
-        assertThat(recordedRequest.getPath()).startsWith("/api/health/jwtreceiver");
-        assertThat(recordedRequest.getMethod()).isEqualTo("GET");
+        AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/api/health/jwtreceiver");
+        AssertionsForClassTypes.assertThat(recordedRequest.getMethod()).isEqualTo("GET");
     }
 
     @Test
@@ -152,7 +153,7 @@ public class JwtHeaderPassIntegTest {
 
         final String authenticationId = "dave";
         Jwt jwt = jwt(authenticationId);
-        when(this.jwtDecoder.decode(anyString())).thenReturn(Mono.just(jwt));
+        Mockito.when(this.jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(Mono.just(jwt));
 
         final String jwtString= "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzb25hbSIsImlzcyI6InNvbmFtLmNsb3VkIiwiYXVkIjoic29uYW0uY2xvdWQiLCJqdGkiOiJmMTY2NjM1OS05YTViLTQ3NzMtOWUyNy00OGU0OTFlNDYzNGIifQ.KGFBUjghvcmNGDH0eM17S9pWkoLwbvDaDBGAx2AyB41yZ_8-WewTriR08JdjLskw1dsRYpMh9idxQ4BS6xmOCQ";
 
@@ -170,8 +171,8 @@ public class JwtHeaderPassIntegTest {
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
-        assertThat(recordedRequest.getPath()).startsWith("/oauth2/token?grant_type=client_credentials");
-        assertThat(recordedRequest.getMethod()).isEqualTo("POST");
+        AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/oauth2/token?grant_type=client_credentials");
+        AssertionsForClassTypes.assertThat(recordedRequest.getMethod()).isEqualTo("POST");
     }
 
     @Test
@@ -181,7 +182,7 @@ public class JwtHeaderPassIntegTest {
 
         final String authenticationId = "dave";
         Jwt jwt = jwt(authenticationId);
-        when(this.jwtDecoder.decode(anyString())).thenReturn(Mono.just(jwt));
+        Mockito.when(this.jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(Mono.just(jwt));
 
         mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json")
                 .setResponseCode(200).setBody("{ \"message\": \"logged-in user: "+authenticationId+"\"}"));
@@ -201,7 +202,7 @@ public class JwtHeaderPassIntegTest {
 
         final String authenticationId = "dave";
         Jwt jwt = jwt(authenticationId);
-        when(this.jwtDecoder.decode(anyString())).thenReturn(Mono.just(jwt));
+        Mockito.when(this.jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(Mono.just(jwt));
 
         mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json")
                 .setResponseCode(200).setBody("{ \"message\": \"logged-in user: "+authenticationId+"\"}"));

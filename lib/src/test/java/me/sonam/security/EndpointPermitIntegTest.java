@@ -1,10 +1,11 @@
 package me.sonam.security;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.java.Log;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,17 +16,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.reactive.server.FluxExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-import java.security.Key;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Consumer;
-
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 
 /**
  * Test the liveness and readiness endpoints
@@ -50,7 +46,7 @@ public class EndpointPermitIntegTest {
     Jwt jwt = jwt(authenticationId);
 
     LOG.info("the following is needed to return the correct jwt");
-    when(this.jwtDecoder.decode(anyString())).thenReturn(Mono.just(jwt));
+    Mockito.when(this.jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(Mono.just(jwt));
 
     final String jwtString = createJwt("sonam", "message.read");
     client.get().uri("/api/scope/read")
@@ -64,7 +60,7 @@ public class EndpointPermitIntegTest {
     final String authenticationId = "dave";
     Jwt jwt = jwt(authenticationId, "message:none");
 
-    when(this.jwtDecoder.decode(anyString())).thenReturn(Mono.just(jwt));
+    Mockito.when(this.jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(Mono.just(jwt));
 
     final String jwtString = createJwt("sonam", "message:none");
     client.get().uri("/api/scope/read")
@@ -101,7 +97,7 @@ public class EndpointPermitIntegTest {
     LOG.info("this endpoint requires jwt endpoint");
     final String authenticationId = "dave";
     Jwt jwt = jwt(authenticationId);
-    when(this.jwtDecoder.decode(anyString())).thenReturn(Mono.just(jwt));
+    Mockito.when(this.jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(Mono.just(jwt));
 
     client.get().uri("/api/health/liveness")
             .headers(addJwt(jwt))
