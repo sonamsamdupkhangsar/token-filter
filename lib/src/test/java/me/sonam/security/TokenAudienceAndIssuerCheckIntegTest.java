@@ -1,16 +1,14 @@
 package me.sonam.security;
 
 import me.sonam.security.property.TokenProperty;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -36,7 +34,7 @@ public class TokenAudienceAndIssuerCheckIntegTest {
 
         LOG.info("tokenProperty: {}", tokenProperty);
 
-        assertThat("hello").isEqualTo("hello");
+        AssertionsForClassTypes.assertThat("hello").isEqualTo("hello");
         assertThat(tokenProperty.getToken().getAudiences().contains("oauth-client")).isTrue();
         assertThat(tokenProperty.getToken().getAudiences().contains("my-other-client")).isTrue();
         assertThat(tokenProperty.getToken().getAudiences().contains("non-existing-client")).isFalse();
