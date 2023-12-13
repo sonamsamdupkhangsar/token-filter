@@ -33,6 +33,8 @@ public class TokenProperty {
     public static class Token {
         private String audiences;
         private String issuerUri;
+        private String jwkSetUri;
+
         public Token() {
         }
 
@@ -48,8 +50,15 @@ public class TokenProperty {
             return issuerUri;
         }
 
+        public String getJwkSetUri() {
+            return this.jwkSetUri;
+        }
         public void setIssuerUri(String issuerUri) {
             this.issuerUri = issuerUri;
+        }
+
+        public void setJwkSetUri(String jwkSetUri) {
+            this.jwkSetUri = jwkSetUri;
         }
 
         @Override
@@ -57,6 +66,7 @@ public class TokenProperty {
             return "Token{" +
                     "audiences=" + audiences +
                     ", issuerUri='" + issuerUri + '\'' +
+                    ", jwtkSetUri='" + jwkSetUri +'\''+
                     '}';
         }
     }

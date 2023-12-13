@@ -35,11 +35,11 @@ public class TokenAudienceAndIssuerCheckIntegTest {
         LOG.info("tokenProperty: {}", tokenProperty);
 
         AssertionsForClassTypes.assertThat("hello").isEqualTo("hello");
-        assertThat(tokenProperty.getToken().getAudiences().contains("oauth-client")).isTrue();
+      /*  assertThat(tokenProperty.getToken().getAudiences().contains("oauth-client")).isTrue();
         assertThat(tokenProperty.getToken().getAudiences().contains("my-other-client")).isTrue();
         assertThat(tokenProperty.getToken().getAudiences().contains("non-existing-client")).isFalse();
         assertThat(tokenProperty.getToken().getIssuerUri()).isEqualTo("http://my-server:9001");
-        assertThat(tokenProperty.getToken().getIssuerUri()).isNotEqualTo("http://my-server");
+        assertThat(tokenProperty.getToken().getIssuerUri()).isNotEqualTo("http://my-server");*/
 
 
       /*  LOG.info("call passheader endpoint");

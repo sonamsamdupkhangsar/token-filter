@@ -61,6 +61,11 @@ jwt-receiver:
 jwt:
   issuer: https://www.sonam.cloud
 
+#token:
+#  audiences: oauth-client  ,  my-other-client
+#  issuerUri: http://my-server:9001
+#  jwkSetUri: http://my-server:8080/.well-knon/jwks.json
+
 spring:
   r2dbc:
     url: r2dbc:h2:mem:///contentitem?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
@@ -71,6 +76,9 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:9000
+          jwk-set-uri: http://localhost:9000/.well-known/jwks.json
+          audiences: oauth-client, my-other-client
+
 # this issuer-uri is used for discovering the authorization server's public keys and to use them for validating jwt.
 # for spring.security.oauth2.resourceserver.jwt.issuer-uri: check link
 # https://docs.spring.io/spring-security/reference/reactive/oauth2/resource-server/jwt.html
@@ -102,6 +110,4 @@ jwtrequest:
       scopes: message.read
       base64EncodedClientIdSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
 
-token:
-  audiences: oauth-client  ,  my-other-client
-  issuerUri: http://my-server:9001
+
