@@ -58,13 +58,6 @@ jwt-receiver:
   root: http://localhost:${server.port}
   receiver: /api/health/jwtreceiver
 
-jwt:
-  issuer: https://www.sonam.cloud
-
-#token:
-#  audiences: oauth-client  ,  my-other-client
-#  issuerUri: http://my-server:9001
-#  jwkSetUri: http://my-server:8080/.well-knon/jwks.json
 
 spring:
   r2dbc:

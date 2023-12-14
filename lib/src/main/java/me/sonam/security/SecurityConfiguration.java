@@ -2,7 +2,6 @@ package me.sonam.security;
 
 
 import me.sonam.security.property.PermitPath;
-import me.sonam.security.property.TokenProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +27,6 @@ public class SecurityConfiguration {
 
     @Autowired
     private PermitPath permitPath;
-
-    @Autowired
-    private TokenProperty tokenProperty;
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
