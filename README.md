@@ -148,3 +148,9 @@ Fore more on how to use this `token-filter` from github to another github reposi
 
 To publish this library to local maven repo:
 `./gradlew publishToMavenLocal `
+
+### Release notes
+
+1.0.2-SNAPSHOT
+
+This library has been updated to use HTTP POST for calling Spring Authorization Server for requesting token using Client Credential Grant.

@@ -143,6 +143,11 @@ public class JwtHeaderPassIntegTest {
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
+        AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/oauth2/token");
+        AssertionsForClassTypes.assertThat(recordedRequest.getMethod()).isEqualTo("POST");
+
+        recordedRequest = mockWebServer.takeRequest();
+        LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
         AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/api/health/jwtreceiver");
         AssertionsForClassTypes.assertThat(recordedRequest.getMethod()).isEqualTo("GET");
     }
@@ -171,8 +176,13 @@ public class JwtHeaderPassIntegTest {
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
-        AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/oauth2/token?grant_type=client_credentials");
+        AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/oauth2/token");
         AssertionsForClassTypes.assertThat(recordedRequest.getMethod()).isEqualTo("POST");
+
+        recordedRequest = mockWebServer.takeRequest();
+        LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
+        AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/api/health/jwtreceiver");
+        AssertionsForClassTypes.assertThat(recordedRequest.getMethod()).isEqualTo("GET");
     }
 
     @Test

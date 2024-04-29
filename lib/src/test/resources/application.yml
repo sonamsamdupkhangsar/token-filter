@@ -51,7 +51,7 @@ auth-server:
   root: http://localhost:{port}
   oauth2token:
     path: /oauth2/token
-    params: ?grant_type=client_credentials
+    grantType: client_credentials
 
 # this is for testing
 jwt-receiver:

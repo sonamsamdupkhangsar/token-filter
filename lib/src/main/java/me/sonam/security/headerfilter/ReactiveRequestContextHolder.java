@@ -9,9 +9,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.*;
 import reactor.core.publisher.Mono;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -22,10 +25,14 @@ public class ReactiveRequestContextHolder {
 
     //set default value to empty if this filter is not added
     //the following is the endpoint for provision of accesstoken from https://{host}:{port}/oauth2/token
-    @Value("${auth-server.root:}${auth-server.oauth2token.path:}${auth-server.oauth2token.params:}")
+    @Value("${auth-server.root:}${auth-server.oauth2token.path:}")
     private String oauth2TokenEndpoint;
+
     @Value("${auth-server.oauth2token.path:}")
     private String accessTokenPath;
+
+    @Value("${auth-server.oauth2token.grantType}")
+    private String grantType;
 
     @Autowired
     private JwtPath jwtPath;
@@ -117,13 +124,18 @@ public class ReactiveRequestContextHolder {
                 accessToken.getScopes());
         final StringBuilder oauthEndpointWithScope = new StringBuilder(oauth2TokenEndpoint);
 
+        MultiValueMap<String, Object> multiValueMap = new LinkedMultiValueMap<>();
+        multiValueMap.add("grant_type", grantType);
+
         if (accessToken.getScopes() != null && !accessToken.getScopes().trim().isEmpty()) {
-            oauthEndpointWithScope.append("&scope=").append(accessToken.getScopes()).toString();
+            List<String> scopeList = Arrays.stream(accessToken.getScopes().split(" ")).toList();
+            multiValueMap.add("scopes", scopeList);
         }
 
         LOG.info("sending oauth2TokenEndpointWithScopes: {}", oauthEndpointWithScope);
 
         WebClient.ResponseSpec responseSpec = webClientBuilder.build().post().uri(oauthEndpointWithScope.toString())
+                .bodyValue(multiValueMap)
                 .headers(httpHeaders -> httpHeaders.setBasicAuth(accessToken.getBase64EncodedClientIdSecret()))
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve();
