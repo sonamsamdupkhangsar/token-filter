@@ -31,7 +31,7 @@ public class ReactiveRequestContextHolder {
     @Value("${auth-server.oauth2token.path:}")
     private String accessTokenPath;
 
-    @Value("${auth-server.oauth2token.grantType}")
+    @Value("${auth-server.oauth2token.grantType:}")
     private String grantType;
 
     @Autowired
