@@ -106,7 +106,7 @@ public class ReactiveRequestContextHolder {
                         .headers(headers -> {
                             headers.set(HttpHeaders.ORIGIN, serverHttpRequest.getHeaders().getFirst(HttpHeaders.ORIGIN));
                             headers.set(HttpHeaders.AUTHORIZATION,  serverHttpRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
-                            LOG.info("forward jwt to header from access token http callout");
+                            LOG.info("forward jwt to header from access token http call-out: {}", serverHttpRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
                         }).build();
                 return exchangeFunction.exchange(clientRequest);
             }
@@ -128,8 +128,8 @@ public class ReactiveRequestContextHolder {
         multiValueMap.add("grant_type", grantType);
 
         if (accessToken.getScopes() != null && !accessToken.getScopes().trim().isEmpty()) {
-            List<String> scopeList = Arrays.stream(accessToken.getScopes().split(" ")).toList();
-            multiValueMap.add("scopes", scopeList);
+            multiValueMap.add("scope", accessToken.getScopes());
+            LOG.info("added scope: {}", accessToken.getScopes());
         }
 
         LOG.info("sending oauth2TokenEndpointWithScopes: {}", oauthEndpointWithScope);
