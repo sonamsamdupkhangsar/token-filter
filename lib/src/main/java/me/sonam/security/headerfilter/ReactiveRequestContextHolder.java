@@ -1,7 +1,7 @@
 package me.sonam.security.headerfilter;
 
 import me.sonam.security.SecurityException;
-import me.sonam.security.util.JwtPath;
+import me.sonam.security.util.TokenRequestFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.*;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +34,7 @@ public class ReactiveRequestContextHolder {
     private String grantType;
 
     @Autowired
-    private JwtPath jwtPath;
+    private TokenRequestFilter tokenRequestFilter;
 
     // base64 encoded of clientId and secret if jwt requested for outgoing call
     // based on jwtrequest outbound call.
@@ -71,14 +70,35 @@ public class ReactiveRequestContextHolder {
                         LOG.info("in path: {}, outbound path: {}", r.getPath().pathWithinApplication().value(),
                                 request.url().getPath());
 
-                        List<JwtPath.JwtRequest> jwtRequestList = jwtPath.getJwtRequest();
-                        for (JwtPath.JwtRequest jwtRequest : jwtRequestList) {
-                            if (r.getPath().pathWithinApplication().value().matches(jwtRequest.getIn()) &&
-                                    request.url().getPath().matches(jwtRequest.getOut())) {
-                                LOG.info("inbound request path and outbound request path both matched");
-                                return getClientResponse(jwtRequest, request, r, next);
+                        List<TokenRequestFilter.RequestFilter> requestFilterList = tokenRequestFilter.getRequestFilters();
+                        for (TokenRequestFilter.RequestFilter requestFilter : requestFilterList) {
+                            String[] inMatches = requestFilter.getIn().split(",");
+
+                            for (String inPath : inMatches) {
+                                LOG.debug("inPath: {}", inPath);
+
+                                if (r.getPath().pathWithinApplication().value().matches(inPath.trim())) {
+                                    LOG.info("inbound request path {} matches with inPath parameter: {}",
+                                            r.getPath().pathWithinApplication().value(), inPath.trim());
+
+                                    LOG.debug("check outbound path now");
+                                    String[] outMatches = requestFilter.getOut().split(",");
+
+                                    for (String outPath : outMatches) {
+                                        LOG.debug("outPath: {}", outPath);
+
+                                        if (request.url().getPath().matches(outPath.trim())) {
+                                            LOG.info("outbound path {} matches with outbound parameter: {}",
+                                                    request.url().getPath(), outPath);
+
+                                            return getClientResponse(requestFilter, request, r, next);
+                                        }
+                                    }
+                                }
                             }
+
                         }
+
                         LOG.info("no path match found");
                         LOG.info("just do nothing to add to header");
                         ClientRequest clientRequest = ClientRequest.from(request).build();
@@ -88,10 +108,10 @@ public class ReactiveRequestContextHolder {
 
     }
 
-    private Mono<ClientResponse> getClientResponse(JwtPath.JwtRequest jwtRequest, ClientRequest request,
+    private Mono<ClientResponse> getClientResponse(TokenRequestFilter.RequestFilter requestFilter, ClientRequest request,
                                                    ServerHttpRequest serverHttpRequest, ExchangeFunction exchangeFunction) {
-            if (jwtRequest.getAccessToken().getOption().name().equals(JwtPath.JwtRequest.AccessToken.JwtOption.request.name())) {
-                return getJwt(jwtRequest.getAccessToken()).flatMap(s -> {
+            if (requestFilter.getAccessToken().getOption().name().equals(TokenRequestFilter.RequestFilter.AccessToken.JwtOption.request.name())) {
+                return getAccessToken(requestFilter.getAccessToken()).flatMap(s -> {
                     ClientRequest clientRequest = ClientRequest.from(request)
                             .headers(headers -> {
                                 headers.set(HttpHeaders.ORIGIN, serverHttpRequest.getHeaders().getFirst(HttpHeaders.ORIGIN));
@@ -101,12 +121,22 @@ public class ReactiveRequestContextHolder {
                     return exchangeFunction.exchange(clientRequest);
                 });
             }
-            else if (jwtRequest.getAccessToken().getOption().name().equals(JwtPath.JwtRequest.AccessToken.JwtOption.forward.name())) {
+            else if (requestFilter.getAccessToken().getOption().name()
+                    .equals(TokenRequestFilter.RequestFilter.AccessToken.JwtOption.forward.name())) {
                 ClientRequest clientRequest = ClientRequest.from(request)
                         .headers(headers -> {
-                            headers.set(HttpHeaders.ORIGIN, serverHttpRequest.getHeaders().getFirst(HttpHeaders.ORIGIN));
-                            headers.set(HttpHeaders.AUTHORIZATION,  serverHttpRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
-                            LOG.info("forward jwt to header from access token http call-out: {}", serverHttpRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
+                            String accessTokenHeader = serverHttpRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+                            if (accessTokenHeader != null && accessTokenHeader.contains("Bearer ")) {
+                                final String accessToken = accessTokenHeader.replace("Bearer ", "");
+
+                                headers.set(HttpHeaders.ORIGIN, serverHttpRequest.getHeaders().getFirst(HttpHeaders.ORIGIN));
+                                headers.set(HttpHeaders.AUTHORIZATION,  accessToken);
+                                LOG.info("pass inbound accessToken : {}", accessToken);
+                            }
+                            else {
+                                LOG.error("inbound request does not contain valid accessToken is {}", accessTokenHeader);
+                            }
+
                         }).build();
                 return exchangeFunction.exchange(clientRequest);
             }
@@ -117,7 +147,7 @@ public class ReactiveRequestContextHolder {
             }
     }
 
-    private Mono<String> getJwt(JwtPath.JwtRequest.AccessToken accessToken) {
+    private Mono<String> getAccessToken(TokenRequestFilter.RequestFilter.AccessToken accessToken) {
         LOG.info("get access token using base64EncodedClientIdAndSecret: {}," +
                 " b64ClientIdAndSecret: {}, scopes: {}", oauth2TokenEndpoint,
                 accessToken.getBase64EncodedClientIdSecret(),

@@ -81,7 +81,7 @@ spring:
 base64EncodedClientIdAndSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
 
 # this is to call jwt-rest-service accesstoken for matching inbound and outbound
-jwtrequest:
+requestFilters:
   - in: /api/health/passheader
     out: /api/health/jwtreceiver
     accessToken:

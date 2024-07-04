@@ -10,38 +10,25 @@ import java.util.Map;
 
 @Component
 @ConfigurationProperties
-public class JwtPath {
-    private List<JwtRequest> jwtrequest = new ArrayList();
+public class TokenRequestFilter {
+    private final List<RequestFilter> requestFilters = new ArrayList<>();
 
-    public List<JwtRequest> getJwtRequest() {
-        return jwtrequest;
+    public List<RequestFilter> getRequestFilters() {
+        return requestFilters;
     }
 
     private Map<String, List> map = new HashMap<>();
 
-    public JwtPath() {
+    public TokenRequestFilter() {
 
     }
 
-    public void mapInAsKey() {
-        jwtrequest.forEach(jwtRequest -> {
-            if(map.get(jwtRequest.getIn()) == null) {
-                map.put(jwtRequest.getIn(), List.of(jwtRequest.getOut()));
-            }
-            else {
-                map.put(jwtRequest.in, List.of(map.get(jwtRequest.getIn()).add(jwtRequest.getOut())));
-            }
-        });
-    }
-
-
-
-    public static class JwtRequest {
+    public static class RequestFilter {
         private String in;
         private String out;
         private AccessToken accessToken;
 
-        public JwtRequest() {
+        public RequestFilter() {
         }
 
         public String getIn() {
