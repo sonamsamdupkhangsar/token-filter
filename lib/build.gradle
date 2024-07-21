@@ -14,7 +14,7 @@ plugins {
 }
 
 group = 'me.sonam'
-version = '1.0.3-SNAPSHOT'
+version = '1.0.4-SNAPSHOT'
 description = 'token-filter'
 java.sourceCompatibility = JavaVersion.VERSION_17
 
@@ -51,6 +51,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     testImplementation 'org.projectlombok:lombok:1.18.20'
+    testImplementation 'org.springframework.security:spring-security-test'
 
 }
 
@@ -110,7 +111,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'me.sonam'
             artifactId 'token-filter'
-            version '1.0.3-SNAPSHOT'
+            version '1.0.4-SNAPSHOT'
 
             from components.java
         }

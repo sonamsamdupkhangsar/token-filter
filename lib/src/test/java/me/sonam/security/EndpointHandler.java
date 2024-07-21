@@ -100,6 +100,25 @@ public class EndpointHandler {
         } );
     }
 
+    public Mono<ServerResponse> deletePassJwtHeaderToBService(ServerRequest serverRequest) {
+        LOG.debug("pass jwt header to receiveJwtHeader endpoint");
+
+        return callEndpoint(jwtReceiver).flatMap(s ->
+                ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(getMap(Pair.of("message", s)))
+        ).onErrorResume(throwable ->{
+            LOG.error("endpoint call failed: {}", throwable.getMessage());
+            String errorMessage = throwable.getMessage();
+
+            if (throwable instanceof WebClientResponseException) {
+                WebClientResponseException webClientResponseException = (WebClientResponseException) throwable;
+                LOG.error("error body contains: {}", webClientResponseException.getResponseBodyAsString());
+                errorMessage = webClientResponseException.getResponseBodyAsString();
+            }
+            return Mono.error(new SecurityException(errorMessage));
+        } );
+    }
+
     private Mono<String> callEndpoint(final String endpoint) {
         LOG.info("call endpoint: {}", endpoint);
 

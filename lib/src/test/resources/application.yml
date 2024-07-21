@@ -84,20 +84,29 @@ base64EncodedClientIdAndSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
 requestFilters:
   - in: /api/health/passheader
     out: /api/health/jwtreceiver
+    httpMethods: delete
+    accessToken:
+      option: forward
+  - in: /api/health/passheader
+    out: /api/health/jwtreceiver
+    httpMethods: get, post, put
     accessToken:
       option: request
       scopes: message.read message.write
       base64EncodedClientIdSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
   - in: /api/health/passheader
     out: /api/health/liveness
+    httpMethods: get, post, put
     accessToken:
       option: forward
   - in: /api/health/forwardtoken
     out: /api/health/jwtreceiver
+    httpMethods: get, post, put
     accessToken:
       option: forward
   - in: /api/scope/callread
     out: /api/scope/read
+    httpMethods: get, post, put
     accessToken:
       option: request
       scopes: message.read

@@ -26,6 +26,7 @@ public class TokenRequestFilter {
     public static class RequestFilter {
         private String in;
         private String out;
+        private String httpMethods;
         private AccessToken accessToken;
 
         public RequestFilter() {
@@ -47,6 +48,14 @@ public class TokenRequestFilter {
             this.out = out;
         }
 
+        public String getHttpMethods() {
+            return httpMethods;
+        }
+
+        public void setHttpMethods(String httpMethods) {
+            this.httpMethods = httpMethods;
+        }
+
         public AccessToken getAccessToken() {
             return accessToken;
         }
@@ -60,6 +69,7 @@ public class TokenRequestFilter {
             return "JwtRequest{" +
                     "in='" + in + '\'' +
                     ", out='" + out + '\'' +
+                    ", httpMethod='" + httpMethods +'\'' +
                     ", accessToken='" + accessToken + '\'' +
                     '}';
         }

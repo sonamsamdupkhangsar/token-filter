@@ -21,6 +21,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
@@ -32,9 +33,13 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
+import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
 
 
 /**
@@ -53,6 +58,20 @@ public class JwtHeaderPassIntegTest {
     @MockBean
     ReactiveJwtDecoder jwtDecoder;
     private static MockWebServer mockWebServer;
+
+    @Autowired
+    ApplicationContext context;
+
+    @org.junit.jupiter.api.BeforeEach
+    public void setup() {
+        this.client = WebTestClient
+                .bindToApplicationContext(this.context)
+                // add Spring Security test Support
+                .apply(springSecurity())
+                .configureClient()
+                //   .filter(basicAuthentication("user", "password"))
+                .build();
+    }
 
     private static String jwtReceiverEndpoint = "http://localhost:{port}";///api/health/jwtreceiver";
     private static String apiPassHeaderEndpoint = "http://localhost:{port}/api/health/passheader";
@@ -152,6 +171,39 @@ public class JwtHeaderPassIntegTest {
         AssertionsForClassTypes.assertThat(recordedRequest.getMethod()).isEqualTo("GET");
     }
 
+
+    /**
+     * this method tests http delete method overridden for calling '/api/health/passheader -> '/api/health/jwtreceiver'
+     * @throws InterruptedException
+     */
+
+    @Test
+    public void passExistingHeaderJwtForDelete() throws InterruptedException {
+        LOG.info("readiness delete requires jwt, should get bad request");
+
+        UUID userId = UUID.randomUUID();
+        final String authenticationId = "dave";
+        Jwt jwt = jwt(authenticationId, userId);
+        Mockito.when(this.jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(Mono.just(jwt));
+
+        final String jwtString= "eyJraWQiOiJlOGQ3MjIzMC1iMDgwLTRhZjEtODFkOC0zMzE3NmNhMTM5ODIiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI3NzI1ZjZmZC1kMzk2LTQwYWYtOTg4Ni1jYTg4YzZlOGZjZDgiLCJhdWQiOiI3NzI1ZjZmZC1kMzk2LTQwYWYtOTg4Ni1jYTg4YzZlOGZjZDgiLCJuYmYiOjE3MTQ3NTY2ODIsImlzcyI6Imh0dHA6Ly9teS1zZXJ2ZXI6OTAwMSIsImV4cCI6MTcxNDc1Njk4MiwiaWF0IjoxNzE0NzU2NjgyLCJqdGkiOiI0NDBlZDY0My00MzdkLTRjOTMtYTZkMi1jNzYxNjFlNDRlZjUifQ.fjqgoczZbbmcnvYpVN4yakpbplp7EkDyxslvar5nXBFa6mgIFcZa29fwIKfcie3oUMQ8MDWxayak5PZ_QIuHwTvKSWHs0WL91ljf-GT1sPi1b4gDKf0rJOwi0ClcoTCRIx9-WGR6t2BBR1Rk6RGF2MW7xKw8M-RMac2A2mPEPJqoh4Pky1KgxhZpEXixegpAdQIvBgc0KBZeQme-ZzTYugB8EPUmGpMlfd-zX_vcR1ijxi8e-LRRJMqmGkc9GXfrH7MOKNQ_nu6pc6Gish2v_iuUEcpPHXrfqzGb9IHCLvfuLSaTDcYKYjQaEUAp-1uDW8-5posjiUV2eBiU48ajYg";
+
+        final String jwtReceiver = " {\"message\":\"jwt received endpoint\"}";
+        mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json").setResponseCode(200).setBody(jwtReceiver));//"Account created successfully.  Check email for activating account"));
+
+        LOG.info("call passheader endpoint");
+        client.mutateWith(mockJwt().jwt(jwt)).delete().uri("/api/health/passheader")
+                .headers(httpHeaders -> httpHeaders.setBearerAuth(jwtString))
+                .exchange().expectStatus().isOk();
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+
+        LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
+        AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/api/health/jwtreceiver");
+        AssertionsForClassTypes.assertThat(recordedRequest.getMethod()).isEqualTo("GET");
+    }
+
+
     @Test
     public void callWithJwtToken() throws InterruptedException {
         LOG.info("readiness delete requires jwt, should get bad request");
@@ -230,6 +282,11 @@ public class JwtHeaderPassIntegTest {
     private Jwt jwt(String subjectName) {
         return new Jwt("token", null, null,
                 Map.of("alg", "none"), Map.of("sub", subjectName));
+    }
+
+    private Jwt jwt(String subjectName, UUID userId) {
+        return new Jwt("token", null, null,
+                Map.of("alg", "none"), Map.of("sub", subjectName, "userId", userId.toString()));
     }
 
     private Consumer<HttpHeaders> addJwt(Jwt jwt) {

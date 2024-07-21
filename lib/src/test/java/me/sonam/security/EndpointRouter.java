@@ -34,7 +34,11 @@ public class EndpointRouter {
                         livenessReadinessHandler::readinessDelete)
                 .andRoute(RequestPredicates.GET("/api/health/passheader").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
                         livenessReadinessHandler::passJwtHeaderToBService)
+                .andRoute(RequestPredicates.DELETE("/api/health/passheader").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::deletePassJwtHeaderToBService)
                 .andRoute(RequestPredicates.GET("/api/health/jwtreceiver").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::jwtHeaderReceiver)
+                .andRoute(RequestPredicates.DELETE("/api/health/jwtreceiver").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
                         livenessReadinessHandler::jwtHeaderReceiver)
                 .andRoute(RequestPredicates.GET("/api/health/calljwtreceiver").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
                         livenessReadinessHandler::callJwtHeaderReceiverFromThis)
