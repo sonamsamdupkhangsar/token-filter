@@ -3,10 +3,8 @@ package me.sonam.security.util;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @ConfigurationProperties
@@ -27,6 +25,7 @@ public class TokenRequestFilter {
         private String in;
         private String out;
         private String httpMethods;
+        private Set<String> httpMethodSet = new HashSet<>();
         private AccessToken accessToken;
 
         public RequestFilter() {
@@ -51,9 +50,14 @@ public class TokenRequestFilter {
         public String getHttpMethods() {
             return httpMethods;
         }
+        public Set<String> getHttpMethodSet() {
+            return this.httpMethodSet;
+        }
 
         public void setHttpMethods(String httpMethods) {
             this.httpMethods = httpMethods;
+            String[] httpMethodArray = httpMethods.split(",");
+            httpMethodSet = Arrays.stream(httpMethodArray).map(String::trim).map(String::toLowerCase).collect(Collectors.toSet());
         }
 
         public AccessToken getAccessToken() {

@@ -74,15 +74,12 @@ public class ReactiveRequestContextHolder {
                         for (TokenRequestFilter.RequestFilter requestFilter : requestFilterList) {
 
                             if (requestFilter.getHttpMethods() != null) {
-                                String[] httpMethods = requestFilter.getHttpMethods().split(",");
-                                LOG.info("httpMethods: {}", (Object) httpMethods);
+                                LOG.info("httpMethods: {}", requestFilter.getHttpMethodSet());
 
                                 LOG.info("request.httpMethod: {}", r.getMethod().name());
-                                for (String httpMethod: httpMethods) {
-                                    if (r.getMethod().name().equalsIgnoreCase(httpMethod.trim())) {
-                                        LOG.info("request.method {} matched with provided httpMethod {}", r.getMethod().name(), httpMethod);
-                                        return processInboundPath(requestFilter, r, request, next);
-                                    }
+                                if (requestFilter.getHttpMethodSet().contains(r.getMethod().name().toLowerCase())) {
+                                    LOG.info("request.method {} matched with provided httpMethod", r.getMethod().name());
+                                    return processInboundPath(requestFilter, r, request, next);
                                 }
                             }
                         }
