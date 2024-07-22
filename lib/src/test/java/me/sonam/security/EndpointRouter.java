@@ -53,7 +53,15 @@ public class EndpointRouter {
                 .andRoute(RequestPredicates.GET("/api/scope/callread").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
                         livenessReadinessHandler::callScopeEndpoint)
                 .andRoute(RequestPredicates.GET("/api/scope/jwtrequired").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
-                        livenessReadinessHandler::jwtRequired);
+                        livenessReadinessHandler::jwtRequired)
+                .andRoute(RequestPredicates.GET("/api/scope/jwtrequired2").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::jwtRequired)
+                .andRoute(RequestPredicates.GET("/api/scope/jwtrequired3").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::jwtRequired)
+                .andRoute(RequestPredicates.GET("/api/scope/jwtrequired4").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::jwtRequired)
+                .andRoute(RequestPredicates.GET("/api/scope/callJwtRequired").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                livenessReadinessHandler::callJwtRequired);
 
     }
 }

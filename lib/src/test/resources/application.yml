@@ -83,6 +83,31 @@ base64EncodedClientIdAndSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
 # this is to call jwt-rest-service accesstoken for matching inbound and outbound
 requestFilters:
   - in: /api/health/passheader
+    out: /api/health/jwtrequired
+    httpMethods: GET
+    accessToken:
+      option: forward
+  - in: /api/scope/callJwtRequired
+    out: /api/scope/jwtrequired
+    httpMethods: GET
+    accessToken:
+      option: forward
+  - in: /api/scope/callJwtRequired
+    out: /api/scope/jwtrequired2
+    httpMethods: GET
+    accessToken:
+      option: forward
+  - in: /api/scope/callJwtRequired
+    out: /api/scope/jwtrequired3
+    httpMethods: GET
+    accessToken:
+      option: forward
+  - in: /api/scope/callJwtRequired
+    out: /api/scope/jwtrequired4
+    httpMethods: GET
+    accessToken:
+      option: forward
+  - in: /api/health/passheader
     out: /api/health/jwtreceiver
     httpMethods: delete
     accessToken:
@@ -96,12 +121,12 @@ requestFilters:
       base64EncodedClientIdSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
   - in: /api/health/passheader
     out: /api/health/liveness
-    httpMethods: get, post, put
+    httpMethods: get, post, head
     accessToken:
       option: forward
   - in: /api/health/forwardtoken
     out: /api/health/jwtreceiver
-    httpMethods: get, post, put
+    httpMethods: get, delete
     accessToken:
       option: forward
   - in: /api/scope/callread
@@ -111,5 +136,9 @@ requestFilters:
       option: request
       scopes: message.read
       base64EncodedClientIdSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
+  - in: /api/scope/dummyin
+    out: /api/scope/dummyout
+    accessToken:
+      option: forward
 
 

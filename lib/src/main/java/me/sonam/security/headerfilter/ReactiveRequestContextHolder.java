@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class ReactiveRequestContextHolder {
@@ -50,7 +51,6 @@ public class ReactiveRequestContextHolder {
     public static Mono<ServerHttpRequest> getRequest() {
         return Mono.deferContextual(Mono::just)// returns .Mono<ContextView>
                 .map(ctx -> ctx.get(CONTEXT_KEY)).map(serverHttpRequest -> {
-                    LOG.info("serverHttpRequest: {}", serverHttpRequest.getPath());
                     return serverHttpRequest;
                 });
     }
@@ -59,67 +59,75 @@ public class ReactiveRequestContextHolder {
         LOG.info("in headerFilter()");
         return (request, next) -> ReactiveRequestContextHolder.getRequest().flatMap(r ->
                 {
-                    LOG.info("request path: {}, accessTokenPath: {}", request.url().getPath(), accessTokenPath);
+                    Mono<ClientResponse> clientResponseMono = Mono.empty();
+                    LOG.info("inbound path: {}, outbound path: {}", r.getPath().pathWithinApplication().value(),
+                            request.url().getPath());
 
                     if (request.url().getPath().equals(accessTokenPath)) {
-                        LOG.info("don't call itself if using the same webclient builder");
+                        LOG.debug("don't call itself if using the same webclient builder");
                         ClientRequest clientRequest = ClientRequest.from(request).build();
                         return next.exchange(clientRequest);
                     }
                     else {
-                        LOG.info("in path: {}, outbound path: {}", r.getPath().pathWithinApplication().value(),
-                                request.url().getPath());
-
                         List<TokenRequestFilter.RequestFilter> requestFilterList = tokenRequestFilter.getRequestFilters();
+                        int index = 0;
                         for (TokenRequestFilter.RequestFilter requestFilter : requestFilterList) {
+                            LOG.info("checking requestFilter[{}]  {}", index++, requestFilter);
 
                             if (requestFilter.getHttpMethods() != null) {
-                                LOG.info("httpMethods: {}", requestFilter.getHttpMethodSet());
+                                LOG.debug("httpMethods: {} provided, actual requeset httpMethod: {}", requestFilter.getHttpMethodSet(),
+                                        r.getMethod().name());
 
-                                LOG.info("request.httpMethod: {}", r.getMethod().name());
                                 if (requestFilter.getHttpMethodSet().contains(r.getMethod().name().toLowerCase())) {
-                                    LOG.info("request.method {} matched with provided httpMethod", r.getMethod().name());
-                                    return processInboundPath(requestFilter, r, request, next);
+                                    LOG.debug("request.method {} matched with provided httpMethod", r.getMethod().name());
+                                    clientResponseMono =  processInboundPath(requestFilter, r, request, next);
+
+
                                 }
                             }
                         }
-
-                        LOG.info("executing default action of pass thru");
-                        ClientRequest clientRequest = ClientRequest.from(request).build();
-                        return next.exchange(clientRequest);
+                        return clientResponseMono.switchIfEmpty(defaultClientRequest(request, next));
                     }
+
                 });
 
+    }
+
+    public Mono<ClientResponse> defaultClientRequest(ClientRequest request, ExchangeFunction next) {
+        LOG.info("httpMethods didn't even match, executing default action of pass thru");
+        ClientRequest clientRequest = ClientRequest.from(request).build();
+        return next.exchange(clientRequest);
     }
 
     private Mono<ClientResponse> processInboundPath(TokenRequestFilter.RequestFilter requestFilter, ServerHttpRequest r,
                                                     ClientRequest request, ExchangeFunction next) {
         String[] inMatches = requestFilter.getIn().split(",");
         for (String inPath : inMatches) {
-            LOG.debug("inPath: {}", inPath);
+            LOG.debug("requestFilter.inPath: {}", inPath);
 
             if (r.getPath().pathWithinApplication().value().matches(inPath.trim())) {
-                LOG.info("inbound request path {} matches with inPath parameter: {}",
-                        r.getPath().pathWithinApplication().value(), inPath.trim());
 
                 LOG.debug("check outbound path now");
                 String[] outMatches = requestFilter.getOut().split(",");
 
                 for (String outPath : outMatches) {
-                    LOG.debug("outPath: {}", outPath);
+                    LOG.debug("requestFilter outPath: {}", outPath);
 
                     if (request.url().getPath().matches(outPath.trim())) {
-                        LOG.info("outbound path {} matches with outbound parameter: {}",
+                        LOG.info("inbound path {} and outbound path {} matches with outbound parameter: {}",
+                                r.getPath().pathWithinApplication().value(),
                                 request.url().getPath(), outPath);
 
                         return getClientResponse(requestFilter, request, r, next);
                     }
                 }
             }
+            else {
+                LOG.debug("filter path {} didn't match request.path: {}", inPath, r.getPath().pathWithinApplication().value());
+            }
         }
-        LOG.info("only httpMethod was same, executing default action of pass thru");
-        ClientRequest clientRequest = ClientRequest.from(request).build();
-        return next.exchange(clientRequest);
+        LOG.info("no outPath match found, return empty");
+        return Mono.empty();
     }
 
     private Mono<ClientResponse> getClientResponse(TokenRequestFilter.RequestFilter requestFilter, ClientRequest request,
@@ -137,6 +145,7 @@ public class ReactiveRequestContextHolder {
             }
             else if (requestFilter.getAccessToken().getOption().name()
                     .equals(TokenRequestFilter.RequestFilter.AccessToken.JwtOption.forward.name())) {
+
                 ClientRequest clientRequest = ClientRequest.from(request)
                         .headers(headers -> {
                             String accessTokenHeader = serverHttpRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);

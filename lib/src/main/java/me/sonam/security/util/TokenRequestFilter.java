@@ -26,6 +26,8 @@ public class TokenRequestFilter {
         private String out;
         private String httpMethods;
         private Set<String> httpMethodSet = new HashSet<>();
+        private Set<String> inSet = new HashSet<>();
+        private Set<String> outSet = new HashSet<>();
         private AccessToken accessToken;
 
         public RequestFilter() {
@@ -41,10 +43,14 @@ public class TokenRequestFilter {
 
         public void setIn(String in) {
             this.in = in;
+            String[] inArray = in.split(",");
+            inSet = Arrays.stream(inArray).map(String::trim).map(String::toLowerCase).collect(Collectors.toSet());
         }
 
         public void setOut(String out) {
             this.out = out;
+            String[] outArray = out.split(",");
+            outSet = Arrays.stream(outArray).map(String::trim).map(String::toLowerCase).collect(Collectors.toSet());
         }
 
         public String getHttpMethods() {
@@ -52,6 +58,13 @@ public class TokenRequestFilter {
         }
         public Set<String> getHttpMethodSet() {
             return this.httpMethodSet;
+        }
+
+        public Set<String> getInSet() {
+            return this.inSet;
+        }
+        public Set<String> getOutSet() {
+            return this.outSet;
         }
 
         public void setHttpMethods(String httpMethods) {
@@ -72,8 +85,11 @@ public class TokenRequestFilter {
         public String toString() {
             return "JwtRequest{" +
                     "in='" + in + '\'' +
+                    ", inSet='" + inSet + '\'' +
                     ", out='" + out + '\'' +
-                    ", httpMethod='" + httpMethods +'\'' +
+                    ", outSet='" + outSet + '\'' +
+                    ", httpMethods='" + httpMethods +'\'' +
+                    ", httpMethodSet='" + httpMethodSet + '\''+
                     ", accessToken='" + accessToken + '\'' +
                     '}';
         }

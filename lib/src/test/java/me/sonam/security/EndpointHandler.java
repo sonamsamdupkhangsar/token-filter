@@ -2,6 +2,7 @@ package me.sonam.security;
 
 import jakarta.annotation.PostConstruct;
 import me.sonam.security.headerfilter.ReactiveRequestContextHolder;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.conversions.Conversions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -268,6 +269,21 @@ public class EndpointHandler {
     public Mono<ServerResponse> jwtRequired(ServerRequest serverRequest) {
         LOG.info("this endpoint requires jwt");
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build();
+    }
+
+    public Mono<ServerResponse> callJwtRequired(ServerRequest serverRequest) {
+        LOG.info("this tests out the multiple requestFilters with httpMethods for forwarding tokens");
+
+        return callGetEndpoint("/api/scope/jwtrequired").then(callGetEndpoint("/api/scope/jwtrequired2"))
+                .then(callGetEndpoint("/api/scope/jwtrequired3"))
+                .then(callGetEndpoint("/api/scope/jwtrequired4")).then(
+         ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build());
+    }
+
+    private Mono<String> callGetEndpoint(String endpoint) {
+        LOG.info("calling endpoint {}", endpoint);
+        return webClientBuilder.build().get().uri(localHost+endpoint)
+                .retrieve().bodyToMono(String.class).doOnNext(string -> LOG.info("response is {}", string));
     }
 
     public static Map<String, String> getMap(Pair<String, String>... pairs){
