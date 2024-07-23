@@ -282,8 +282,11 @@ public class EndpointHandler {
 
     private Mono<String> callGetEndpoint(String endpoint) {
         LOG.info("calling endpoint {}", endpoint);
-        return webClientBuilder.build().get().uri(localHost+endpoint)
-                .retrieve().bodyToMono(String.class).doOnNext(string -> LOG.info("response is {}", string));
+        return webClientBuilder.build().get().uri(endpoint)
+                .retrieve().bodyToMono(String.class).flatMap(string -> {
+                    LOG.info("response is {}", string);
+                    return Mono.just(string);
+                });
     }
 
     public static Map<String, String> getMap(Pair<String, String>... pairs){

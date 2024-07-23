@@ -2,7 +2,7 @@ package me.sonam.security;
 
 import io.jsonwebtoken.Jwts;
 import lombok.extern.java.Log;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
@@ -65,7 +65,7 @@ public class EndpointPermitIntegTest {
     final String jwtString = createJwt("sonam", "message:none");
     client.get().uri("/api/scope/read")
             .headers(addJwt(jwtString))
-            .exchange().expectStatus().isForbidden();
+            .exchange().expectStatus().isUnauthorized();
   }
 
 

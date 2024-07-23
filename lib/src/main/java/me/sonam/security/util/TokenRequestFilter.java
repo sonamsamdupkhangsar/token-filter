@@ -44,13 +44,13 @@ public class TokenRequestFilter {
         public void setIn(String in) {
             this.in = in;
             String[] inArray = in.split(",");
-            inSet = Arrays.stream(inArray).map(String::trim).map(String::toLowerCase).collect(Collectors.toSet());
+            inSet = Arrays.stream(inArray).map(String::trim).collect(Collectors.toSet());
         }
 
         public void setOut(String out) {
             this.out = out;
             String[] outArray = out.split(",");
-            outSet = Arrays.stream(outArray).map(String::trim).map(String::toLowerCase).collect(Collectors.toSet());
+            outSet = Arrays.stream(outArray).map(String::trim).collect(Collectors.toSet());
         }
 
         public String getHttpMethods() {

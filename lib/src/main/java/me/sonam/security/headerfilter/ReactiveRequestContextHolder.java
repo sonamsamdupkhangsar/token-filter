@@ -59,7 +59,6 @@ public class ReactiveRequestContextHolder {
         LOG.info("in headerFilter()");
         return (request, next) -> ReactiveRequestContextHolder.getRequest().flatMap(r ->
                 {
-                    Mono<ClientResponse> clientResponseMono = Mono.empty();
                     LOG.info("inbound path: {}, outbound path: {}", r.getPath().pathWithinApplication().value(),
                             request.url().getPath());
 
@@ -79,55 +78,31 @@ public class ReactiveRequestContextHolder {
                                         r.getMethod().name());
 
                                 if (requestFilter.getHttpMethodSet().contains(r.getMethod().name().toLowerCase())) {
-                                    LOG.debug("request.method {} matched with provided httpMethod", r.getMethod().name());
-                                    clientResponseMono =  processInboundPath(requestFilter, r, request, next);
+                                    LOG.info("request.method {} matched with provided httpMethod", r.getMethod().name());
+
+                                    if (requestFilter.getInSet().contains(r.getPath().pathWithinApplication().value()) &&
+                                            requestFilter.getOutSet().contains(request.url().getPath())) {
+                                        LOG.info("inbound and outbound path matched");
+                                        return getClientResponse(requestFilter, request, r, next);
+                                    }
+                                    else {
+                                        LOG.info("no match found for inbound path {} and outbound path {} ",
+                                                r.getPath().pathWithinApplication().value(),
+                                                request.url().getPath());
+                                    }
 
 
                                 }
                             }
                         }
-                        return clientResponseMono.switchIfEmpty(defaultClientRequest(request, next));
+
+                        LOG.info("httpMethods didn't even match, executing default action of pass thru");
+                        ClientRequest clientRequest = ClientRequest.from(request).build();
+                        return next.exchange(clientRequest);
                     }
 
                 });
 
-    }
-
-    public Mono<ClientResponse> defaultClientRequest(ClientRequest request, ExchangeFunction next) {
-        LOG.info("httpMethods didn't even match, executing default action of pass thru");
-        ClientRequest clientRequest = ClientRequest.from(request).build();
-        return next.exchange(clientRequest);
-    }
-
-    private Mono<ClientResponse> processInboundPath(TokenRequestFilter.RequestFilter requestFilter, ServerHttpRequest r,
-                                                    ClientRequest request, ExchangeFunction next) {
-        String[] inMatches = requestFilter.getIn().split(",");
-        for (String inPath : inMatches) {
-            LOG.debug("requestFilter.inPath: {}", inPath);
-
-            if (r.getPath().pathWithinApplication().value().matches(inPath.trim())) {
-
-                LOG.debug("check outbound path now");
-                String[] outMatches = requestFilter.getOut().split(",");
-
-                for (String outPath : outMatches) {
-                    LOG.debug("requestFilter outPath: {}", outPath);
-
-                    if (request.url().getPath().matches(outPath.trim())) {
-                        LOG.info("inbound path {} and outbound path {} matches with outbound parameter: {}",
-                                r.getPath().pathWithinApplication().value(),
-                                request.url().getPath(), outPath);
-
-                        return getClientResponse(requestFilter, request, r, next);
-                    }
-                }
-            }
-            else {
-                LOG.debug("filter path {} didn't match request.path: {}", inPath, r.getPath().pathWithinApplication().value());
-            }
-        }
-        LOG.info("no outPath match found, return empty");
-        return Mono.empty();
     }
 
     private Mono<ClientResponse> getClientResponse(TokenRequestFilter.RequestFilter requestFilter, ClientRequest request,
