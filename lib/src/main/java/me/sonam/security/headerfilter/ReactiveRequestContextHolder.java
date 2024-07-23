@@ -83,7 +83,7 @@ public class ReactiveRequestContextHolder {
                                     boolean matchInPath = requestFilter.getInSet().stream().anyMatch(w -> r.getPath().pathWithinApplication().value().matches(w));
 
                                     if (matchInPath) {
-                                        LOG.info("inPath match found, match outPath");
+                                        LOG.info("inPath match found, check outPath next");
                                         boolean matchOutPath = requestFilter.getOutSet().stream().anyMatch(w -> {
                                             boolean value = request.url().getPath().matches(w);
                                             LOG.debug("w '{}' matches request.url.path '{}', result: {}", w, request.url().getPath(), value);
