@@ -31,7 +31,7 @@ public class TokenRequestFilterYamlTest {
     @Test
     public void jwtPath() {
         LOG.info("jwt.path: {}", tokenRequestFilter.getRequestFilters().size());
-        assertThat(tokenRequestFilter.getRequestFilters().size()).isEqualTo(11);
+        assertThat(tokenRequestFilter.getRequestFilters().size()).isEqualTo(14);
 
         int index = 5;
         
@@ -101,6 +101,57 @@ public class TokenRequestFilterYamlTest {
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().size()).isEqualTo(0);
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getAccessToken().getOption().name()).isEqualTo("forward");
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getAccessToken().getOption().name()).isNotEqualTo("doNothing");
+
+        index++;
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getIn()).isEqualTo("/.*");
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getOut()).isEqualTo("/accounts/email/.*");
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().size()).isEqualTo(1);
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getAccessToken().getOption().name()).isEqualTo("forward");
+
+
+
+        LOG.info("path: {}", tokenRequestFilter.getRequestFilters().get(index).getIn());
+        String inPath = "/users";
+
+        boolean inMatch = tokenRequestFilter.getRequestFilters().get(index).getInSet().stream().anyMatch(w -> {
+            LOG.info("w {} inMatch path {}", w, inPath);
+            return inPath.matches(w);});
+
+        if (inMatch) {
+            LOG.info("inMatch found");
+        }
+        else {
+            LOG.info("inMatch not found");
+        }
+
+        assertThat(inMatch).isTrue();
+
+        inMatch = tokenRequestFilter.getRequestFilters().get(index).getOutSet().stream().anyMatch(w -> {
+            LOG.info("w {} outMatch path {}", w, inPath);
+            return inPath.matches(w);});
+
+        if (inMatch) {
+            LOG.info("inMatch found");
+        }
+        else {
+            LOG.info("inMatch not found");
+        }
+
+        assertThat(inMatch).isFalse();
+
+
+        String emailPath = "/accounts/email/apple@some.com";
+        boolean outMatch = tokenRequestFilter.getRequestFilters().get(index).getOutSet().stream().anyMatch(w -> {
+            LOG.info("w {} outMatch path {}", w, emailPath);
+            return emailPath.matches(w);});
+        if (outMatch) {
+            LOG.info("outMatch found");
+        }
+        else {
+            LOG.info("outMatch not found");
+        }
+
+        assertThat(outMatch).isTrue();
 
     }
     @Test

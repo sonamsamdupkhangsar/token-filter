@@ -80,18 +80,28 @@ public class ReactiveRequestContextHolder {
                                 if (requestFilter.getHttpMethodSet().contains(r.getMethod().name().toLowerCase())) {
                                     LOG.info("request.method {} matched with provided httpMethod", r.getMethod().name());
 
-                                    if (requestFilter.getInSet().contains(r.getPath().pathWithinApplication().value()) &&
-                                            requestFilter.getOutSet().contains(request.url().getPath())) {
-                                        LOG.info("inbound and outbound path matched");
-                                        return getClientResponse(requestFilter, request, r, next);
+                                    boolean matchInPath = requestFilter.getInSet().stream().anyMatch(w -> r.getPath().pathWithinApplication().value().matches(w));
+
+                                    if (matchInPath) {
+                                        LOG.info("inPath match found, match outPath");
+                                        boolean matchOutPath = requestFilter.getOutSet().stream().anyMatch(w -> {
+                                            boolean value = request.url().getPath().matches(w);
+                                            LOG.debug("w '{}' matches request.url.path '{}', result: {}", w, request.url().getPath(), value);
+                                            return value;
+                                        });
+                                        if (matchOutPath) {
+                                            LOG.info("inbound and outbound path matched");
+                                            return getClientResponse(requestFilter, request, r, next);
+                                        }
+                                        else {
+                                            LOG.info("no match found for outbound path {} ",
+                                                    request.url().getPath());
+                                        }
                                     }
                                     else {
-                                        LOG.info("no match found for inbound path {} and outbound path {} ",
-                                                r.getPath().pathWithinApplication().value(),
-                                                request.url().getPath());
+                                        LOG.info("no match found for inbound path {}",
+                                                r.getPath().pathWithinApplication().value());
                                     }
-
-
                                 }
                             }
                         }

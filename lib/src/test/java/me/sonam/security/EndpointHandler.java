@@ -20,6 +20,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -278,6 +280,22 @@ public class EndpointHandler {
                 .then(callGetEndpoint("/api/scope/jwtrequired3"))
                 .then(callGetEndpoint("/api/scope/jwtrequired4")).then(
          ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build());
+    }
+
+    public Mono<ServerResponse> callEmailEndpoint(ServerRequest serverRequest) {
+        LOG.info("calling email endpoint");
+
+        String email = serverRequest.pathVariable("email");
+
+        return callGetEndpoint("/api/scope/email/"+ URLEncoder.encode(email, Charset.defaultCharset()))
+                .then(ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build());
+    }
+
+    public Mono<ServerResponse> emailEndpoint(ServerRequest serverRequest) {
+        String email = serverRequest.pathVariable("email");
+        LOG.info("got email for {}", email);
+
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build();
     }
 
     private Mono<String> callGetEndpoint(String endpoint) {

@@ -2,7 +2,7 @@ logging:
   level:
     root: error
     me:
-      sonam: debug
+      sonam: info
 info:
   app:
     name: Springboot me.sonam.Application
@@ -140,5 +140,19 @@ requestFilters:
     out: /api/scope/dummyout
     accessToken:
       option: forward
-
+  - in: /.*
+    out: /accounts/email/.*
+    httpMethods: get
+    accessToken:
+      option: forward
+  - in: /api/scope/callEmailEndpoint/.*
+    out: /api/scope/email/.*
+    httpMethods: get
+    accessToken:
+      option: forward
+  - in: /api/scope/callEmailEndpoint/.*
+    out: /api/scope/email/hello
+    httpMethods: get
+    accessToken:
+      option: forward
 

@@ -61,7 +61,12 @@ public class EndpointRouter {
                 .andRoute(RequestPredicates.GET("/api/scope/jwtrequired4").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
                         livenessReadinessHandler::jwtRequired)
                 .andRoute(RequestPredicates.GET("/api/scope/callJwtRequired").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
-                livenessReadinessHandler::callJwtRequired);
+                livenessReadinessHandler::callJwtRequired)
+                .andRoute(RequestPredicates.GET("/api/scope/callEmailEndpoint/{email}").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::callEmailEndpoint)
+                .andRoute(RequestPredicates.GET("/api/scope/email/{email}").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::emailEndpoint)
+                ;
 
     }
 }
