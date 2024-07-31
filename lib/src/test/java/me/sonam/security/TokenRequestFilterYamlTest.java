@@ -39,18 +39,18 @@ public class TokenRequestFilterYamlTest {
         LOG.info("jwtPath[0].toString: {}", tokenRequestFilter.getRequestFilters().get(index).toString());
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getIn()).isEqualTo("/api/health/passheader");
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getOut()).isEqualTo("/api/health/jwtreceiver");
-        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().size()).isEqualTo(1);
-        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().contains("delete")).isTrue();
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().size()).isEqualTo(1);
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().contains("delete")).isTrue();
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getAccessToken().getOption().name()).isEqualTo("forward");
 
         index++;
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getIn()).isEqualTo("/api/health/passheader");
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getOut()).isEqualTo("/api/health/jwtreceiver");
-        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().size()).isEqualTo(3);
-        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().contains("get")).isTrue();
-        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().contains("post")).isTrue();
-        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().contains("put")).isTrue();
-        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().contains("delete")).isFalse();
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().size()).isEqualTo(3);
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().contains("get")).isTrue();
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().contains("post")).isTrue();
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().contains("put")).isTrue();
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().contains("delete")).isFalse();
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getAccessToken().getOption().name()).isEqualTo("request");
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getAccessToken().getOption().name()).isNotEqualTo("doNothing");
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getAccessToken().getScopes()).isEqualTo("message.read message.write");
@@ -61,11 +61,11 @@ public class TokenRequestFilterYamlTest {
         index++;
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getIn()).isEqualTo("/api/health/passheader");
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getOut()).isEqualTo("/api/health/liveness");
-        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().size()).isEqualTo(3);
-        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().contains("get")).isTrue();
-        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().contains("post")).isTrue();
-        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().contains("head")).isTrue();
-        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().contains("put")).isFalse();
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().size()).isEqualTo(3);
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().contains("get")).isTrue();
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().contains("post")).isTrue();
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().contains("head")).isTrue();
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().contains("put")).isFalse();
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getAccessToken().getOption().name()).isEqualTo("forward");
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getAccessToken().getOption().name()).isNotEqualTo("request");
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getAccessToken().getScopes()).isNull();
@@ -74,11 +74,11 @@ public class TokenRequestFilterYamlTest {
         index++;
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getIn()).isEqualTo("/api/health/forwardtoken");
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getOut()).isEqualTo("/api/health/jwtreceiver");
-        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().size()).isEqualTo(2);
-        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().contains("get")).isTrue();
-        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().contains("delete")).isTrue();
-        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().contains("put")).isFalse();
-        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().contains("post")).isFalse();
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().size()).isEqualTo(2);
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().contains("get")).isTrue();
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().contains("delete")).isTrue();
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().contains("put")).isFalse();
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().contains("post")).isFalse();
 
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getAccessToken().getOption().name()).isEqualTo("forward");
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getAccessToken().getScopes()).isNull();
@@ -87,7 +87,7 @@ public class TokenRequestFilterYamlTest {
         index++;
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getIn()).isEqualTo("/api/scope/callread");
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getOut()).isEqualTo("/api/scope/read");
-        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().size()).isEqualTo(3);
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().size()).isEqualTo(3);
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getAccessToken().getOption().name()).isEqualTo("request");
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getAccessToken().getOption().name()).isNotEqualTo("doNothing");
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getAccessToken().getScopes()).isEqualTo("message.read");
@@ -98,14 +98,14 @@ public class TokenRequestFilterYamlTest {
         index++;
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getIn()).isEqualTo("/api/scope/dummyin");
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getOut()).isEqualTo("/api/scope/dummyout");
-        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().size()).isEqualTo(0);
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().size()).isEqualTo(0);
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getAccessToken().getOption().name()).isEqualTo("forward");
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getAccessToken().getOption().name()).isNotEqualTo("doNothing");
 
         index++;
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getIn()).isEqualTo("/.*");
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getOut()).isEqualTo("/accounts/email/.*");
-        assertThat(tokenRequestFilter.getRequestFilters().get(index).getHttpMethodSet().size()).isEqualTo(1);
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().size()).isEqualTo(1);
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getAccessToken().getOption().name()).isEqualTo("forward");
 
 
@@ -160,5 +160,16 @@ public class TokenRequestFilterYamlTest {
         permitPath.getPermitpath().forEach(path -> {
             LOG.info("path: {}, method: {}", path.getPath(), path.getHttpMethods());
         });
+    }
+
+    @Test
+    public void urlEncodedEmailPath() {
+        final String path = "/accounts/email/sendAuthenticationId%2540sonam.co/authentication-id";
+
+        final String exp = "/accounts/(.)*/(.)*";
+        boolean matchOutPath = path.matches(exp);
+
+        LOG.info("matchOutput is {}, path {}, exp {}", matchOutPath, path, exp);
+        assertThat(matchOutPath).isTrue();
     }
 }

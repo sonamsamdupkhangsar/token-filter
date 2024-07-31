@@ -62,9 +62,9 @@ public class EndpointRouter {
                         livenessReadinessHandler::jwtRequired)
                 .andRoute(RequestPredicates.GET("/api/scope/callJwtRequired").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
                 livenessReadinessHandler::callJwtRequired)
-                .andRoute(RequestPredicates.GET("/api/scope/callEmailEndpoint/{email}").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                .andRoute(RequestPredicates.PUT("/api/scope/callEmailEndpoint/{email}").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
                         livenessReadinessHandler::callEmailEndpoint)
-                .andRoute(RequestPredicates.GET("/api/scope/email/{email}").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                .andRoute(RequestPredicates.POST("/api/scope/email/{email}").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
                         livenessReadinessHandler::emailEndpoint)
                 ;
 

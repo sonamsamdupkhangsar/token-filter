@@ -14,7 +14,7 @@ plugins {
 }
 
 group = 'me.sonam'
-version = '1.0.4-SNAPSHOT'
+version = '1.0.5-SNAPSHOT'
 description = 'token-filter'
 java.sourceCompatibility = JavaVersion.VERSION_21
 
@@ -111,7 +111,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'me.sonam'
             artifactId 'token-filter'
-            version '1.0.4-SNAPSHOT'
+            version '1.0.5-SNAPSHOT'
 
             from components.java
         }

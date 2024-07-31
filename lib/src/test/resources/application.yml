@@ -80,58 +80,60 @@ spring:
 # mac terminal base64 encode "echo -n  'oauth-client:oauth-secret' | openssl base64"
 base64EncodedClientIdAndSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
 
-# this is to call jwt-rest-service accesstoken for matching inbound and outbound
+# Token Filter is for creating a new token, forwarding the inbound token or pass-thru for the inbound
+# http method.  If the http method is matched, then match the inbound path and the outbound path
+
 requestFilters:
   - in: /api/health/passheader
     out: /api/health/jwtrequired
-    httpMethods: GET
+    inHttpMethods: GET
     accessToken:
       option: forward
   - in: /api/scope/callJwtRequired
     out: /api/scope/jwtrequired
-    httpMethods: GET
+    inHttpMethods: GET
     accessToken:
       option: forward
   - in: /api/scope/callJwtRequired
     out: /api/scope/jwtrequired2
-    httpMethods: GET
+    inHttpMethods: GET
     accessToken:
       option: forward
   - in: /api/scope/callJwtRequired
     out: /api/scope/jwtrequired3
-    httpMethods: GET
+    inHttpMethods: GET
     accessToken:
       option: forward
   - in: /api/scope/callJwtRequired
     out: /api/scope/jwtrequired4
-    httpMethods: GET
+    inHttpMethods: GET
     accessToken:
       option: forward
   - in: /api/health/passheader
     out: /api/health/jwtreceiver
-    httpMethods: delete
+    inHttpMethods: delete
     accessToken:
       option: forward
   - in: /api/health/passheader
     out: /api/health/jwtreceiver
-    httpMethods: get, post, put
+    inHttpMethods: get, post, put
     accessToken:
       option: request
       scopes: message.read message.write
       base64EncodedClientIdSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
   - in: /api/health/passheader
     out: /api/health/liveness
-    httpMethods: get, post, head
+    inHttpMethods: get, post, head
     accessToken:
       option: forward
   - in: /api/health/forwardtoken
     out: /api/health/jwtreceiver
-    httpMethods: get, delete
+    inHttpMethods: get, delete
     accessToken:
       option: forward
   - in: /api/scope/callread
     out: /api/scope/read
-    httpMethods: get, post, put
+    inHttpMethods: get, post, put
     accessToken:
       option: request
       scopes: message.read
@@ -142,17 +144,17 @@ requestFilters:
       option: forward
   - in: /.*
     out: /accounts/email/.*
-    httpMethods: get
+    inHttpMethods: get
     accessToken:
       option: forward
   - in: /api/scope/callEmailEndpoint/.*
     out: /api/scope/email/.*
-    httpMethods: get
+    inHttpMethods: post
     accessToken:
       option: forward
   - in: /api/scope/callEmailEndpoint/.*
     out: /api/scope/email/hello
-    httpMethods: get
+    inHttpMethods: get
     accessToken:
       option: forward
 

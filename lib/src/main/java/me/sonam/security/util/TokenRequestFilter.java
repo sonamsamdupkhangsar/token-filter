@@ -15,17 +15,14 @@ public class TokenRequestFilter {
         return requestFilters;
     }
 
-    private Map<String, List> map = new HashMap<>();
-
     public TokenRequestFilter() {
-
     }
 
     public static class RequestFilter {
         private String in;
         private String out;
-        private String httpMethods;
-        private Set<String> httpMethodSet = new HashSet<>();
+        private String inHttpMethods;
+        private Set<String> inHttpMethodSet = new HashSet<>(); //inbound http Method
         private Set<String> inSet = new HashSet<>();
         private Set<String> outSet = new HashSet<>();
         private AccessToken accessToken;
@@ -53,11 +50,11 @@ public class TokenRequestFilter {
             outSet = Arrays.stream(outArray).map(String::trim).collect(Collectors.toSet());
         }
 
-        public String getHttpMethods() {
-            return httpMethods;
+        public String getInHttpMethods() {
+            return inHttpMethods;
         }
-        public Set<String> getHttpMethodSet() {
-            return this.httpMethodSet;
+        public Set<String> getInHttpMethodSet() {
+            return this.inHttpMethodSet;
         }
 
         public Set<String> getInSet() {
@@ -67,10 +64,10 @@ public class TokenRequestFilter {
             return this.outSet;
         }
 
-        public void setHttpMethods(String httpMethods) {
-            this.httpMethods = httpMethods;
-            String[] httpMethodArray = httpMethods.split(",");
-            httpMethodSet = Arrays.stream(httpMethodArray).map(String::trim).map(String::toLowerCase).collect(Collectors.toSet());
+        public void setInHttpMethods(String inHttpMethods) {
+            this.inHttpMethods = inHttpMethods;
+            String[] httpMethodArray = inHttpMethods.split(",");
+            inHttpMethodSet = Arrays.stream(httpMethodArray).map(String::trim).map(String::toLowerCase).collect(Collectors.toSet());
         }
 
         public AccessToken getAccessToken() {
@@ -88,20 +85,21 @@ public class TokenRequestFilter {
                     ", inSet='" + inSet + '\'' +
                     ", out='" + out + '\'' +
                     ", outSet='" + outSet + '\'' +
-                    ", httpMethods='" + httpMethods +'\'' +
-                    ", httpMethodSet='" + httpMethodSet + '\''+
+                    ", httpMethods='" + inHttpMethods +'\'' +
+                    ", httpMethodSet='" + inHttpMethodSet + '\''+
                     ", accessToken='" + accessToken + '\'' +
                     '}';
         }
+
 
         public static class AccessToken {
             public static enum JwtOption {
                 forward, request, doNothing
             }
 
-            private JwtOption option;
-            private String scopes;
-            private String base64EncodedClientIdSecret;
+            private final JwtOption option;
+            private final String scopes;
+            private final String base64EncodedClientIdSecret;
 
             public AccessToken(String option, String scopes, String base64EncodedClientIdSecret) {
                 this.option = JwtOption.valueOf(option);

@@ -287,8 +287,17 @@ public class EndpointHandler {
 
         String email = serverRequest.pathVariable("email");
 
-        return callGetEndpoint("/api/scope/email/"+ URLEncoder.encode(email, Charset.defaultCharset()))
+        return callPostEndpoint("/api/scope/email/"+ URLEncoder.encode(email, Charset.defaultCharset()))
                 .then(ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build());
+    }
+
+    private Mono<String> callPostEndpoint(String endpoint) {
+        LOG.info("calling endpoint {}", endpoint);
+        return webClientBuilder.build().post().uri(endpoint)
+                .retrieve().bodyToMono(String.class).flatMap(string -> {
+                    LOG.info("response is {}", string);
+                    return Mono.just(string);
+                });
     }
 
     public Mono<ServerResponse> emailEndpoint(ServerRequest serverRequest) {

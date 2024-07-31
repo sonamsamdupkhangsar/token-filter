@@ -213,7 +213,7 @@ public class JwtHeaderPassIntegTest {
         LOG.info("call passheader endpoint");
         final String email = "sonam@yamoo.com";
 
-        client.mutateWith(mockJwt().jwt(jwt)).get().uri("/api/scope/callEmailEndpoint/"+ URLEncoder.encode(email, Charset.defaultCharset()))
+        client.mutateWith(mockJwt().jwt(jwt)).put().uri("/api/scope/callEmailEndpoint/"+ URLEncoder.encode(email, Charset.defaultCharset()))
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(jwtString))
                 .exchange().expectStatus().isOk();
 
@@ -269,7 +269,7 @@ public class JwtHeaderPassIntegTest {
         final String jwtReceiver = " {\"message\":\"jwt received endpoint\"}";
         mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json").setResponseCode(200).setBody(jwtReceiver));//"Account created successfully.  Check email for activating account"));
 
-        LOG.info("call passheader endpoint");
+        LOG.info("call passheader endpoint \"/api/health/passheader\"");
         client.get().uri("/api/health/passheader")
                 .headers(addJwt(jwt))
                 .exchange().expectStatus().isOk();

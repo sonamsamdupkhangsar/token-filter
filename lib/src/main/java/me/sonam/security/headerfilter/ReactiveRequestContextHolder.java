@@ -16,7 +16,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class ReactiveRequestContextHolder {
@@ -59,8 +58,9 @@ public class ReactiveRequestContextHolder {
         LOG.info("in headerFilter()");
         return (request, next) -> ReactiveRequestContextHolder.getRequest().flatMap(r ->
                 {
-                    LOG.info("inbound path: {}, outbound path: {}", r.getPath().pathWithinApplication().value(),
-                            request.url().getPath());
+                    //r == inbound request, request = outbound request
+                    LOG.info("inbound path: {}, outbound path: {}, outbound method: {}", r.getPath().pathWithinApplication().value(),
+                            request.url().getPath(), request.method().name());
 
                     if (request.url().getPath().equals(accessTokenPath)) {
                         LOG.debug("don't call itself if using the same webclient builder");
@@ -73,19 +73,20 @@ public class ReactiveRequestContextHolder {
                         for (TokenRequestFilter.RequestFilter requestFilter : requestFilterList) {
                             LOG.info("checking requestFilter[{}]  {}", index++, requestFilter);
 
-                            if (requestFilter.getHttpMethods() != null) {
-                                LOG.debug("httpMethods: {} provided, actual requeset httpMethod: {}", requestFilter.getHttpMethodSet(),
+                            if (requestFilter.getInHttpMethods() != null) {
+                                LOG.debug("httpMethods: {} provided, actual inbound request httpMethod: {}", requestFilter.getInHttpMethodSet(),
                                         r.getMethod().name());
 
-                                if (requestFilter.getHttpMethodSet().contains(r.getMethod().name().toLowerCase())) {
-                                    LOG.info("request.method {} matched with provided httpMethod", r.getMethod().name());
+                                //very important: match the inbound request (r) path, NOT the outbound request (request)
+                                if (requestFilter.getInHttpMethodSet().contains(r.getMethod().name().toLowerCase())) {
+                                    LOG.info("request.method {} matched with provided inbound httpMethod", r.getMethod().name());
 
                                     boolean matchInPath = requestFilter.getInSet().stream().anyMatch(w -> r.getPath().pathWithinApplication().value().matches(w));
 
                                     if (matchInPath) {
                                         LOG.info("inPath match found, check outPath next");
                                         boolean matchOutPath = requestFilter.getOutSet().stream().anyMatch(w -> {
-                                            boolean value = request.url().getPath().matches(w);
+                                            boolean value = request.url().getPath().matches(w); //use request var for outbound request
                                             LOG.debug("w '{}' matches request.url.path '{}', result: {}", w, request.url().getPath(), value);
                                             return value;
                                         });
