@@ -136,11 +136,13 @@ public class ReactiveRequestContextHolder {
                         .headers(headers -> {
                             String accessTokenHeader = serverHttpRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
                             LOG.info("accessTokenHeader: {}", accessTokenHeader);
+                            //check if the inbound has access token
                             if (accessTokenHeader != null && accessTokenHeader.contains("Bearer ")) {
                                 final String accessToken = accessTokenHeader.replace("Bearer ", "");
-
+                                //get the inbound access token without the 'Bearer' word
+                                //and pass the access-token to external service call.
                                 headers.set(HttpHeaders.ORIGIN, serverHttpRequest.getHeaders().getFirst(HttpHeaders.ORIGIN));
-                                headers.set(HttpHeaders.AUTHORIZATION,  accessToken);
+                                headers.set(HttpHeaders.AUTHORIZATION,  "Bearer " + accessToken);
                                 LOG.info("pass inbound accessToken : {}", accessToken);
                             }
                             else {

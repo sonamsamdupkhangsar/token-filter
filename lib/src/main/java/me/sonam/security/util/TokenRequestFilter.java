@@ -85,8 +85,8 @@ public class TokenRequestFilter {
                     ", inSet='" + inSet + '\'' +
                     ", out='" + out + '\'' +
                     ", outSet='" + outSet + '\'' +
-                    ", httpMethods='" + inHttpMethods +'\'' +
-                    ", httpMethodSet='" + inHttpMethodSet + '\''+
+                    ", inHttpMethods='" + inHttpMethods +'\'' +
+                    ", inHttpMethodSet='" + inHttpMethodSet + '\''+
                     ", accessToken='" + accessToken + '\'' +
                     '}';
         }
