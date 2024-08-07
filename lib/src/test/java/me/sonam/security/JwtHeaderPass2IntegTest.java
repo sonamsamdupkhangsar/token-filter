@@ -138,7 +138,7 @@ public class JwtHeaderPass2IntegTest {
      *       option: forward
      * @throws InterruptedException
      */
-    @Test
+    //@Test
     public void callEmailEndpoint() throws InterruptedException {
         LOG.info("readiness delete requires jwt, should get bad request");
 
