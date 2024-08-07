@@ -58,7 +58,7 @@ public class JwtHeaderPass2IntegTest {
     @MockBean
     ReactiveJwtDecoder jwtDecoder;
     private static MockWebServer mockWebServer;
-
+/*
     @Autowired
     ApplicationContext context;
 
@@ -71,7 +71,7 @@ public class JwtHeaderPass2IntegTest {
                 .configureClient()
                 //   .filter(basicAuthentication("user", "password"))
                 .build();
-    }
+    }*/
 
     private static String jwtReceiverEndpoint = "http://localhost:{port}";///api/health/jwtreceiver";
     private static String apiPassHeaderEndpoint = "http://localhost:{port}/api/health/passheader";
@@ -123,7 +123,7 @@ public class JwtHeaderPass2IntegTest {
         final String jwtString= "eyJraWQiOiJlOGQ3MjIzMC1iMDgwLTRhZjEtODFkOC0zMzE3NmNhMTM5ODIiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI3NzI1ZjZmZC1kMzk2LTQwYWYtOTg4Ni1jYTg4YzZlOGZjZDgiLCJhdWQiOiI3NzI1ZjZmZC1kMzk2LTQwYWYtOTg4Ni1jYTg4YzZlOGZjZDgiLCJuYmYiOjE3MTQ3NTY2ODIsImlzcyI6Imh0dHA6Ly9teS1zZXJ2ZXI6OTAwMSIsImV4cCI6MTcxNDc1Njk4MiwiaWF0IjoxNzE0NzU2NjgyLCJqdGkiOiI0NDBlZDY0My00MzdkLTRjOTMtYTZkMi1jNzYxNjFlNDRlZjUifQ.fjqgoczZbbmcnvYpVN4yakpbplp7EkDyxslvar5nXBFa6mgIFcZa29fwIKfcie3oUMQ8MDWxayak5PZ_QIuHwTvKSWHs0WL91ljf-GT1sPi1b4gDKf0rJOwi0ClcoTCRIx9-WGR6t2BBR1Rk6RGF2MW7xKw8M-RMac2A2mPEPJqoh4Pky1KgxhZpEXixegpAdQIvBgc0KBZeQme-ZzTYugB8EPUmGpMlfd-zX_vcR1ijxi8e-LRRJMqmGkc9GXfrH7MOKNQ_nu6pc6Gish2v_iuUEcpPHXrfqzGb9IHCLvfuLSaTDcYKYjQaEUAp-1uDW8-5posjiUV2eBiU48ajYg";
 
         LOG.info("call passheader endpoint");
-        client.mutateWith(mockJwt().jwt(jwt)).get().uri("/api/scope/callJwtRequired")
+        client./*mutateWith(mockJwt().jwt(jwt)).*/get().uri("/api/scope/callJwtRequired")
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(jwtString))
                 .exchange().expectStatus().isOk();
 
