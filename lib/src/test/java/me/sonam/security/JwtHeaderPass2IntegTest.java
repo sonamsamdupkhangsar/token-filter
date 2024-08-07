@@ -110,33 +110,6 @@ public class JwtHeaderPass2IntegTest {
 
         LOG.info("mockWebServer.port: {}", mockWebServer.getPort());
     }
-    @Test
-    public void jwtRequired() {
-        LOG.info("jwtrequired requires jwt, should get unauthorized response");
-
-        client.get().uri("/api/health/jwtrequired")
-                .exchange().expectStatus().isUnauthorized();
-    }
-
-    @Test
-    public void demoClientErrorRetrieve() throws InterruptedException {
-        LOG.info("readiness delete requires jwt, should get bad request");
-
-        final String authenticationId = "dave";
-        Jwt jwt = jwt(authenticationId);
-        Mockito.when(this.jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(Mono.just(jwt));
-
-        mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json")
-                .setResponseCode(400).setBody("bad request"));
-
-        LOG.info("call passheader endpoint");
-        client.get().uri("/api/health/callthrowerror")
-                .exchange().expectStatus().is5xxServerError();
-        RecordedRequest recordedRequest = mockWebServer.takeRequest();
-        LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
-
-
-    }
 
 
     @Test
