@@ -280,9 +280,10 @@ public class EndpointHandler {
     public Mono<ServerResponse> callJwtRequired(ServerRequest serverRequest) {
         LOG.info("this tests out the multiple requestFilters with httpMethods for forwarding tokens");
 
-        return callGetEndpoint("/api/scope/jwtrequired").then(callGetEndpoint("/api/scope/jwtrequired2"))
-                .then(callGetEndpoint("/api/scope/jwtrequired3"))
-                .then(callGetEndpoint("/api/scope/jwtrequired4")).then(
+        return callGetEndpoint("http://localhost:"+randomServerPort+"/api/scope/jwtrequired")
+                .then(callGetEndpoint("http://localhost:"+randomServerPort+"/api/scope/jwtrequired2"))
+                .then(callGetEndpoint("http://localhost:"+randomServerPort+"/api/scope/jwtrequired3"))
+                .then(callGetEndpoint("http://localhost:"+randomServerPort+"/api/scope/jwtrequired4")).then(
          ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build());
     }
 
@@ -291,7 +292,7 @@ public class EndpointHandler {
 
         String email = serverRequest.pathVariable("email");
 
-        return callPostEndpoint("http://localhost:"+randomServerPort+"/api/scope/email/"+ URLEncoder.encode(email, Charset.defaultCharset()))
+        return callPostEndpoint("/api/scope/email/"+ URLEncoder.encode(email, Charset.defaultCharset()))
                 .then(ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build());
     }
 
