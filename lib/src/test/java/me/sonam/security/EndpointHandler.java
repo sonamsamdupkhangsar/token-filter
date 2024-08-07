@@ -273,6 +273,10 @@ public class EndpointHandler {
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build();
     }
 
+
+    @Value("${server.port}")
+    int randomServerPort;
+
     public Mono<ServerResponse> callJwtRequired(ServerRequest serverRequest) {
         LOG.info("this tests out the multiple requestFilters with httpMethods for forwarding tokens");
 
@@ -287,7 +291,7 @@ public class EndpointHandler {
 
         String email = serverRequest.pathVariable("email");
 
-        return callPostEndpoint("/api/scope/email/"+ URLEncoder.encode(email, Charset.defaultCharset()))
+        return callPostEndpoint("http://localhost:"+randomServerPort+"/api/scope/email/"+ URLEncoder.encode(email, Charset.defaultCharset()))
                 .then(ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build());
     }
 

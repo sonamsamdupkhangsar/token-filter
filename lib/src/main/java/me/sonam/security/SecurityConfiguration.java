@@ -48,6 +48,7 @@ public class SecurityConfiguration {
 
     private void setExchange(ServerHttpSecurity.AuthorizeExchangeSpec authorizeExchangeSpec) {
          permitPath.getPermitpath().forEach(path -> {
+
              LOG.info("path: '{}'", path);
 
              if (path.getScopes() != null) {

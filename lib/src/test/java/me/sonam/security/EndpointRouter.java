@@ -17,13 +17,12 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 @Configuration
 public class EndpointRouter {
     private static final Logger LOG = LoggerFactory.getLogger(EndpointRouter.class);
-    @Value("${server.port}")
-    int randomServerPort;
+
 
     @Bean("livenessRouter")
     public RouterFunction<ServerResponse> route(EndpointHandler livenessReadinessHandler) {
         LOG.info("building email router function");
-        LOG.info("server port is {}", randomServerPort);
+
         return RouterFunctions.route(RequestPredicates.GET("/api/health/liveness").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
                 livenessReadinessHandler::liveness)
                 .andRoute(RequestPredicates.HEAD("/api/health/liveness").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
