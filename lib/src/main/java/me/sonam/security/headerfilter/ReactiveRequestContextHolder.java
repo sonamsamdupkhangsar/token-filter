@@ -59,8 +59,8 @@ public class ReactiveRequestContextHolder {
         return (request, next) -> ReactiveRequestContextHolder.getRequest().flatMap(r ->
                 {
                     //r == inbound request, request = outbound request
-                    LOG.info("inbound path: {}, outbound path: {}, outbound method: {}", r.getPath().pathWithinApplication().value(),
-                            request.url().getPath(), request.method().name());
+                    LOG.info("inbound path: {}, outbound path: {}, inbound method: {}, outbound method: {}", r.getPath().pathWithinApplication().value(),
+                            request.url().getPath(), r.getMethod().name(), request.method().name());
 
                     if (request.url().getPath().equals(accessTokenPath)) {
                         LOG.debug("don't call itself if using the same webclient builder");
