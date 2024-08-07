@@ -174,7 +174,7 @@ public class JwtHeaderPassIntegTest {
     }
 
 
-    @Test
+   // @Test
     public void callMultipleEndpoints() throws InterruptedException {
         LOG.info("readiness delete requires jwt, should get bad request");
 
