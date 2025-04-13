@@ -85,7 +85,7 @@ public class EndpointHandler {
     }
 
     public Mono<ServerResponse> passJwtHeaderToBService(ServerRequest serverRequest) {
-        LOG.debug("pass jwt header to receiveJwtHeader endpoint");
+        LOG.info("pass jwt header to receiveJwtHeader endpoint");
 
         return callEndpoint(jwtReceiver).flatMap(s ->
                 ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
@@ -104,7 +104,7 @@ public class EndpointHandler {
     }
 
     public Mono<ServerResponse> deletePassJwtHeaderToBService(ServerRequest serverRequest) {
-        LOG.debug("pass jwt header to receiveJwtHeader endpoint");
+        LOG.info("pass jwt header to receiveJwtHeader endpoint");
 
         return callEndpoint(jwtReceiver).flatMap(s ->
                 ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
@@ -146,7 +146,7 @@ public class EndpointHandler {
     }
 
     public Mono<ServerResponse> callJwtHeaderReceiverFromThis(ServerRequest serverRequest) {
-        LOG.debug("in callJwtHeaderReceiverFromThis, just call jwtReceiver endpoint but without jwt");
+        LOG.info("in callJwtHeaderReceiverFromThis, just call jwtReceiver endpoint but without jwt");
 
         return callEndpoint(jwtReceiver).flatMap(s ->
                 ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
@@ -295,6 +295,16 @@ public class EndpointHandler {
                 .then(ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build());
     }
 
+
+    public Mono<ServerResponse> callMultiEndpoint(ServerRequest serverRequest) {
+        LOG.debug("call multiple endpoints to see the behavior of token reuse");
+        return callGetEndpoint("/api/scope/jwtrequired").
+                then(callGetEndpoint("/api/scope/jwtrequired2"))
+                .then(callGetEndpoint("/api/scope/jwtrequired3"))
+                .then(callGetEndpoint("/api/scope/jwtrequired4")).then(
+                        ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build());
+    }
+
     private Mono<String> callPostEndpoint(String endpoint) {
         LOG.info("calling endpoint {}", endpoint);
         return webClientBuilder.build().post().uri(endpoint)
@@ -311,7 +321,7 @@ public class EndpointHandler {
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build();
     }
 
-    private Mono<String> callGetEndpoint(String endpoint) {
+    Mono<String> callGetEndpoint(String endpoint) {
         LOG.info("calling endpoint {}", endpoint);
         return webClientBuilder.build().get().uri(endpoint)
                 .retrieve().bodyToMono(String.class).flatMap(string -> {

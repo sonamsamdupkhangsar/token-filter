@@ -15,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
@@ -36,7 +37,7 @@ public class EndpointPermitIntegTest {
   @Autowired
   private WebTestClient client;
 
-  @MockBean
+  @MockitoBean
   ReactiveJwtDecoder jwtDecoder;
 
   @Test

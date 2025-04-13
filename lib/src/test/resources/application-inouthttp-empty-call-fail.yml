@@ -2,7 +2,7 @@ logging:
   level:
     root: error
     me:
-      sonam: debug
+      sonam: info
 info:
   app:
     name: Springboot me.sonam.Application
@@ -35,8 +35,6 @@ permitpath:
     scopes: message.read, message.write
   - path: /api/health/liveness
     httpMethods: HEAD, POST
-  - path: /api/health/jwtreceiver
-    httpMethods: GET
   - path: /api/health/passheader
     httpMethods: GET
   - path: /api/health/calljwtreceiver
@@ -44,8 +42,6 @@ permitpath:
   - path: /api/health/callthrowerror
     httpMethods: GET
   - path: /api/health/throwerror
-    httpMethods: GET
-  - path: /api/multi-call
     httpMethods: GET
 
 # this is used for getting accesstoken by header filter
@@ -89,101 +85,21 @@ base64EncodedClientIdAndSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
 # insertion order
 requestFilters:
   - in: /api/health/passheader
-    out: /api/health/jwtrequired
-    inHttpMethods: GET
-    accessToken:
-      option: forward
-  - in: /api/scope/callJwtRequired
-    out: /api/scope/jwtrequired
-    inHttpMethods: GET
-    accessToken:
-      option: forward
-  - in: /api/scope/callJwtRequired
-    out: /api/scope/jwtrequired2
-    inHttpMethods: GET
-    accessToken:
-      option: forward
-  - in: /api/scope/callJwtRequired
-    out: /api/scope/jwtrequired3
-    inHttpMethods: GET
-    accessToken:
-      option: forward
-  - in: /api/scope/callJwtRequired
-    out: /api/scope/jwtrequired4
-    inHttpMethods: GET
-    accessToken:
-      option: forward
-  - in: /api/health/passheader
     out: /api/health/jwtreceiver
-    inHttpMethods: delete
+    inHttpMethods: GET
     accessToken:
-      option: forward
-  - in: /api/health/passheader
-    out: /api/health/jwtreceiver
-    inHttpMethods: get, post, put
-    accessToken:
-      option: request
-      scopes: message.read message.write
-      base64EncodedClientIdSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
-  - in: /api/health/passheader
-    out: /api/health/liveness
-    inHttpMethods: get, post, head
-    accessToken:
-      option: forward
-  - in: /api/health/forwardtoken
-    out: /api/health/jwtreceiver
-    inHttpMethods: get, delete
-    accessToken:
-      option: forward
-  - in: /api/scope/callread
-    out: /api/scope/read
-    inHttpMethods: get, post, put
-    accessToken:
-      option: request
-      scopes: message.read
-      base64EncodedClientIdSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
-  - in: /api/scope/dummyin
-    out: /api/scope/dummyout
-    accessToken:
-      option: forward
-  - in: /.*
-    out: /accounts/email/.*
-    inHttpMethods: get
-    accessToken:
-      option: forward
-  - in: /api/scope/callEmailEndpoint/.*
-    out: /api/scope/email/.*
-    inHttpMethods: post
-    accessToken:
-      option: forward
-  - in: /api/scope/callEmailEndpoint/.*
-    out: /api/scope/email/hello
-    inHttpMethods: get
-    accessToken:
-      option: forward
+      option: doNothing
   - in:
     out:
     inHttpMethods:
     accessToken:
-      option: doNothing
-      scopes: message.read
+      option: request
+      scopes: message.read message.write
       base64EncodedClientIdSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
 
 clientCredential:
       scopes: message.read
       base64EncodedClientIdSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
 
-token-filter:
-  ins:
-    - in:
-        in-path: /users/authentication-id
-        in-http-method: get
-        outs:
-            out-path: /authentications/authenticate
-            http-method: post
 
-    - in:
-         path: /users/authentication-id
-         http-method: delete
 
-tokenExpireSeconds: 3

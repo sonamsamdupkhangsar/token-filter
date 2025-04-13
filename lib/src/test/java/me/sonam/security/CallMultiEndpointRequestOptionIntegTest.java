@@ -1,6 +1,7 @@
 package me.sonam.security;
 
 
+import me.sonam.security.headerfilter.ReactiveRequestContextHolder;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -20,38 +21,44 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
 
 
 /**
- * this test is to verify passing a jwt header from called service to another.
+ * This test is to call multiple endpoints from the main rest-service endpoint.
+ * This will test the request option which will request a new token if no inbound token found and
+ * then use that token for subsequent calls within that same webservice to other rest-services.
  */
 @EnableAutoConfiguration
 @ExtendWith(SpringExtension.class)
+@ActiveProfiles("request-token")
 @SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(MockitoExtension.class)
-public class JwtHeaderPass2IntegTest {
-    private static final Logger LOG = LoggerFactory.getLogger(JwtHeaderPass2IntegTest.class);
+public class CallMultiEndpointRequestOptionIntegTest {
+    private static final Logger LOG = LoggerFactory.getLogger(CallMultiEndpointRequestOptionIntegTest.class);
 
     @Autowired
     private WebTestClient client;
@@ -59,7 +66,7 @@ public class JwtHeaderPass2IntegTest {
     @MockitoBean
     ReactiveJwtDecoder jwtDecoder;
     private static MockWebServer mockWebServer;
-/*
+
     @Autowired
     ApplicationContext context;
 
@@ -72,11 +79,21 @@ public class JwtHeaderPass2IntegTest {
                 .configureClient()
                 //   .filter(basicAuthentication("user", "password"))
                 .build();
-    }*/
+    }
+
+    @MockitoSpyBean
+    private EndpointHandler endpointHandler;
+
+    @MockitoSpyBean
+    private ReactiveRequestContextHolder reactiveRequestContextHolder;
 
     private static String jwtReceiverEndpoint = "http://localhost:{port}";///api/health/jwtreceiver";
     private static String apiPassHeaderEndpoint = "http://localhost:{port}/api/health/passheader";
     private static String jwtRestServiceAccesstoken = "http://localhost:{port}";
+    final String jwtString= "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzb25hbSIsImlzcyI6InNvbmFtLmNsb3VkIiwiYXVkIjoic29uYW0uY2xvdWQiLCJqdGkiOiJmMTY2NjM1OS05YTViLTQ3NzMtOWUyNy00OGU0OTFlNDYzNGIifQ.KGFBUjghvcmNGDH0eM17S9pWkoLwbvDaDBGAx2AyB41yZ_8-WewTriR08JdjLskw1dsRYpMh9idxQ4BS6xmOCQ";
+
+    final String jwtTokenMsg = " {\"access_token\":\""+jwtString+"\"}";
+
     @Autowired
     private ServerProperties serverProperties;
 
@@ -112,51 +129,40 @@ public class JwtHeaderPass2IntegTest {
         LOG.info("mockWebServer.port: {}", mockWebServer.getPort());
     }
 
-
-   // @Test
-    public void callMultipleEndpoints() throws InterruptedException {
-        LOG.info("readiness delete requires jwt, should get bad request");
-
+    @Test
+    public void callMultiEndpoints() throws InterruptedException {
+        LOG.debug("this will call api/multi-call endpoint which will call multiple endpoints to test" +
+                "that the access-token is reused 3 times");
         final String authenticationId = "dave";
         Jwt jwt = jwt(authenticationId);
         Mockito.when(this.jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(Mono.just(jwt));
 
-        final String jwtString= "eyJraWQiOiJlOGQ3MjIzMC1iMDgwLTRhZjEtODFkOC0zMzE3NmNhMTM5ODIiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI3NzI1ZjZmZC1kMzk2LTQwYWYtOTg4Ni1jYTg4YzZlOGZjZDgiLCJhdWQiOiI3NzI1ZjZmZC1kMzk2LTQwYWYtOTg4Ni1jYTg4YzZlOGZjZDgiLCJuYmYiOjE3MTQ3NTY2ODIsImlzcyI6Imh0dHA6Ly9teS1zZXJ2ZXI6OTAwMSIsImV4cCI6MTcxNDc1Njk4MiwiaWF0IjoxNzE0NzU2NjgyLCJqdGkiOiI0NDBlZDY0My00MzdkLTRjOTMtYTZkMi1jNzYxNjFlNDRlZjUifQ.fjqgoczZbbmcnvYpVN4yakpbplp7EkDyxslvar5nXBFa6mgIFcZa29fwIKfcie3oUMQ8MDWxayak5PZ_QIuHwTvKSWHs0WL91ljf-GT1sPi1b4gDKf0rJOwi0ClcoTCRIx9-WGR6t2BBR1Rk6RGF2MW7xKw8M-RMac2A2mPEPJqoh4Pky1KgxhZpEXixegpAdQIvBgc0KBZeQme-ZzTYugB8EPUmGpMlfd-zX_vcR1ijxi8e-LRRJMqmGkc9GXfrH7MOKNQ_nu6pc6Gish2v_iuUEcpPHXrfqzGb9IHCLvfuLSaTDcYKYjQaEUAp-1uDW8-5posjiUV2eBiU48ajYg";
+        mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json")
+                        .setResponseCode(200).setBody(jwtTokenMsg));
+
+        mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json")
+                .setResponseCode(200).setBody("{ \"message\": \"logged-in user: "+authenticationId+"\"}"));
 
         LOG.info("call passheader endpoint");
-        client./*mutateWith(mockJwt().jwt(jwt)).*/get().uri("/api/scope/callJwtRequired")
-                .headers(httpHeaders -> httpHeaders.setBearerAuth(jwtString))
+        client.get().uri("/api/multi-call")
                 .exchange().expectStatus().isOk();
 
+        LOG.info("Verify each of the jwtrequest endpoints are called");
+
+        verify(endpointHandler, times(1)).callGetEndpoint("/api/scope/jwtrequired");
+        verify(endpointHandler, times(1)).callGetEndpoint("/api/scope/jwtrequired2");
+        verify(endpointHandler, times(1)).callGetEndpoint("/api/scope/jwtrequired3");
+        verify(endpointHandler, times(1)).callGetEndpoint("/api/scope/jwtrequired4");
+
+        LOG.debug("Verify that the generateAccessToken is only called once.");
+        verify(reactiveRequestContextHolder, times(1)).generateAccessToken(any());
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        LOG.info("token request: {}", recordedRequest.getPath());
+        AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/issuer/oauth2/token");
+        AssertionsForClassTypes.assertThat(recordedRequest.getMethod()).isEqualTo("POST");
     }
 
-    /**
-     * this tests the regular expression in the requestFilters for
-     *   - in: /users
-     *     out: /accounts/email/.*
-     *     httpMethods: delete, post
-     *     accessToken:
-     *       option: forward
-     * @throws InterruptedException
-     */
-    //@Test
-    public void callEmailEndpoint() throws InterruptedException {
-        LOG.info("readiness delete requires jwt, should get bad request");
-
-        final String authenticationId = "dave";
-        Jwt jwt = jwt(authenticationId);
-        Mockito.when(this.jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(Mono.just(jwt));
-
-        final String jwtString= "eyJraWQiOiJlOGQ3MjIzMC1iMDgwLTRhZjEtODFkOC0zMzE3NmNhMTM5ODIiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI3NzI1ZjZmZC1kMzk2LTQwYWYtOTg4Ni1jYTg4YzZlOGZjZDgiLCJhdWQiOiI3NzI1ZjZmZC1kMzk2LTQwYWYtOTg4Ni1jYTg4YzZlOGZjZDgiLCJuYmYiOjE3MTQ3NTY2ODIsImlzcyI6Imh0dHA6Ly9teS1zZXJ2ZXI6OTAwMSIsImV4cCI6MTcxNDc1Njk4MiwiaWF0IjoxNzE0NzU2NjgyLCJqdGkiOiI0NDBlZDY0My00MzdkLTRjOTMtYTZkMi1jNzYxNjFlNDRlZjUifQ.fjqgoczZbbmcnvYpVN4yakpbplp7EkDyxslvar5nXBFa6mgIFcZa29fwIKfcie3oUMQ8MDWxayak5PZ_QIuHwTvKSWHs0WL91ljf-GT1sPi1b4gDKf0rJOwi0ClcoTCRIx9-WGR6t2BBR1Rk6RGF2MW7xKw8M-RMac2A2mPEPJqoh4Pky1KgxhZpEXixegpAdQIvBgc0KBZeQme-ZzTYugB8EPUmGpMlfd-zX_vcR1ijxi8e-LRRJMqmGkc9GXfrH7MOKNQ_nu6pc6Gish2v_iuUEcpPHXrfqzGb9IHCLvfuLSaTDcYKYjQaEUAp-1uDW8-5posjiUV2eBiU48ajYg";
-
-        LOG.info("call passheader endpoint");
-        final String email = "sonam@yamoo.com";
-
-        client.mutateWith(mockJwt().jwt(jwt)).put().uri("/api/scope/callEmailEndpoint/"+ URLEncoder.encode(email, Charset.defaultCharset()))
-                .headers(httpHeaders -> httpHeaders.setBearerAuth(jwtString))
-                .exchange().expectStatus().isOk();
-
-    }
 
     private Jwt jwt(String subjectName) {
         return new Jwt("token", null, null,

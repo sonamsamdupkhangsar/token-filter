@@ -20,28 +20,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
-import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
 
 
 /**
@@ -57,7 +53,7 @@ public class JwtHeaderPassIntegTest {
     @Autowired
     private WebTestClient client;
 
-    @MockBean
+    @MockitoBean
     ReactiveJwtDecoder jwtDecoder;
     private static MockWebServer mockWebServer;
 
@@ -78,6 +74,10 @@ public class JwtHeaderPassIntegTest {
     private static String jwtReceiverEndpoint = "http://localhost:{port}";///api/health/jwtreceiver";
     private static String apiPassHeaderEndpoint = "http://localhost:{port}/api/health/passheader";
     private static String jwtRestServiceAccesstoken = "http://localhost:{port}";
+    final String jwtString= "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzb25hbSIsImlzcyI6InNvbmFtLmNsb3VkIiwiYXVkIjoic29uYW0uY2xvdWQiLCJqdGkiOiJmMTY2NjM1OS05YTViLTQ3NzMtOWUyNy00OGU0OTFlNDYzNGIifQ.KGFBUjghvcmNGDH0eM17S9pWkoLwbvDaDBGAx2AyB41yZ_8-WewTriR08JdjLskw1dsRYpMh9idxQ4BS6xmOCQ";
+
+    final String jwtTokenMsg = " {\"access_token\":\""+jwtString+"\"}";
+
     @Autowired
     private ServerProperties serverProperties;
 
@@ -164,7 +164,7 @@ public class JwtHeaderPassIntegTest {
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
-        AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/oauth2/token");
+        AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/issuer/oauth2/token");
         AssertionsForClassTypes.assertThat(recordedRequest.getMethod()).isEqualTo("POST");
 
         recordedRequest = mockWebServer.takeRequest();
@@ -213,11 +213,11 @@ public class JwtHeaderPassIntegTest {
         Jwt jwt = jwt(authenticationId);
         Mockito.when(this.jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(Mono.just(jwt));
 
-        final String jwtString= "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzb25hbSIsImlzcyI6InNvbmFtLmNsb3VkIiwiYXVkIjoic29uYW0uY2xvdWQiLCJqdGkiOiJmMTY2NjM1OS05YTViLTQ3NzMtOWUyNy00OGU0OTFlNDYzNGIifQ.KGFBUjghvcmNGDH0eM17S9pWkoLwbvDaDBGAx2AyB41yZ_8-WewTriR08JdjLskw1dsRYpMh9idxQ4BS6xmOCQ";
+      /*  final String jwtString= "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzb25hbSIsImlzcyI6InNvbmFtLmNsb3VkIiwiYXVkIjoic29uYW0uY2xvdWQiLCJqdGkiOiJmMTY2NjM1OS05YTViLTQ3NzMtOWUyNy00OGU0OTFlNDYzNGIifQ.KGFBUjghvcmNGDH0eM17S9pWkoLwbvDaDBGAx2AyB41yZ_8-WewTriR08JdjLskw1dsRYpMh9idxQ4BS6xmOCQ";
 
         final String jwtTokenMsg = " {\"token\":\""+jwtString+"\"}";
         mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json")
-                .setResponseCode(200).setBody(jwtTokenMsg));
+                .setResponseCode(200).setBody(jwtTokenMsg));*/
 
         final String jwtReceiver = " {\"message\":\"jwt received endpoint\"}";
         mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json").setResponseCode(200).setBody(jwtReceiver));//"Account created successfully.  Check email for activating account"));
@@ -228,12 +228,12 @@ public class JwtHeaderPassIntegTest {
                 .exchange().expectStatus().isOk();
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
-        LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
-        AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/oauth2/token");
+        /*LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
+        AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/issuer/oauth2/token");
         AssertionsForClassTypes.assertThat(recordedRequest.getMethod()).isEqualTo("POST");
 
         recordedRequest = mockWebServer.takeRequest();
-        LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
+        */LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
         AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/api/health/jwtreceiver");
         AssertionsForClassTypes.assertThat(recordedRequest.getMethod()).isEqualTo("GET");
     }
@@ -278,7 +278,6 @@ public class JwtHeaderPassIntegTest {
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
     }
-
 
     private Jwt jwt(String subjectName) {
         return new Jwt("token", null, null,

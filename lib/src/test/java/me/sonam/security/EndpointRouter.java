@@ -69,7 +69,8 @@ public class EndpointRouter {
                         livenessReadinessHandler::callEmailEndpoint)
                 .andRoute(RequestPredicates.POST("/api/scope/email/{email}").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
                         livenessReadinessHandler::emailEndpoint)
-                ;
+                .andRoute(RequestPredicates.GET("api/multi-call").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::callMultiEndpoint);
 
     }
 }

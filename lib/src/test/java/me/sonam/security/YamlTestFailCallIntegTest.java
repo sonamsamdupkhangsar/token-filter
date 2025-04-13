@@ -1,6 +1,7 @@
 package me.sonam.security;
 
 
+import me.sonam.security.headerfilter.ReactiveRequestContextHolder;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -21,10 +22,12 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -33,13 +36,10 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
 
 
@@ -48,10 +48,11 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
  */
 @EnableAutoConfiguration
 @ExtendWith(SpringExtension.class)
+@ActiveProfiles("inouthttp-empty-call-fail")
 @SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(MockitoExtension.class)
-public class JwtHeaderPass2IntegTest {
-    private static final Logger LOG = LoggerFactory.getLogger(JwtHeaderPass2IntegTest.class);
+public class YamlTestFailCallIntegTest {
+    private static final Logger LOG = LoggerFactory.getLogger(YamlTestFailCallIntegTest.class);
 
     @Autowired
     private WebTestClient client;
@@ -59,7 +60,7 @@ public class JwtHeaderPass2IntegTest {
     @MockitoBean
     ReactiveJwtDecoder jwtDecoder;
     private static MockWebServer mockWebServer;
-/*
+
     @Autowired
     ApplicationContext context;
 
@@ -72,7 +73,7 @@ public class JwtHeaderPass2IntegTest {
                 .configureClient()
                 //   .filter(basicAuthentication("user", "password"))
                 .build();
-    }*/
+    }
 
     private static String jwtReceiverEndpoint = "http://localhost:{port}";///api/health/jwtreceiver";
     private static String apiPassHeaderEndpoint = "http://localhost:{port}/api/health/passheader";
@@ -113,49 +114,39 @@ public class JwtHeaderPass2IntegTest {
     }
 
 
-   // @Test
-    public void callMultipleEndpoints() throws InterruptedException {
-        LOG.info("readiness delete requires jwt, should get bad request");
-
-        final String authenticationId = "dave";
-        Jwt jwt = jwt(authenticationId);
-        Mockito.when(this.jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(Mono.just(jwt));
-
-        final String jwtString= "eyJraWQiOiJlOGQ3MjIzMC1iMDgwLTRhZjEtODFkOC0zMzE3NmNhMTM5ODIiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI3NzI1ZjZmZC1kMzk2LTQwYWYtOTg4Ni1jYTg4YzZlOGZjZDgiLCJhdWQiOiI3NzI1ZjZmZC1kMzk2LTQwYWYtOTg4Ni1jYTg4YzZlOGZjZDgiLCJuYmYiOjE3MTQ3NTY2ODIsImlzcyI6Imh0dHA6Ly9teS1zZXJ2ZXI6OTAwMSIsImV4cCI6MTcxNDc1Njk4MiwiaWF0IjoxNzE0NzU2NjgyLCJqdGkiOiI0NDBlZDY0My00MzdkLTRjOTMtYTZkMi1jNzYxNjFlNDRlZjUifQ.fjqgoczZbbmcnvYpVN4yakpbplp7EkDyxslvar5nXBFa6mgIFcZa29fwIKfcie3oUMQ8MDWxayak5PZ_QIuHwTvKSWHs0WL91ljf-GT1sPi1b4gDKf0rJOwi0ClcoTCRIx9-WGR6t2BBR1Rk6RGF2MW7xKw8M-RMac2A2mPEPJqoh4Pky1KgxhZpEXixegpAdQIvBgc0KBZeQme-ZzTYugB8EPUmGpMlfd-zX_vcR1ijxi8e-LRRJMqmGkc9GXfrH7MOKNQ_nu6pc6Gish2v_iuUEcpPHXrfqzGb9IHCLvfuLSaTDcYKYjQaEUAp-1uDW8-5posjiUV2eBiU48ajYg";
-
-        LOG.info("call passheader endpoint");
-        client./*mutateWith(mockJwt().jwt(jwt)).*/get().uri("/api/scope/callJwtRequired")
-                .headers(httpHeaders -> httpHeaders.setBearerAuth(jwtString))
-                .exchange().expectStatus().isOk();
-
-    }
-
     /**
-     * this tests the regular expression in the requestFilters for
-     *   - in: /users
-     *     out: /accounts/email/.*
-     *     httpMethods: delete, post
-     *     accessToken:
-     *       option: forward
+     * This test will pick up the first requestFilter matching from the yaml
+     * and do nothing to pass the token.  It will fail as the jwtreceiver gets the wrong response.
+     * This test is to verify it picks the first matching in, out and inHttpMethods param
+     * instead of the general empty one.  A better test would do verify the method called
+     * but it works for now.
      * @throws InterruptedException
      */
-    //@Test
-    public void callEmailEndpoint() throws InterruptedException {
+    @Test
+    public void passHeaderJwt() throws InterruptedException {
         LOG.info("readiness delete requires jwt, should get bad request");
 
         final String authenticationId = "dave";
         Jwt jwt = jwt(authenticationId);
         Mockito.when(this.jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(Mono.just(jwt));
 
-        final String jwtString= "eyJraWQiOiJlOGQ3MjIzMC1iMDgwLTRhZjEtODFkOC0zMzE3NmNhMTM5ODIiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI3NzI1ZjZmZC1kMzk2LTQwYWYtOTg4Ni1jYTg4YzZlOGZjZDgiLCJhdWQiOiI3NzI1ZjZmZC1kMzk2LTQwYWYtOTg4Ni1jYTg4YzZlOGZjZDgiLCJuYmYiOjE3MTQ3NTY2ODIsImlzcyI6Imh0dHA6Ly9teS1zZXJ2ZXI6OTAwMSIsImV4cCI6MTcxNDc1Njk4MiwiaWF0IjoxNzE0NzU2NjgyLCJqdGkiOiI0NDBlZDY0My00MzdkLTRjOTMtYTZkMi1jNzYxNjFlNDRlZjUifQ.fjqgoczZbbmcnvYpVN4yakpbplp7EkDyxslvar5nXBFa6mgIFcZa29fwIKfcie3oUMQ8MDWxayak5PZ_QIuHwTvKSWHs0WL91ljf-GT1sPi1b4gDKf0rJOwi0ClcoTCRIx9-WGR6t2BBR1Rk6RGF2MW7xKw8M-RMac2A2mPEPJqoh4Pky1KgxhZpEXixegpAdQIvBgc0KBZeQme-ZzTYugB8EPUmGpMlfd-zX_vcR1ijxi8e-LRRJMqmGkc9GXfrH7MOKNQ_nu6pc6Gish2v_iuUEcpPHXrfqzGb9IHCLvfuLSaTDcYKYjQaEUAp-1uDW8-5posjiUV2eBiU48ajYg";
+        final String jwtString= "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzb25hbSIsImlzcyI6InNvbmFtLmNsb3VkIiwiYXVkIjoic29uYW0uY2xvdWQiLCJqdGkiOiJmMTY2NjM1OS05YTViLTQ3NzMtOWUyNy00OGU0OTFlNDYzNGIifQ.KGFBUjghvcmNGDH0eM17S9pWkoLwbvDaDBGAx2AyB41yZ_8-WewTriR08JdjLskw1dsRYpMh9idxQ4BS6xmOCQ";
 
-        LOG.info("call passheader endpoint");
-        final String email = "sonam@yamoo.com";
+        final String jwtTokenMsg = " {\"access_token\":\""+jwtString+"\"}";
+        mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json")
+                .setResponseCode(200).setBody(jwtTokenMsg));
 
-        client.mutateWith(mockJwt().jwt(jwt)).put().uri("/api/scope/callEmailEndpoint/"+ URLEncoder.encode(email, Charset.defaultCharset()))
-                .headers(httpHeaders -> httpHeaders.setBearerAuth(jwtString))
-                .exchange().expectStatus().isOk();
+        final String jwtReceiver = " {\"message\":\"jwt received endpoint\"}";
+        mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json").setResponseCode(200).setBody(jwtReceiver));//"Account created successfully.  Check email for activating account"));
 
+        LOG.info("call passheader endpoint /api/health/passheader");
+        client.get().uri("/api/health/passheader")
+                .exchange().expectStatus().is5xxServerError();
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
+        AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/api/health/jwtreceiver");
+        AssertionsForClassTypes.assertThat(recordedRequest.getMethod()).isEqualTo("GET");
     }
 
     private Jwt jwt(String subjectName) {

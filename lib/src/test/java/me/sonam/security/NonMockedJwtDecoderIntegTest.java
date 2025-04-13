@@ -23,6 +23,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
@@ -50,7 +51,7 @@ public class NonMockedJwtDecoderIntegTest {
     @Autowired
     private WebTestClient client;
 
-    @MockBean
+    @MockitoBean
     ReactiveJwtDecoder jwtDecoder;
     private static MockWebServer mockWebServer;
 

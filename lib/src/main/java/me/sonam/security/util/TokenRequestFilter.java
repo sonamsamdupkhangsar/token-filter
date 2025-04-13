@@ -3,6 +3,7 @@ package me.sonam.security.util;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,7 +19,7 @@ public class TokenRequestFilter {
     public TokenRequestFilter() {
     }
 
-    public static class RequestFilter {
+    public static class RequestFilter{
         private String in;
         private String out;
         private String inHttpMethods;
@@ -91,7 +92,6 @@ public class TokenRequestFilter {
                     '}';
         }
 
-
         public static class AccessToken {
             public static enum JwtOption {
                 forward, request, doNothing
@@ -100,6 +100,8 @@ public class TokenRequestFilter {
             private final JwtOption option;
             private final String scopes;
             private final String base64EncodedClientIdSecret;
+            private String accessToken;
+            private LocalDateTime accessTokenCreationTime;
 
             public AccessToken(String option, String scopes, String base64EncodedClientIdSecret) {
                 this.option = JwtOption.valueOf(option);
@@ -116,7 +118,30 @@ public class TokenRequestFilter {
             public String getBase64EncodedClientIdSecret() {
                 return base64EncodedClientIdSecret;
             }
+            public String getAccessToken() {
+                return this.accessToken;
+            }
 
+            public void setAccessToken(String accessToken) {
+                this.accessToken = accessToken;
+                accessTokenCreationTime = LocalDateTime.now();
+            }
+
+            public LocalDateTime getAccessTokenCreationTime() {
+                return this.accessTokenCreationTime;
+            }
+            @Override
+            public boolean equals(Object object) {
+                if (this == object) return true;
+                if (object == null || getClass() != object.getClass()) return false;
+                AccessToken that = (AccessToken) object;
+                return option == that.option && Objects.equals(scopes, that.scopes) && Objects.equals(base64EncodedClientIdSecret, that.base64EncodedClientIdSecret);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(option, scopes, base64EncodedClientIdSecret);
+            }
             @Override
             public String toString() {
                 return "AccessToken{" +

@@ -31,7 +31,7 @@ public class TokenRequestFilterYamlTest {
     @Test
     public void jwtPath() {
         LOG.info("jwt.path: {}", tokenRequestFilter.getRequestFilters().size());
-        assertThat(tokenRequestFilter.getRequestFilters().size()).isEqualTo(14);
+        assertThat(tokenRequestFilter.getRequestFilters().size()).isEqualTo(15);
 
         int index = 5;
         
