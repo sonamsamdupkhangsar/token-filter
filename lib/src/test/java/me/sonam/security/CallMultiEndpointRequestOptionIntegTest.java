@@ -130,6 +130,9 @@ public class CallMultiEndpointRequestOptionIntegTest {
     }
 
     @Test
+    public void hello() {
+        LOG.info("do nothing");
+    }
     public void callMultiEndpoints() throws InterruptedException {
         LOG.debug("this will call api/multi-call endpoint which will call multiple endpoints to test" +
                 "that the access-token is reused 3 times");
