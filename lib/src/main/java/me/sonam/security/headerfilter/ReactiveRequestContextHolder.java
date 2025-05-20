@@ -134,8 +134,14 @@ public class ReactiveRequestContextHolder {
         if (requestFilter.getAccessToken().getOption().name().equals(TokenRequestFilter.RequestFilter.AccessToken.JwtOption.request.name())) {
             LOG.info("tokenFilter requests a client credential flow");
 
-            return getClientRequestWithHeader(request, serverHttpRequest, exchangeFunction)
-                    .switchIfEmpty(requestTokenAndCreateClientRequest(requestFilter, request, serverHttpRequest, exchangeFunction));
+            if (serverHttpRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION) != null &&
+                    !serverHttpRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION).isEmpty()) {
+
+                return getClientRequestWithHeader(request, serverHttpRequest, exchangeFunction);
+            }
+            else{
+                    return requestTokenAndCreateClientRequest(requestFilter, request, serverHttpRequest, exchangeFunction);
+            }
         }
         else if (requestFilter.getAccessToken().getOption().name()
                 .equals(TokenRequestFilter.RequestFilter.AccessToken.JwtOption.forward.name())) {
@@ -153,6 +159,7 @@ public class ReactiveRequestContextHolder {
 
     private Mono<ClientResponse> requestTokenAndCreateClientRequest(TokenRequestFilter.RequestFilter requestFilter, ClientRequest request,
                                                                     ServerHttpRequest serverHttpRequest, ExchangeFunction exchangeFunction) {
+        LOG.debug("request access-token");
         return getAccessTokenCheck(requestFilter.getAccessToken()).flatMap(s -> {
             final String originHeader = serverHttpRequest.getHeaders().getFirst(HttpHeaders.ORIGIN);
             return getClientRequestWithHeader(s, originHeader, request, exchangeFunction);
