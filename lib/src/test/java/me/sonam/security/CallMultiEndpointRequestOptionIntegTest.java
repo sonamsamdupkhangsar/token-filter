@@ -31,6 +31,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -133,6 +134,8 @@ public class CallMultiEndpointRequestOptionIntegTest {
     public void hello() {
         LOG.info("do nothing");
     }
+
+    @Test
     public void callMultiEndpoints() throws InterruptedException {
         LOG.debug("this will call api/multi-call endpoint which will call multiple endpoints to test" +
                 "that the access-token is reused 3 times");
@@ -147,9 +150,10 @@ public class CallMultiEndpointRequestOptionIntegTest {
                 .setResponseCode(200).setBody("{ \"message\": \"logged-in user: "+authenticationId+"\"}"));
 
         LOG.info("call passheader endpoint");
-        client.get().uri("/api/multi-call")
-                .exchange().expectStatus().isOk();
+        EntityExchangeResult<String> entityExchangeResult = client.get().uri("/api/multi-call")
+                .exchange().expectStatus().isOk().expectBody(String.class).returnResult();
 
+        LOG.debug("response: {}", entityExchangeResult.getResponseBody());
         LOG.info("Verify each of the jwtrequest endpoints are called");
 
         verify(endpointHandler, times(1)).callGetEndpoint("/api/scope/jwtrequired");

@@ -270,7 +270,7 @@ public class EndpointHandler {
 
     public Mono<ServerResponse> jwtRequired(ServerRequest serverRequest) {
         LOG.info("this endpoint requires jwt");
-        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build();
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue("jwtRequired called");
     }
 
 
@@ -280,9 +280,9 @@ public class EndpointHandler {
     public Mono<ServerResponse> callJwtRequired(ServerRequest serverRequest) {
         LOG.info("this tests out the multiple requestFilters with httpMethods for forwarding tokens");
 
-        return callGetEndpoint("/api/scope/jwtrequired").then(callGetEndpoint("/api/scope/jwtrequired2"))
-                .then(callGetEndpoint("/api/scope/jwtrequired3"))
-                .then(callGetEndpoint("/api/scope/jwtrequired4")).then(
+        return callGetEndpoint(localHost+"/api/scope/jwtrequired").then(callGetEndpoint(localHost+"/api/scope/jwtrequired2"))
+                .then(callGetEndpoint(localHost+"/api/scope/jwtrequired3"))
+                .then(callGetEndpoint(localHost+"/api/scope/jwtrequired4")).then(
          ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build());
     }
 
@@ -302,7 +302,7 @@ public class EndpointHandler {
                 then(callGetEndpoint("/api/scope/jwtrequired2"))
                 .then(callGetEndpoint("/api/scope/jwtrequired3"))
                 .then(callGetEndpoint("/api/scope/jwtrequired4")).then(
-                        ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build());
+                        ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue("called all endpoints"));
     }
 
     private Mono<String> callPostEndpoint(String endpoint) {
