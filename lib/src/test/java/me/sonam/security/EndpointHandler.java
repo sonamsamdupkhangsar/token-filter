@@ -298,10 +298,10 @@ public class EndpointHandler {
 
     public Mono<ServerResponse> callMultiEndpoint(ServerRequest serverRequest) {
         LOG.debug("call multiple endpoints to see the behavior of token reuse");
-        return callGetEndpoint("/api/scope/jwtrequired").
-                then(callGetEndpoint("/api/scope/jwtrequired2"))
-                .then(callGetEndpoint("/api/scope/jwtrequired3"))
-                .then(callGetEndpoint("/api/scope/jwtrequired4")).then(
+        return callGetEndpoint(localHost+"/api/scope/jwtrequired").
+                then(callGetEndpoint(localHost+"/api/scope/jwtrequired2"))
+                .then(callGetEndpoint(localHost+"/api/scope/jwtrequired3"))
+                .then(callGetEndpoint(localHost+"/api/scope/jwtrequired4")).then(
                         ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue("called all endpoints"));
     }
 

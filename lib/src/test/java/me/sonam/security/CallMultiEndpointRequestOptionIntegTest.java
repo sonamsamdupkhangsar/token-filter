@@ -144,10 +144,19 @@ public class CallMultiEndpointRequestOptionIntegTest {
         Mockito.when(this.jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(Mono.just(jwt));
 
         mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json")
-                        .setResponseCode(200).setBody(jwtTokenMsg));
+                .setResponseCode(200).setBody(jwtTokenMsg));
 
         mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json")
-                .setResponseCode(200).setBody("{ \"message\": \"logged-in user: "+authenticationId+"\"}"));
+                .setResponseCode(200).setBody("{ \"message\": \"response 1\"}"));
+
+        mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json")
+                .setResponseCode(200).setBody("{ \"message\": \"response 2\"}"));
+
+        mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json")
+                .setResponseCode(200).setBody("{ \"message\": \"response 3\"}"));
+
+        mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json")
+                .setResponseCode(200).setBody("{ \"message\": \"response 4\"}"));
 
         LOG.info("call passheader endpoint");
         EntityExchangeResult<String> entityExchangeResult = client.get().uri("/api/multi-call")
@@ -156,10 +165,7 @@ public class CallMultiEndpointRequestOptionIntegTest {
         LOG.debug("response: {}", entityExchangeResult.getResponseBody());
         LOG.info("Verify each of the jwtrequest endpoints are called");
 
-        verify(endpointHandler, times(1)).callGetEndpoint("/api/scope/jwtrequired");
-        verify(endpointHandler, times(1)).callGetEndpoint("/api/scope/jwtrequired2");
-        verify(endpointHandler, times(1)).callGetEndpoint("/api/scope/jwtrequired3");
-        verify(endpointHandler, times(1)).callGetEndpoint("/api/scope/jwtrequired4");
+        verify(reactiveRequestContextHolder, times(1)).generateAccessToken(any());
 
         LOG.debug("Verify that the generateAccessToken is only called once.");
         verify(reactiveRequestContextHolder, times(1)).generateAccessToken(any());
@@ -168,10 +174,29 @@ public class CallMultiEndpointRequestOptionIntegTest {
         LOG.info("token request: {}", recordedRequest.getPath());
         AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/issuer/oauth2/token");
         AssertionsForClassTypes.assertThat(recordedRequest.getMethod()).isEqualTo("POST");
+
+        recordedRequest = mockWebServer.takeRequest();
+        LOG.info("token request: {}", recordedRequest.getPath());
+        AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/api/scope/jwtrequired");
+        AssertionsForClassTypes.assertThat(recordedRequest.getMethod()).isEqualTo("GET");
+        recordedRequest = mockWebServer.takeRequest();
+        LOG.info("token request: {}", recordedRequest.getPath());
+        AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/api/scope/jwtrequired2");
+        AssertionsForClassTypes.assertThat(recordedRequest.getMethod()).isEqualTo("GET");
+
+        recordedRequest = mockWebServer.takeRequest();
+        LOG.info("token request: {}", recordedRequest.getPath());
+        AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/api/scope/jwtrequired3");
+        AssertionsForClassTypes.assertThat(recordedRequest.getMethod()).isEqualTo("GET");
+
+        recordedRequest = mockWebServer.takeRequest();
+        LOG.info("token request: {}", recordedRequest.getPath());
+        AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/api/scope/jwtrequired4");
+        AssertionsForClassTypes.assertThat(recordedRequest.getMethod()).isEqualTo("GET");
+
     }
 
-
-    private Jwt jwt(String subjectName) {
+        private Jwt jwt(String subjectName) {
         return new Jwt("token", null, null,
                 Map.of("alg", "none"), Map.of("sub", subjectName));
     }
