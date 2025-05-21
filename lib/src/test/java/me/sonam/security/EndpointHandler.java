@@ -2,6 +2,7 @@ package me.sonam.security;
 
 import jakarta.annotation.PostConstruct;
 import me.sonam.security.headerfilter.ReactiveRequestContextHolder;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.conversions.Conversions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -82,7 +85,26 @@ public class EndpointHandler {
     }
 
     public Mono<ServerResponse> passJwtHeaderToBService(ServerRequest serverRequest) {
-        LOG.debug("pass jwt header to receiveJwtHeader endpoint");
+        LOG.info("pass jwt header to receiveJwtHeader endpoint");
+
+        return callEndpoint(jwtReceiver).flatMap(s ->
+                ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(getMap(Pair.of("message", s)))
+        ).onErrorResume(throwable ->{
+            LOG.error("endpoint call failed: {}", throwable.getMessage());
+            String errorMessage = throwable.getMessage();
+
+            if (throwable instanceof WebClientResponseException) {
+                WebClientResponseException webClientResponseException = (WebClientResponseException) throwable;
+                LOG.error("error body contains: {}", webClientResponseException.getResponseBodyAsString());
+                errorMessage = webClientResponseException.getResponseBodyAsString();
+            }
+            return Mono.error(new SecurityException(errorMessage));
+        } );
+    }
+
+    public Mono<ServerResponse> deletePassJwtHeaderToBService(ServerRequest serverRequest) {
+        LOG.info("pass jwt header to receiveJwtHeader endpoint");
 
         return callEndpoint(jwtReceiver).flatMap(s ->
                 ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
@@ -124,7 +146,7 @@ public class EndpointHandler {
     }
 
     public Mono<ServerResponse> callJwtHeaderReceiverFromThis(ServerRequest serverRequest) {
-        LOG.debug("in callJwtHeaderReceiverFromThis, just call jwtReceiver endpoint but without jwt");
+        LOG.info("in callJwtHeaderReceiverFromThis, just call jwtReceiver endpoint but without jwt");
 
         return callEndpoint(jwtReceiver).flatMap(s ->
                 ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
@@ -248,7 +270,64 @@ public class EndpointHandler {
 
     public Mono<ServerResponse> jwtRequired(ServerRequest serverRequest) {
         LOG.info("this endpoint requires jwt");
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue("jwtRequired called");
+    }
+
+
+    @Value("${server.port}")
+    int randomServerPort;
+
+    public Mono<ServerResponse> callJwtRequired(ServerRequest serverRequest) {
+        LOG.info("this tests out the multiple requestFilters with httpMethods for forwarding tokens");
+
+        return callGetEndpoint(localHost+"/api/scope/jwtrequired").then(callGetEndpoint(localHost+"/api/scope/jwtrequired2"))
+                .then(callGetEndpoint(localHost+"/api/scope/jwtrequired3"))
+                .then(callGetEndpoint(localHost+"/api/scope/jwtrequired4")).then(
+         ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build());
+    }
+
+    public Mono<ServerResponse> callEmailEndpoint(ServerRequest serverRequest) {
+        LOG.info("calling email endpoint");
+
+        String email = serverRequest.pathVariable("email");
+
+        return callPostEndpoint("/api/scope/email/"+ URLEncoder.encode(email, Charset.defaultCharset()))
+                .then(ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build());
+    }
+
+
+    public Mono<ServerResponse> callMultiEndpoint(ServerRequest serverRequest) {
+        LOG.debug("call multiple endpoints to see the behavior of token reuse");
+        return callGetEndpoint(localHost+"/api/scope/jwtrequired").
+                then(callGetEndpoint(localHost+"/api/scope/jwtrequired2"))
+                .then(callGetEndpoint(localHost+"/api/scope/jwtrequired3"))
+                .then(callGetEndpoint(localHost+"/api/scope/jwtrequired4")).then(
+                        ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValue("called all endpoints"));
+    }
+
+    private Mono<String> callPostEndpoint(String endpoint) {
+        LOG.info("calling endpoint {}", endpoint);
+        return webClientBuilder.build().post().uri(endpoint)
+                .retrieve().bodyToMono(String.class).flatMap(string -> {
+                    LOG.info("response is {}", string);
+                    return Mono.just(string);
+                });
+    }
+
+    public Mono<ServerResponse> emailEndpoint(ServerRequest serverRequest) {
+        String email = serverRequest.pathVariable("email");
+        LOG.info("got email for {}", email);
+
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).build();
+    }
+
+    Mono<String> callGetEndpoint(String endpoint) {
+        LOG.info("calling endpoint {}", endpoint);
+        return webClientBuilder.build().get().uri(endpoint)
+                .retrieve().bodyToMono(String.class).flatMap(string -> {
+                    LOG.info("response is {}", string);
+                    return Mono.just(string);
+                });
     }
 
     public static Map<String, String> getMap(Pair<String, String>... pairs){

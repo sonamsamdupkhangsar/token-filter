@@ -1,0 +1,98 @@
+logging:
+  level:
+    root: error
+    me:
+      sonam: info
+info:
+  app:
+    name: Springboot me.sonam.Application
+    description: This is a Springboot application
+    version: 1.0.0
+
+management:
+  endpoint:
+    health:
+      show-details: always
+
+server:
+  port: 10001
+
+eureka:
+  client:
+    enabled: false
+
+permitpath:
+  - path: /users
+    httpMethods: POST, GET
+
+
+# this is used for getting accesstoken by header filter
+auth-server:
+  root: http://localhost:{port}
+  context-path: /issuer
+  oauth2token:
+    path: /oauth2/token
+    grantType: client_credentials
+
+# this is for testing
+jwt-receiver:
+  root: http://localhost:${server.port}
+  receiver: /api/health/jwtreceiver
+
+
+spring:
+  r2dbc:
+    url: r2dbc:h2:mem:///contentitem?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    name: sa
+    password:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9000
+          jwk-set-uri: http://localhost:9000/.well-known/jwks.json
+          audiences: oauth-client, my-other-client
+
+# this issuer-uri is used for discovering the authorization server's public keys and to use them for validating jwt.
+# for spring.security.oauth2.resourceserver.jwt.issuer-uri: check link
+# https://docs.spring.io/spring-security/reference/reactive/oauth2/resource-server/jwt.html
+
+
+# mac terminal base64 encode "echo -n  'oauth-client:oauth-secret' | openssl base64"
+base64EncodedClientIdAndSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
+
+# Token Filter is for creating a new token, forwarding the inbound token or pass-thru for the inbound
+# http method.  If the http method is matched, then match the inbound path and the outbound path
+
+# insertion order
+requestFilters:
+  - in:
+    out:
+    inHttpMethods:
+    accessToken:
+      option: request
+      scopes: message.read message.write
+      base64EncodedClientIdSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
+  - in: /api/health/passheader
+    out: /api/health/jwtrequired
+    inHttpMethods: GET
+    accessToken:
+      option: forward
+
+clientCredential:
+      scopes: message.read
+      base64EncodedClientIdSecret: b2F1dGgtY2xpZW50Om9hdXRoLXNlY3JldA==
+
+token-filter:
+  ins:
+    - in:
+        in-path: /users/authentication-id
+        in-http-method: get
+        outs:
+            out-path: /authentications/authenticate
+            http-method: post
+
+    - in:
+         path: /users/authentication-id
+         http-method: delete
+

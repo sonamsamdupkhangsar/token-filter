@@ -4,6 +4,7 @@ import io.r2dbc.spi.ConnectionFactory;
 import me.sonam.security.headerfilter.ReactiveRequestContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,7 +21,8 @@ public class Application implements CommandLineRunner {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
-
+    @Value("${tokenExpireSeconds:1}")
+    private int tokenExpireSeconds;
 
     @Override
     public void run(String... args) {
@@ -46,7 +48,7 @@ public class Application implements CommandLineRunner {
 
     @Bean
     public ReactiveRequestContextHolder reactiveRequestContextHolder() {
-        return new ReactiveRequestContextHolder(testWebClient());
+        return new ReactiveRequestContextHolder(testWebClient(), tokenExpireSeconds);
     }
 
 }

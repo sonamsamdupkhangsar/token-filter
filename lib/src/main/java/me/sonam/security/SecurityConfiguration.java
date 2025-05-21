@@ -48,7 +48,8 @@ public class SecurityConfiguration {
 
     private void setExchange(ServerHttpSecurity.AuthorizeExchangeSpec authorizeExchangeSpec) {
          permitPath.getPermitpath().forEach(path -> {
-             LOG.info("path: '{}'", path);
+
+             LOG.debug("path: '{}'", path);
 
              if (path.getScopes() != null) {
                  LOG.debug("scope is not null");
@@ -75,11 +76,11 @@ public class SecurityConfiguration {
              }
              else {
                  if (path.getHttpMethods() == null) {
-                     LOG.info("scope is null and path.httpMethods is null so permitAll to path: '{}'", path.getPath());
+                     LOG.debug("scope is null and path.httpMethods is null so permitAll to path: '{}'", path.getPath());
                      authorizeExchangeSpec.pathMatchers(path.getPath()).permitAll();
                  }
                  else {
-                     LOG.info("permit for individual httpMethods");
+                     LOG.debug("permit for individual httpMethods");
                      Arrays.stream(path.getHttpMethods().split(","))
                              .forEach(httpMethod -> {
                                  LOG.debug("permit httpMethod: '{}' to path: '{}'",

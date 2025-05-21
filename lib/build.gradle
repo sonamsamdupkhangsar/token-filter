@@ -7,16 +7,16 @@
  */
 
 plugins {
-    id 'org.springframework.boot' version '3.1.0'
-    id 'io.spring.dependency-management' version '1.1.0'
+    id 'org.springframework.boot' version '3.4.1'
+    id 'io.spring.dependency-management' version '1.1.7'
     id 'java-library'
     id 'maven-publish'
 }
 
 group = 'me.sonam'
-version = '1.0.1-SNAPSHOT'
+version = '1.0.5-SNAPSHOT'
 description = 'token-filter'
-java.sourceCompatibility = JavaVersion.VERSION_17
+java.sourceCompatibility = JavaVersion.VERSION_21
 
 repositories {
     mavenLocal()
@@ -26,7 +26,7 @@ repositories {
     mavenCentral()
 }
 ext {
-    set('springCloudVersion', "2022.0.3")
+    set('springCloudVersion', "2024.0.0")
 }
 
 bootJar {
@@ -46,18 +46,19 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.jsonwebtoken:jjwt:0.9.1'
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'com.squareup.okhttp3:okhttp:4.0.1'
+  //  testImplementation 'com.squareup.okhttp3:okhttp:4.0.1'
     testImplementation 'com.squareup.okhttp3:mockwebserver:4.0.1'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     testImplementation 'org.projectlombok:lombok:1.18.20'
-
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -75,7 +76,9 @@ tasks.named('test', Test) {
     maxHeapSize = '1G'
 
     testLogging {
-        events "passed"
+        events "passed", "skipped", "failed" // Log specific events
+        exceptionFormat "full" // Print full exception stacktrace
+        showStandardStreams = true // Print standard output and error
     }
 }
 
@@ -110,7 +113,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'me.sonam'
             artifactId 'token-filter'
-            version '1.0.1-SNAPSHOT'
+            version '1.0.6-SNAPSHOT'
 
             from components.java
         }

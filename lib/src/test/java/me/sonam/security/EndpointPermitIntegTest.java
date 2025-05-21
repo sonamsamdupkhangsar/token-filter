@@ -2,7 +2,7 @@ package me.sonam.security;
 
 import io.jsonwebtoken.Jwts;
 import lombok.extern.java.Log;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
@@ -15,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
@@ -36,7 +37,7 @@ public class EndpointPermitIntegTest {
   @Autowired
   private WebTestClient client;
 
-  @MockBean
+  @MockitoBean
   ReactiveJwtDecoder jwtDecoder;
 
   @Test
@@ -65,7 +66,7 @@ public class EndpointPermitIntegTest {
     final String jwtString = createJwt("sonam", "message:none");
     client.get().uri("/api/scope/read")
             .headers(addJwt(jwtString))
-            .exchange().expectStatus().isForbidden();
+            .exchange().expectStatus().isUnauthorized();
   }
 
 

@@ -1,7 +1,10 @@
 package me.sonam.security;
 
 
+import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.Before;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,10 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -30,23 +34,23 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
 
 
 /**
- * this test is to verify passing a jwt header from called service to another.
- * In the test case this mock with `jwt` is actually the one that is used
- *         `when(this.jwtDecoder.decode(anyString())).thenReturn(Mono.just(jwt));`
- * For example, the username in this jwt is returned in the spring security principal
+ * this is to test that when a request filter is not found then it will do nothing which should let the method pass
  */
+@ActiveProfiles("missing-requestfilter")
 @EnableAutoConfiguration
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(classes = {Application.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(MockitoExtension.class)
-public class NonMockedJwtDecoderIntegTest {
-    private static final Logger LOG = LoggerFactory.getLogger(NonMockedJwtDecoderIntegTest.class);
+public class DoNothingWithNoRequestFilterIntegTest {
+    private static final Logger LOG = LoggerFactory.getLogger(DoNothingWithNoRequestFilterIntegTest.class);
 
     @Autowired
     private WebTestClient client;
@@ -54,6 +58,20 @@ public class NonMockedJwtDecoderIntegTest {
     @MockitoBean
     ReactiveJwtDecoder jwtDecoder;
     private static MockWebServer mockWebServer;
+
+    @Autowired
+    ApplicationContext context;
+
+    @org.junit.jupiter.api.BeforeEach
+    public void setup() {
+        this.client = WebTestClient
+                .bindToApplicationContext(this.context)
+                // add Spring Security test Support
+                .apply(springSecurity())
+                .configureClient()
+                //   .filter(basicAuthentication("user", "password"))
+                .build();
+    }
 
     private static String jwtReceiverEndpoint = "http://localhost:{port}";///api/health/jwtreceiver";
     private static String apiPassHeaderEndpoint = "http://localhost:{port}/api/health/passheader";
@@ -88,33 +106,39 @@ public class NonMockedJwtDecoderIntegTest {
        // r.add("api-health-passheader", () -> apiPassHeaderEndpoint.replace("{port}", mockWebServer.getPort() + ""));
         r.add("auth-server.root", () -> "http://localhost:"+ mockWebServer.getPort());
 
-        //r.add("jwt-receiver.root", () -> jwtReceiverEndpoint.replace("{port}", serverProperties.getPort()+""));
+        r.add("jwt-receiver.root", () -> jwtReceiverEndpoint.replace("{port}", mockWebServer.getPort()+""));
 
         LOG.info("mockWebServer.port: {}", mockWebServer.getPort());
     }
 
     @Test
-    public void forwardtoken() throws InterruptedException {
+    public void callJwtReceiver() throws InterruptedException {
         LOG.info("this will call `calljwtreceiver` endpoint which will call jwtreceiver endpoint");
         LOG.info("this will test to ensure service can call another endpoint");
 
         final String authenticationId = "dave";
         Jwt jwt = jwt(authenticationId);
-
-        //this is the jwt that is actually used for user principal
         Mockito.when(this.jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(Mono.just(jwt));
 
+        mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json")
+                .setResponseCode(200).setBody("{ \"message\": \"logged-in user: "+authenticationId+"\"}"));
+
         LOG.info("call passheader endpoint");
-        client.get().uri("/api/health/forwardtoken")
-                .headers(addJwt(jwt))
-                .exchange().expectStatus().isOk().expectBody(String.class).
-        consumeWith(stringEntityExchangeResult -> LOG.info("response: {}", stringEntityExchangeResult.getResponseBody()));
+        client.get().uri("/api/health/calljwtreceiver")//.headers(addJwt(jwt))
+                .exchange().expectStatus().isOk();
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
     }
 
-
     private Jwt jwt(String subjectName) {
-        return new Jwt("1eyJraWQiOiJhNzZhN2I0My00YTAzLTQ2MzAtYjVlMi0wMTUzMGRlYzk0MGUiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJwcml2YXRlLWNsaWVudCIsImF1ZCI6InByaXZhdGUtY2xpZW50IiwibmJmIjoxNjg3MzY5NDM5LCJzY29wZSI6WyJtZXNzYWdlLnJlYWQiLCJtZXNzYWdlLndyaXRlIl0sImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6OTAwMSIsImV4cCI6MTY4NzM2OTczOSwiaWF0IjoxNjg3MzY5NDM5LCJhdXRob3JpdGllcyI6WyJtZXNzYWdlLnJlYWQiLCJtZXNzYWdlLndyaXRlIl19.chibxXXoYok5YuiTpPqD6yu8k39009oxlv4NrMggfp4wkopLP1RrWnFQ1reeTFhSFXBmNFEHMjJxOkYoj7g3B7UbgtwwjpU40VwzWDSSdJqAJxfkequtJl5D8G43wh3IPG4DpiA-uIUauicbgJmLn9WIF61_rzQCUevD-HzmB3Gv9ESa3tF2YyAve4Vp1bpFZDqwT4ntDzIkwlAMxWgJjREYjgxUA1JCnpgbvk9JFxqa4GSZtXcHfUl40-Rv_uJo1_50EimS306TnOC5pHj5_XxND-rvr4Ay5ewROVDnOwZsFu0JRaPKbiok484hDgTg7wJujzEDr7CyLfNNW7o0Og", null, null,
+        return new Jwt("token", null, null,
                 Map.of("alg", "none"), Map.of("sub", subjectName));
+    }
+
+    private Jwt jwt(String subjectName, UUID userId) {
+        return new Jwt("token", null, null,
+                Map.of("alg", "none"), Map.of("sub", subjectName, "userId", userId.toString()));
     }
 
     private Consumer<HttpHeaders> addJwt(Jwt jwt) {

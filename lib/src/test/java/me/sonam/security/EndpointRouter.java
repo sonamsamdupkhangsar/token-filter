@@ -2,6 +2,7 @@ package me.sonam.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -17,9 +18,11 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 public class EndpointRouter {
     private static final Logger LOG = LoggerFactory.getLogger(EndpointRouter.class);
 
+
     @Bean("livenessRouter")
     public RouterFunction<ServerResponse> route(EndpointHandler livenessReadinessHandler) {
         LOG.info("building email router function");
+
         return RouterFunctions.route(RequestPredicates.GET("/api/health/liveness").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
                 livenessReadinessHandler::liveness)
                 .andRoute(RequestPredicates.HEAD("/api/health/liveness").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
@@ -34,7 +37,11 @@ public class EndpointRouter {
                         livenessReadinessHandler::readinessDelete)
                 .andRoute(RequestPredicates.GET("/api/health/passheader").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
                         livenessReadinessHandler::passJwtHeaderToBService)
+                .andRoute(RequestPredicates.DELETE("/api/health/passheader").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::deletePassJwtHeaderToBService)
                 .andRoute(RequestPredicates.GET("/api/health/jwtreceiver").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::jwtHeaderReceiver)
+                .andRoute(RequestPredicates.DELETE("/api/health/jwtreceiver").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
                         livenessReadinessHandler::jwtHeaderReceiver)
                 .andRoute(RequestPredicates.GET("/api/health/calljwtreceiver").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
                         livenessReadinessHandler::callJwtHeaderReceiverFromThis)
@@ -49,7 +56,21 @@ public class EndpointRouter {
                 .andRoute(RequestPredicates.GET("/api/scope/callread").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
                         livenessReadinessHandler::callScopeEndpoint)
                 .andRoute(RequestPredicates.GET("/api/scope/jwtrequired").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
-                        livenessReadinessHandler::jwtRequired);
+                        livenessReadinessHandler::jwtRequired)
+                .andRoute(RequestPredicates.GET("/api/scope/jwtrequired2").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::jwtRequired)
+                .andRoute(RequestPredicates.GET("/api/scope/jwtrequired3").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::jwtRequired)
+                .andRoute(RequestPredicates.GET("/api/scope/jwtrequired4").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::jwtRequired)
+                .andRoute(RequestPredicates.GET("/api/scope/callJwtRequired").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                livenessReadinessHandler::callJwtRequired)
+                .andRoute(RequestPredicates.PUT("/api/scope/callEmailEndpoint/{email}").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::callEmailEndpoint)
+                .andRoute(RequestPredicates.POST("/api/scope/email/{email}").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::emailEndpoint)
+                .andRoute(RequestPredicates.GET("api/multi-call").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)),
+                        livenessReadinessHandler::callMultiEndpoint);
 
     }
 }

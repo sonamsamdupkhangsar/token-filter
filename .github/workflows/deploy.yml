@@ -14,13 +14,13 @@ jobs:
         run: export PROJECT_NAME=$(echo ${{ github.repository }} | cut -d / -f2); echo $PROJECT_NAME
 
       - name: Checkout main
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Setup Open JDK 17
+      - name: Setup Open JDK 21
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
-          distribution: 'adopt'
+          java-version: '21'
+          distribution: 'temurin'
 
       - name: Run Gradle package task
         uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
