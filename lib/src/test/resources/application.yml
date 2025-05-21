@@ -1,8 +1,9 @@
 logging:
   level:
     root: error
-    me:
-      sonam: debug
+    me.sonam: debug
+    me.sonam.security.headerfilter: info
+    me.sonam.security: info
 info:
   app:
     name: Springboot me.sonam.Application

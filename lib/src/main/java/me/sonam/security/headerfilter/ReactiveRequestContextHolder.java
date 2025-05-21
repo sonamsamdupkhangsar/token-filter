@@ -86,7 +86,7 @@ public class ReactiveRequestContextHolder {
 
         for (TokenRequestFilter.RequestFilter requestFilter : requestFilterList) {
 
-            LOG.info("checking requestFilter[{}]  {}", index++, requestFilter);
+            LOG.debug("checking requestFilter[{}]  {}", index++, requestFilter);
 
             if (requestFilter.getInHttpMethods() != null && !requestFilter.getInHttpMethods().isEmpty()) {
                 LOG.debug("httpMethods: {} provided, actual inbound request httpMethod: {}", requestFilter.getInHttpMethodSet(),
@@ -94,13 +94,13 @@ public class ReactiveRequestContextHolder {
 
                 //very important: match the inbound request (r) path, NOT the outbound request (request)
                 if (requestFilter.getInHttpMethodSet().contains(inboundRequest.getMethod().name().toLowerCase())) {
-                    LOG.info("request.method {} matched with provided inbound httpMethod", inboundRequest.getMethod().name());
+                    LOG.debug("request.method {} matched with provided inbound httpMethod", inboundRequest.getMethod().name());
 
-                    LOG.info("uri: {}, localAddress: {}", inboundRequest.getURI(), inboundRequest.getLocalAddress());
+                    LOG.debug("uri: {}, localAddress: {}", inboundRequest.getURI(), inboundRequest.getLocalAddress());
                     boolean matchInPath = requestFilter.getInSet().stream().anyMatch(w -> inboundRequest.getPath().pathWithinApplication().value().matches(w));
 
                     if (matchInPath) {
-                        LOG.info("inPath match found, check outPath next");
+                        LOG.debug("inPath match found, check outPath next");
                         boolean matchOutPath = requestFilter.getOutSet().stream().anyMatch(w -> {
                             boolean value = outboundRequest.url().getPath().matches(w); //use request var for outbound request
                             LOG.debug("w '{}' matches request.url.path '{}', result: {}", w, outboundRequest.url().getPath(), value);
@@ -121,7 +121,7 @@ public class ReactiveRequestContextHolder {
             }
         }
 
-        LOG.info("httpMethods didn't even match, executing default action of pass thru");
+        LOG.debug("httpMethods didn't even match, executing default action of pass thru");
         ClientRequest clientRequest = ClientRequest.from(outboundRequest).build();
         return exchangeFunction.exchange(clientRequest);
     }
@@ -132,7 +132,7 @@ public class ReactiveRequestContextHolder {
         LOG.debug("check if to request token, forward inbound token, or do nothing");
 
         if (requestFilter.getAccessToken().getOption().name().equals(TokenRequestFilter.RequestFilter.AccessToken.JwtOption.request.name())) {
-            LOG.info("tokenFilter requests a client credential flow");
+            LOG.debug("tokenFilter requests a client credential flow");
 
             if (serverHttpRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION) != null &&
                     !serverHttpRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION).isEmpty()) {
@@ -171,7 +171,7 @@ public class ReactiveRequestContextHolder {
 
         String accessTokenHeader = serverHttpRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (accessTokenHeader != null && !accessTokenHeader.isEmpty()) {
-            LOG.debug("passing inbound request bearer token");
+            LOG.info("passing inbound request bearer token");
 
             final String inboundAccessToken = accessTokenHeader.replace("Bearer ", "");
             final String originHeader = serverHttpRequest.getHeaders().getFirst(HttpHeaders.ORIGIN);
@@ -209,7 +209,7 @@ public class ReactiveRequestContextHolder {
 
     private Mono<String> getAccessTokenCheck(TokenRequestFilter.RequestFilter.AccessToken accessToken) {
         if (accessToken.getAccessToken() != null && !isExpired(accessToken.getAccessTokenCreationTime())) {
-            LOG.info("access token is not expired, return that instead");
+            LOG.debug("access token is not expired, return that instead");
             return Mono.just(accessToken.getAccessToken());
         }
 
@@ -217,7 +217,8 @@ public class ReactiveRequestContextHolder {
     }
 
     public Mono<String> generateAccessToken(TokenRequestFilter.RequestFilter.AccessToken accessToken) {
-        LOG.info("get access token using base64EncodedClientIdAndSecret: {}," +
+        LOG.info("generate access token");
+        LOG.debug("get access token using base64EncodedClientIdAndSecret: {}," +
                         " b64ClientIdAndSecret: {}, scopes: {}", oauth2TokenEndpoint,
                 accessToken.getBase64EncodedClientIdSecret(),
                 accessToken.getScopes());
@@ -228,10 +229,10 @@ public class ReactiveRequestContextHolder {
 
         if (accessToken.getScopes() != null && !accessToken.getScopes().trim().isEmpty()) {
             multiValueMap.add("scope", accessToken.getScopes());
-            LOG.info("added scope: {}", accessToken.getScopes());
+            LOG.debug("added scope: {}", accessToken.getScopes());
         }
 
-        LOG.info("sending oauth2TokenEndpointWithScopes: {}", oauthEndpointWithScope);
+        LOG.debug("sending oauth2TokenEndpointWithScopes: {}", oauthEndpointWithScope);
 
         WebClient.ResponseSpec responseSpec = webClientBuilder.build().post().uri(oauthEndpointWithScope.toString())
                 .bodyValue(multiValueMap)
