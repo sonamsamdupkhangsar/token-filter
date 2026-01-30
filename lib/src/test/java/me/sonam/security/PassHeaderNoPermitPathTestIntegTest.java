@@ -18,9 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.web.server.autoconfigure.ServerProperties;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -44,6 +44,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 /**
  * This will test the call to "/api/health/passheader" not being present in the yaml
  */
+@AutoConfigureWebTestClient
 @EnableAutoConfiguration
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("no-permit-path")

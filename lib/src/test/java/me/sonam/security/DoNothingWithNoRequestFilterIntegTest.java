@@ -4,7 +4,7 @@ package me.sonam.security;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
-import org.assertj.core.api.AssertionsForClassTypes;
+
 import org.junit.Before;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -18,8 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.autoconfigure.ServerProperties;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -44,6 +45,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 /**
  * this is to test that when a request filter is not found then it will do nothing which should let the method pass
  */
+@AutoConfigureWebTestClient
 @ActiveProfiles("missing-requestfilter")
 @EnableAutoConfiguration
 @ExtendWith(SpringExtension.class)
