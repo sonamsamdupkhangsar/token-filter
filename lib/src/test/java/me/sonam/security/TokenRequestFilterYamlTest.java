@@ -49,7 +49,7 @@ public class TokenRequestFilterYamlTest {
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getAccessToken().getOption().name()).isEqualTo("forward");
 
         index++;
-        assertThat(tokenRequestFilter.getRequestveFilters().get(index).getIn()).isEqualTo("/api/health/passheader");
+        assertThat(tokenRequestFilter.getRequestFilters().get(index).getIn()).isEqualTo("/api/health/passheader");
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getOut()).isEqualTo("/api/health/jwtreceiver");
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().size()).isEqualTo(3);
         assertThat(tokenRequestFilter.getRequestFilters().get(index).getInHttpMethodSet().contains("get")).isTrue();
