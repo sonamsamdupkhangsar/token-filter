@@ -15,6 +15,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.*;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +30,9 @@ public class ReactiveRequestContextHolder {
     //the following is the endpoint for provision of accesstoken from https://{host}:{port}/oauth2/token
     @Value("${auth-server.root:}${auth-server.context-path:}${auth-server.oauth2token.path:}")
     private String oauth2TokenEndpoint;
+
+    @Value("${ISSUER_ADDRESS:${auth-server.root:}}")
+    private String issuerAddress;
 
     @Value("${auth-server.context-path:}${auth-server.oauth2token.path:}")
     private String accessTokenPath;
@@ -133,15 +137,8 @@ public class ReactiveRequestContextHolder {
 
         if (requestFilter.getAccessToken().getOption().name().equals(TokenRequestFilter.RequestFilter.AccessToken.JwtOption.request.name())) {
             LOG.debug("tokenFilter requests a client credential flow");
-
-            if (serverHttpRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION) != null &&
-                    !serverHttpRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION).isEmpty()) {
-
-                return getClientRequestWithHeader(request, serverHttpRequest, exchangeFunction);
-            }
-            else{
-                    return requestTokenAndCreateClientRequest(requestFilter, request, serverHttpRequest, exchangeFunction);
-            }
+            LOG.info("request option selected, requesting service access token instead of forwarding inbound bearer token");
+            return requestTokenAndCreateClientRequest(requestFilter, request, serverHttpRequest, exchangeFunction);
         }
         else if (requestFilter.getAccessToken().getOption().name()
                 .equals(TokenRequestFilter.RequestFilter.AccessToken.JwtOption.forward.name())) {
@@ -236,7 +233,10 @@ public class ReactiveRequestContextHolder {
 
         WebClient.ResponseSpec responseSpec = webClientBuilder.build().post().uri(oauthEndpointWithScope.toString())
                 .bodyValue(multiValueMap)
-                .headers(httpHeaders -> httpHeaders.setBasicAuth(accessToken.getBase64EncodedClientIdSecret()))
+                .headers(httpHeaders -> {
+                    httpHeaders.setBasicAuth(accessToken.getBase64EncodedClientIdSecret());
+                    setStableIssuerHostHeaders(httpHeaders);
+                })
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve();
         return responseSpec.bodyToMono(new ParameterizedTypeReference<Map<String, String>>() {
@@ -260,6 +260,41 @@ public class ReactiveRequestContextHolder {
             }
             return Mono.error(new SecurityException(errorMessage));
         });
+    }
+
+    private void setStableIssuerHostHeaders(HttpHeaders httpHeaders) {
+        if (issuerAddress == null || issuerAddress.isBlank()) {
+            return;
+        }
+
+        final URI uri;
+        try {
+            uri = URI.create(issuerAddress);
+        }
+        catch (IllegalArgumentException illegalArgumentException) {
+            LOG.warn("issuerAddress '{}' is not a valid URI, stable token host headers not set", issuerAddress);
+            return;
+        }
+
+        final String host = uri.getHost();
+        if (host == null || host.isBlank()) {
+            LOG.warn("issuerAddress '{}' does not contain a host, stable token host headers not set", issuerAddress);
+            return;
+        }
+
+        final int port = uri.getPort();
+        final String hostHeader = port > 0 ? host + ":" + port : host;
+        httpHeaders.set(HttpHeaders.HOST, hostHeader);
+        httpHeaders.set("X-Forwarded-Host", hostHeader);
+
+        if (uri.getScheme() != null && !uri.getScheme().isBlank()) {
+            httpHeaders.set("X-Forwarded-Proto", uri.getScheme());
+        }
+        if (port > 0) {
+            httpHeaders.set("X-Forwarded-Port", Integer.toString(port));
+        }
+
+        LOG.info("set stable token request host headers host={} scheme={} port={}", host, uri.getScheme(), port);
     }
 
 }

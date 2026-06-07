@@ -4,6 +4,7 @@ package me.sonam.security;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
+import me.sonam.security.util.TokenRequestFilter;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.Before;
 import org.junit.jupiter.api.AfterAll;
@@ -63,6 +64,9 @@ public class JwtHeaderPassIntegTest {
     @Autowired
     ApplicationContext context;
 
+    @Autowired
+    private TokenRequestFilter tokenRequestFilter;
+
     @org.junit.jupiter.api.BeforeEach
     public void setup() {
         this.client = WebTestClient
@@ -72,6 +76,8 @@ public class JwtHeaderPassIntegTest {
                 .configureClient()
                 //   .filter(basicAuthentication("user", "password"))
                 .build();
+        tokenRequestFilter.getRequestFilters().forEach(requestFilter ->
+                requestFilter.getAccessToken().setAccessToken(null));
     }
 
     private static String jwtReceiverEndpoint = "http://localhost:{port}";///api/health/jwtreceiver";
@@ -216,11 +222,8 @@ public class JwtHeaderPassIntegTest {
         Jwt jwt = jwt(authenticationId);
         Mockito.when(this.jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(Mono.just(jwt));
 
-      /*  final String jwtString= "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzb25hbSIsImlzcyI6InNvbmFtLmNsb3VkIiwiYXVkIjoic29uYW0uY2xvdWQiLCJqdGkiOiJmMTY2NjM1OS05YTViLTQ3NzMtOWUyNy00OGU0OTFlNDYzNGIifQ.KGFBUjghvcmNGDH0eM17S9pWkoLwbvDaDBGAx2AyB41yZ_8-WewTriR08JdjLskw1dsRYpMh9idxQ4BS6xmOCQ";
-
-        final String jwtTokenMsg = " {\"token\":\""+jwtString+"\"}";
         mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json")
-                .setResponseCode(200).setBody(jwtTokenMsg));*/
+                .setResponseCode(200).setBody(jwtTokenMsg));
 
         final String jwtReceiver = " {\"message\":\"jwt received endpoint\"}";
         mockWebServer.enqueue(new MockResponse().setHeader("Content-Type", "application/json").setResponseCode(200).setBody(jwtReceiver));//"Account created successfully.  Check email for activating account"));
@@ -231,12 +234,12 @@ public class JwtHeaderPassIntegTest {
                 .exchange().expectStatus().isOk();
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
-        /*LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
+        LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
         AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/issuer/oauth2/token");
         AssertionsForClassTypes.assertThat(recordedRequest.getMethod()).isEqualTo("POST");
 
         recordedRequest = mockWebServer.takeRequest();
-        */LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
+        LOG.info("should be acesstoken path for recordedRequest: {}", recordedRequest.getPath());
         AssertionsForClassTypes.assertThat(recordedRequest.getPath()).startsWith("/api/health/jwtreceiver");
         AssertionsForClassTypes.assertThat(recordedRequest.getMethod()).isEqualTo("GET");
     }
