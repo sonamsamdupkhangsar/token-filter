@@ -154,3 +154,23 @@ To publish this library to local maven repo:
 1.0.2-SNAPSHOT
 
 This library has been updated to use HTTP POST for calling Spring Authorization Server for requesting token using Client Credential Grant.
+# Trusted JWT issuers
+
+Resource servers can restrict lazy JWT decoder creation to an explicit list of
+issuer URLs:
+
+```yaml
+openissuer:
+  trusted-issuers: https://tenant-one.openissuer.com/issuer,https://tenant-two.openissuer.com/issuer
+```
+
+Spring Boot also accepts the comma-separated environment variable form:
+
+```text
+OPENISSUER_TRUSTED_ISSUERS=https://tenant-one.openissuer.com/issuer,https://tenant-two.openissuer.com/issuer
+```
+
+When `openissuer.trusted-issuers` is non-empty, issuer matching is exact and the
+legacy hostname-suffix configuration is ignored. Deployments that have not migrated
+continue to use `openissuer.trusted-issuer-host-suffixes`, whose default is
+`openissuer.test,openissuer.com`.
