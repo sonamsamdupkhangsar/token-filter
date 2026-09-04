@@ -1,6 +1,6 @@
 package me.sonam.security.jwt;
 
-import org.springframework.security.oauth2.jwt.JwtException;
+import org.springframework.security.oauth2.jwt.BadJwtException;
 
 import java.net.URI;
 import java.util.Locale;
@@ -30,7 +30,7 @@ final class TrustedIssuerPolicy {
         URI issuerUri = validatedIssuerUri(issuer);
         if (!trustedIssuers.isEmpty()) {
             if (!trustedIssuers.contains(issuer)) {
-                throw new JwtException("untrusted issuer: " + issuer);
+                throw new BadJwtException("untrusted issuer: " + issuer);
             }
             return;
         }
@@ -40,7 +40,7 @@ final class TrustedIssuerPolicy {
                 .anyMatch(suffix -> host.equalsIgnoreCase(suffix)
                         || host.toLowerCase(Locale.ROOT).endsWith("." + suffix));
         if (!trusted) {
-            throw new JwtException("untrusted issuer host: " + host);
+            throw new BadJwtException("untrusted issuer host: " + host);
         }
     }
 
@@ -51,12 +51,12 @@ final class TrustedIssuerPolicy {
                     || !("https".equalsIgnoreCase(uri.getScheme())
                     || "http".equalsIgnoreCase(uri.getScheme()))
                     || uri.getQuery() != null || uri.getFragment() != null) {
-                throw new JwtException("invalid issuer URI: " + issuer);
+                throw new BadJwtException("invalid issuer URI: " + issuer);
             }
             return uri;
         }
         catch (IllegalArgumentException exception) {
-            throw new JwtException("invalid issuer URI: " + issuer, exception);
+            throw new BadJwtException("invalid issuer URI: " + issuer, exception);
         }
     }
 }

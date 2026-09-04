@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.BadJwtException;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
@@ -60,12 +61,12 @@ public class MultiIssuerJwtDecoderConfig {
             try {
                 String issuer = JWTParser.parse(token).getJWTClaimsSet().getIssuer();
                 if (issuer == null || issuer.isBlank()) {
-                    throw new JwtException("missing issuer claim");
+                    throw new BadJwtException("missing issuer claim");
                 }
                 return issuer;
             }
             catch (ParseException e) {
-                throw new JwtException("failed to parse jwt issuer", e);
+                throw new BadJwtException("failed to parse jwt issuer", e);
             }
         }
 

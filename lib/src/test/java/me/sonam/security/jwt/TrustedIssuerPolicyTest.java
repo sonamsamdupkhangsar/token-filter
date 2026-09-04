@@ -1,7 +1,7 @@
 package me.sonam.security.jwt;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.security.oauth2.jwt.JwtException;
+import org.springframework.security.oauth2.jwt.BadJwtException;
 
 import java.util.Set;
 
@@ -16,9 +16,9 @@ class TrustedIssuerPolicyTest {
                 Set.of("openissuer.com"));
 
         assertDoesNotThrow(() -> policy.assertTrusted("https://acme.openissuer.com/issuer"));
-        assertThrows(JwtException.class,
+        assertThrows(BadJwtException.class,
                 () -> policy.assertTrusted("https://other.openissuer.com/issuer"));
-        assertThrows(JwtException.class,
+        assertThrows(BadJwtException.class,
                 () -> policy.assertTrusted("https://acme.openissuer.com/other"));
     }
 
@@ -29,7 +29,7 @@ class TrustedIssuerPolicyTest {
                 Set.of("openissuer.com"));
 
         assertDoesNotThrow(() -> policy.assertTrusted("https://acme.openissuer.com/issuer"));
-        assertThrows(JwtException.class,
+        assertThrows(BadJwtException.class,
                 () -> policy.assertTrusted("https://openissuer.com.attacker.example/issuer"));
     }
 
@@ -37,14 +37,14 @@ class TrustedIssuerPolicyTest {
     void rejectsMalformedIssuerUris() {
         TrustedIssuerPolicy policy = new TrustedIssuerPolicy(Set.of(), Set.of("openissuer.com"));
 
-        assertThrows(JwtException.class, () -> policy.assertTrusted("not-a-uri"));
-        assertThrows(JwtException.class,
+        assertThrows(BadJwtException.class, () -> policy.assertTrusted("not-a-uri"));
+        assertThrows(BadJwtException.class,
                 () -> policy.assertTrusted("https://acme.openissuer.com/issuer?redirect=attacker"));
     }
 
     @Test
     void rejectsMalformedExplicitConfiguration() {
-        assertThrows(JwtException.class,
+        assertThrows(BadJwtException.class,
                 () -> new TrustedIssuerPolicy(Set.of("not-a-uri"), Set.of()));
     }
 }
